@@ -1,0 +1,25 @@
+project:
+  type: book
+
+book:
+  title: "The R Companion to STATS2"
+  logo: STAT2_logo_small.png
+  author: "Will Hopper"
+  date: "08/18/2020"
+  chapters:
+    - index.qmd
+    - part: "Unit A: Linear Regression"
+      chapters:
+        - "01_simple_linear_regression.qmd"
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+
+
