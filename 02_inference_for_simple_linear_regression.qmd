@@ -27,3 +27,72 @@ In the last column of this regression table are the *p*-values associated with e
 For example, the *p* value shown for the Mileage slope's t-statistic is `3.06e-09`. This notation means "move the decimal place to the left by 9 places to find the precise value". So `3.06e-09` in scientific notation translates to an actual p-value of 0.00000000306 - a very small number indeed! It's easy to misread the p-values given in scientific notation as very large numbers instead of very small numbers if you are quickly glancing over the table, so be sure to read them carefully!
 
 ## A Confidence Interval for the slope coefficient
+
+One piece of information about the slope coefficient the is noticeably *absent* from the regression table is the 95% confidence interval. Example 2.1 demonstrates how to find the bounds of the 95% confidence interval by applying the formula:
+
+$$
+\beta_1 \pm t^* \cdot SE_{\beta_1}
+$$
+
+where $t^*$ is the value of the 97.5^th^ percentile of the $t_{n-2}$ distribution. $\beta_1$ and $SE_{\beta_1}$ are easily found in the regression table, but finding the value of $t^*$ will require one more computation. We can find this "critical value" by using the `qt()` function:
+
+```{r crit_t}
+#| echo: false
+crit_t <- qt(p = .975, df=30-2)
+```
+
+```{r}
+<<crit_t>>
+crit_t
+```
+
+The `p` argument reflects the fact that we're interested in the 97.5^th^ percentile (expressed as the proportion .975, isntead of a percentage). And, we need to supply the appropriate degrees of freedom for this t-distribution, which in this case is 28 (30 cars gives us 30 degrees to freedom to begin with, minus two for the intercept and slope cofficients estimated while fitting the model).
+
+Now, we have the "ingredients" for our confidnece interval formula:
+
+```{r}
+beta_1 <- -0.1198
+<<crit_t>>
+SE_beta <- 0.0141
+
+lower <- beta_1 +- crit_t * SE_beta
+upper <- beta_1 + crit_t * SE_beta
+c("Lower" = lower, "Upper" = upper)
+```
+
+Luckily, we don't **have** to take the time and effort to implement this formula manually; there are several high-level ways to perform this computation more quickly (and with less rounding error!). The `confint()` function is one such method:
+
+```{r}
+<<price_mileage_model>>
+confint(price_mileage_model)
+```
+
+The default setting for the `confint()` function is to produce a 95% confidence interval, but you can customize the confidence level by providing a different proportion as the `level` argument:
+
+```{r}
+<<price_mileage_model>>
+confint(price_mileage_model, level = .99)
+```
+
+As useful as the `confint()` function is, it's often a bit awkward to have your regression table separated from the confidence interval for your coefficient. A useful function that can produce the regression table *including* the confidence interval boundaries is the `tidy` function from the [broom package](https://broom.tidymodels.org/index.html) [@broom_package]
+
+```{r}
+library(broom)
+
+<<price_mileage_model>>
+tidy(price_mileage_model, conf.int = TRUE, conf.level = .99)
+```
+
+This regression table has all the same information as the one produced by the `summary()`, just with slightly different names:
+
+| `broom::tidy()` regression table | `summary()` regression table |
+|----------------------------------|------------------------------|
+| `term`                           | row names                    |
+| `estimate`                       | `Estimate`                   |
+| `std.error`                      | `Std. Error`                 |
+| `statistic`                      | `t value`                    |
+| `p.value`                        | `Pr(>|t|)`                   |
+| `conf.low`                       | No corresponding column      |
+| `conf.high`                      | No corresponding column      |
+
+: Correspondence between columns in the `summary()` regression table and the `broom::tidy()` regression table
