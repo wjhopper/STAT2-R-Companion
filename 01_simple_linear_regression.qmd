@@ -169,3 +169,62 @@ ggplot(data = AccordPrice,
 regression model is the `method = lm` argument. Without the `method=lm` argument, `geom_smooth()` will not display a linear model.
 
 The `se = FALSE` argument is included to stop ggplot from drawing confidence interval bands around the regression line. And, the `formula = y~x` argument is included simply to prevent ggplot from printing an annoying message that says <span style="font-color="red><code>`geom_smooth()` using formula 'y ~ x'</code></span> when creating the plot.
+
+## Centering the Mileage Variable
+
+Example 1.4 demonstrates how centering a variable (i.e., shifting all the values left or right by a single chosen number) changes the interpretation of the intercept coefficient, but not the slope coefficient. In this example, the Mileage variable is shifted to the left by 50; in other words, 50 is subtracted from all the Mileage values *before* fitting the model.
+
+The easiest way to replicate this model is create a new variable in the `AccordPrices` data set which holds the centered Mileage values. To make this new column, we'll use the `mutate` function from the `dplyr` package [@dplyr_package]. If you aren't familiar with the `mutate()` function or the `dplyr` package, here are a few good resources to investigate:
+
+- Reading: [ModernDive Chapter 3: Data Wrangling](https://moderndive.com/3-wrangling.html)
+- Reading: [Cleaning and Wrangling Data](https://datasciencebook.ca/wrangling.html)
+- Watching: [Dplyr Essentials](https://www.youtube.com/watch?v=Gvhkp-Yw65U) on YouTube
+
+In this case, the 'mutation' we apply is quite simple: we just use the subtraction operator to subtract 50, and R automatically applies this subtraction to all 30 values in the Mileage column.
+
+```{r}
+#| message: false
+
+library(dplyr)
+
+AccordPrice <- AccordPrice |>
+  mutate(Mileage_c50 = Mileage - 50)
+AccordPrice
+```
+
+Note that we saved our centered mileage scores in a variable named `Mileage_c50`, to help us keep track of what these values mean: they are mileage values that have been centered by 50.
+
+From here, we just need to fit another linear model with `lm()`, using our new `Mileage_c50` variable as the explanatory variable in our model formula:
+
+```{r centered_mileage_model}
+centered_mileage_model <- lm(Price ~ Mileage_c50, data = AccordPrice)
+```
+
+The textbook only presents the fitted model equation (not the full regression table) in order to show the intercept and slope coefficients. If you ever need **just** the coefficient values, without the rest of the summaries in the regression table, you can use the `coef()` function on your model object to print them out:
+
+```{r}
+<<centered_mileage_model>>
+coef(centered_mileage_model)
+```
+
+## Displaying the fitted model equation
+
+If you are using a literate programming environment (like an RMarkdown or Quarto document), you might find yourself wanting to display the fitted model equation in your document, formatted like a "fancy" mathematical equation. You could always write the $\LaTeX$ markup you need yourself, but the `equatiomatic` package can automatically generate what you need, straight from the model object itself!
+
+To demonstrate, let's display a formatted equation representing the fitted regression model based on the centered mileage scores by using the `extract_eq()` function on the model object. The `extract_eq()` function returns the equation as markdown text, so you'll want to make sure the code chunk returns its results "asis", like the one below:
+
+````{verbatim}
+```{r extract_eq_demo}
+#| results: asis
+
+library(equatiomatic)
+<<centered_mileage_model>>
+extract_eq(centered_mileage_model, intercept = "beta")
+```
+````
+
+```{r}
+#| echo: false
+library(equatiomatic)
+extract_eq(centered_mileage_model, intercept = "beta")
+```
