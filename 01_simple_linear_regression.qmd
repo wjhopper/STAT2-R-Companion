@@ -6,7 +6,7 @@ Linear regression is introduced in Chapter 1 with the motivating question:
 
 > How much should you expect to pay for a used Honda Accord, if you know how many miles the car has already been driven?
 
-and introduces the `AccordPrice` data set, which contains information about the list price and mileage for a sample of 30 Honda Accords. The `AccordPrice` data set is included with the `Stat2Data` R package, so access the data for yourself, you'll need to install the package. If you don't already know how to install R packages, here are two good resources to walk you through the process:
+and introduces the `AccordPrice` data set, which contains information about the list price and mileage for a sample of 30 Honda Accords. The `AccordPrice` data set is included with the `Stat2Data` R package, so to access the data for yourself, you'll need to install the package. If you don't already know how to install R packages, here are two good resources to walk you through the process:
 
 - Reading: [ModernDive Chapter 1.3.1: Installing Packages](https://moderndive.com/1-getting-started.html#package-installation)
 - Watching: [How to Install Packages in R Studio](https://www.youtube.com/watch?v=-wTcDqJWSzA) on YouTube
@@ -168,4 +168,4 @@ ggplot(data = AccordPrice,
 `geom_smooth()` is a generic smoothing function: the key argument that tells it to fit and display a linear 
 regression model is the `method = lm` argument. Without the `method=lm` argument, `geom_smooth()` will not display a linear model.
 
-The `se = FALSE` is included to stop ggplot from drawing confidence interval bands around the regression line. And, the `formula = y~x` is included simply to prevent ggplot from printing an annoying message that says <span style="font-color="red><code>`geom_smooth()` using formula 'y ~ x'</code></span> when creating the plot.
+The `se = FALSE` argument is included to stop ggplot from drawing confidence interval bands around the regression line. And, the `formula = y~x` argument is included simply to prevent ggplot from printing an annoying message that says <span style="font-color="red><code>`geom_smooth()` using formula 'y ~ x'</code></span> when creating the plot.
