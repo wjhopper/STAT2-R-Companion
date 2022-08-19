@@ -1,0 +1,29 @@
+---
+title: "Inference for Simple Linear Regression"
+---
+
+Chapter 2 uses the same simple linear regression model from Chapter 1 (the mode that uses mileage to explain the price of a used Honda Accord) as example to explain the logic of inferences based on Null Hypothesis Significance Tests (NHST) and the resulting *p-values*.
+
+Luckily for us, we don't have to learn many new tricks to execute the same hypothesis tests reported in Chapter 2, because the content of these tests were already present in the summaries we learned how to create in the previous chapter! However, we'll reproduce those tables here, and point out where you can find the relevant statistics seen in Chapter 2 in the output seen from R.
+
+## A t-test for the slope coefficient
+
+Chapter 2.1 demonstrates that the t-statistic for the slope coefficient can be found by dividing the slope coefficient's value by it's estimated standard error. In this example, the t-statistic for the Mileage slope was shown to be -8.5. We can find the same standard error and t-statistic in the regression table produced by calling the `summary()` function on the fitted model object:
+
+```{r price_mileage_model}
+#| echo: false
+price_mileage_model <- lm(Price ~ Mileage, data = AccordPrice)
+```
+
+```{r}
+<<price_mileage_model>>
+summary(price_mileage_model)
+```
+
+Looking in the "Coefficients" section of the out, The standard error values for the intercept and slope are found in the column labeled `Std. Error`, and the t-statistic values are found in the adjacent column labeled `t value`.
+
+In the last column of this regression table are the *p*-values associated with each t-statistic. Since the p-values for the intercept and slope coefficient in this model very small numbers, R displays their value in scientific notation. You can tell R is using scientific notation by the presence of the lower case `e` in the value, followed by a negative integer.
+
+For example, the *p* value shown for the Mileage slope's t-statistic is `3.06e-09`. This notation means "move the decimal place to the left by 9 places to find the precise value". So `3.06e-09` in scientific notation translates to an actual p-value of 0.00000000306 - a very small number indeed! It's easy to misread the p-values given in scientific notation as very large numbers instead of very small numbers if you are quickly glancing over the table, so be sure to read them carefully!
+
+## A Confidence Interval for the slope coefficient
