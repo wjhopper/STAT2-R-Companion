@@ -19,8 +19,3 @@ format:
   html:
     theme: cosmo
     df-print: paged
-  pdf:
-    documentclass: scrreprt
-
-
-

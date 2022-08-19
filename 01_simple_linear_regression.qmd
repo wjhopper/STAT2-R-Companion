@@ -209,13 +209,26 @@ coef(centered_mileage_model)
 
 ## Displaying the fitted model equation
 
-If you are using a literate programming environment (like an RMarkdown or Quarto document), you might find yourself wanting to display the fitted model equation in your document, formatted like a "fancy" mathematical equation. You could always write the $\LaTeX$ markup you need yourself, but the [equatiomatic](https://datalorax.github.io/equatiomatic/) package [@equatiomatic_package] can automatically generate what you need, straight from the model object itself!
+If you are using a literate programming environment (like an RMarkdown or Quarto document), you might find yourself wanting to display the fitted model equation in your document, formatted like a "fancy" mathematical equation. You could always write the LaTeX markup you need yourself, but the [equatiomatic](https://datalorax.github.io/equatiomatic/) package [@equatiomatic_package] can automatically generate what you need, straight from the model object itself!
 
 To demonstrate, let's display a formatted equation representing the fitted regression model based on the centered mileage scores by using the `extract_eq()` function on the model object.
 
-```{r extract_eq_demo}
+```{r}
 library(equatiomatic)
-
 <<centered_mileage_model>>
 extract_eq(centered_mileage_model, use_coefs = TRUE)
 ```
+
+::: {.callout-warning}
+As the time of writing, there are problems with using the equatiomatic package to display equations when rendering Quarto documents to PDF. Thankfully, there is a workaround that is not too difficult, which involves saving the equation as a variable, and `cat()`-ing the equation yourself:
+
+````{verbatim}
+```{r}
+#| results: asis
+eq <- extract_eq(centered_mileage_model, use_coefs = TRUE)
+cat("$$", eq, "$$", sep = "\n")
+```
+````
+
+Just be sure to set the `results: asis` chunk option!
+:::
