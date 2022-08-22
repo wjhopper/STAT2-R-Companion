@@ -2,6 +2,12 @@
 title: "Inference for Simple Linear Regression"
 ---
 
+```{r load_data}
+#| include: false
+library(Stat2Data)
+data("AccordPrice")
+```
+
 Chapter 2 uses the same simple linear regression model from Chapter 1 (the mode that uses mileage to explain the price of a used Honda Accord) as example to explain the logic of inferences based on Null Hypothesis Significance Tests (NHST) and the resulting *p-values*.
 
 Luckily for us, we don't have to learn many new tricks to execute the same hypothesis tests reported in Chapter 2, because the content of these tests were already present in the summaries we learned how to create in the previous chapter! However, we'll reproduce those tables here, and point out where you can find the relevant statistics seen in Chapter 2 in the output seen from R.
@@ -16,6 +22,7 @@ price_mileage_model <- lm(Price ~ Mileage, data = AccordPrice)
 ```
 
 ```{r}
+<<load_data>>
 <<price_mileage_model>>
 summary(price_mileage_model)
 ```
