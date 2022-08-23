@@ -144,7 +144,7 @@ x[17] <- paste0('<span style="background-color: pink;">',
                 x[17],
                 '</span>'
                 )
-cat("<pre>", "<code>", x, "</code>", "</pre>", sep = "\n")
+cat("<pre>", "<code>", x[2:length(x)], "</code>", "</pre>", sep = "\n")
 ```
 
 ### The Correlation Coefficient

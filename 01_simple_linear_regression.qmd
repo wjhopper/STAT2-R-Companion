@@ -2,6 +2,7 @@
 title: "Simple Linear Regression"
 ---
 
+## The Simple Linear Regression Model 
 Linear regression is introduced in Chapter 1 with the motivating question:
 
 > How much should you expect to pay for a used Honda Accord, if you know how many miles the car has already been driven?
@@ -38,7 +39,7 @@ As a side note: not much information is given in the text about how this sample 
 
 in the R console. By reading the "Details" and "Source" sections, we can learn that these 30 Accords were listed for sale on Cars.com in Lakewood Ohio during February 2017. Whenever you want to to know more about one of the textbook's data sets, the help page for that data set is a good place to look first. Sometimes there's not much more information than given in the textbook, but every little bit helps!
 
-## Exploring the `AccordPrice` data set
+### Exploring the `AccordPrice` data set
 
 Figure 1.2 displays a scatter plot of the `Mileage` and `Price` variable, showing how those variables relate to one another. To re-produce this scatter plot, we'll use the `ggplot2` R package [@ggplot2package]. If you're not already familiar with the `ggplot2` package, here are a few good resources to help you get started:
 
@@ -98,7 +99,7 @@ ggplot(data = AccordPrice,
 In the rest of this book, we *won't* use the STAT2 theme for our visualizations, but provide it here for completeness.
 :::
 
-## Modeling the `Mileage` vs. `Price` relationsip
+### Modeling the `Mileage` vs. `Price` relationsip
 
 Example 1.3 shows a summary of a simple linear regression model fit to the `Mileage` and `Price` variable in the `AccordPrices` data set. This summary is actually a mix of two different summaries, a regression table and an Analysis of Variance (ANOVA) table. Reproducing this summary will be a 3 step process in R:
 
@@ -129,7 +130,7 @@ Also, take note that we've saved the results from fitting this linear model in a
 
 In order to report the regression table, we need to call the `summary()` function on the linear model object we just created:
 
-```{r}
+```{r model_summary}
 <<price_mileage_model>>
 summary(price_mileage_model)
 ```
@@ -153,7 +154,7 @@ anova_table <- capture.output(anova(price_mileage_model))
 cat(anova_table, sep="\n")
 ```
 
-## Adding the regression line to a scatterplot
+### Adding the regression line to a scatterplot
 
 Figure 1.3 shows the Price vs. Mileage scatter plot again, but this time with a line representing the regression model's predictions drawn on top of the raw data. Surprisingly, the easiest method for visualizing the predictions of a regression model **doesn't** involve the fitted model object. Instead, we will begin with the same ggplot code we used to draw the Mileage vs. Price scatter plot earlier, and add to it. The `geom_smooth()` function is used to draw the regression line on top of the raw data:
 
@@ -170,7 +171,7 @@ regression model is the `method = lm` argument. Without the `method=lm` argument
 
 The `se = FALSE` argument is included to stop ggplot from drawing confidence interval bands around the regression line. And, the `formula = y~x` argument is included simply to prevent ggplot from printing an annoying message that says <span style="font-color="red><code>`geom_smooth()` using formula 'y ~ x'</code></span> when creating the plot.
 
-## Centering the Mileage Variable
+### Centering the Mileage Variable {#sec-centering-the-mileage-variable}
 
 Example 1.4 demonstrates how centering a variable (i.e., shifting all the values left or right by a single chosen number) changes the interpretation of the intercept coefficient, but not the slope coefficient. In this example, the Mileage variable is shifted to the left by 50; in other words, 50 is subtracted from all the Mileage values *before* fitting the model.
 
@@ -207,7 +208,7 @@ The textbook only presents the fitted model equation (not the full regression ta
 coef(centered_mileage_model)
 ```
 
-## Displaying the fitted model equation
+### Displaying the fitted model equation
 
 If you are using a literate programming environment (like an RMarkdown or Quarto document), you might find yourself wanting to display the fitted model equation in your document, formatted like a "fancy" mathematical equation. You could always write the LaTeX markup you need yourself, but the [equatiomatic](https://datalorax.github.io/equatiomatic/) package [@equatiomatic_package] can automatically generate what you need, straight from the model object itself!
 
@@ -232,3 +233,181 @@ cat("$$", eq, "$$", sep = "\n")
 
 Just be sure to set the `results: asis` chunk option!
 :::
+
+## Conditions for a Simple Linear Model
+
+Section 1.2 introduces mostly conceptual information about neccesary and sufficient conditions for interference on a linear model, but does introduce the formula for estimating the standard error of the regression (also called the "Residual Standard Error"). You'll rarely need to use this formula "manually", since the value of this statistic is included in the output from the `summary()` function:
+
+```{r}
+#| eval: false
+<<model_summary>>
+```
+
+```{r}
+#| echo: false
+#| results: asis
+x <- capture.output(summary(price_mileage_model))
+x[16] <- paste0('<span style="background-color: pink;">',
+                x[16],
+                '</span>'
+                )
+
+cat("<pre>", "<code>", x[2:length(x)], "</code>", "</pre>", sep = "\n")
+```
+
+If you ever need to obtain this value *alone* (without the rest of the summary table), you can use the `sigma()` function on the fitted model object to extract it;
+
+```{r}
+sigma(price_mileage_model)
+```
+
+## Assessing Conditions
+
+Section 1.4 introduces two type of plots that crucial for assessing the validity of the assumptions underpinning theory-based inference on a regression model:
+
+1. The Fitted vs. Residuals Plot
+2. The Normal Quantile plot (which is a specific type of Quantile-Quantile plot)
+
+There are many ways of generating thse plots from a linear model in R, but perhaps the easiest, most full-featured (and prettiest!) method is to use the tools from the [performance](https://easystats.github.io/performance/) package [@performance_package].
+
+The `check_model()` function from the `performance` package can be used to create both fitted vs. residuals plots, and Normal Quantile plots. What's more, it can create different variations of fitted vs. residuals plots that are customized to help you check either the Linearity or the Homogeneity of Variance assumptions.
+
+::: {.callout-tip}
+You'll also want to install the `patchwork` and `see` packages at the same time you isntall the `performance` package, as these supplemental packages are very useful for constructing visualiations with the `performance` package.
+:::
+
+### Checking Linearity with a Fitted vs. Residuals plot
+
+To generate a variant of the Fitted vs. Residuals plot designed to help you assess the Linearity assumption, you'll include the `check="linearity"` argument to the `check_model()` function. The `panel=FALSE` argument instructs the `check_model()` function to devote the entire plot window to this plot (instead of leaving room for other plots checking other model assumptions).
+
+```{r}
+library(performance)
+library(see)
+
+<<price_mileage_model>>
+linearity_check <- check_model(price_mileage_model, check="linearity",
+                              panel=FALSE
+                              )
+plot(linearity_check, data=price_mileage_model)
+```
+
+One odd thing to note: you need to pass the fitted model object as the data arguemnt to the plot function, *not* the original data set.
+
+### Checking Homogeneity of Variance with a Fitted vs. Residuals plot
+
+The only thing that changes for producing a a Fitted vs. Residuals plot designed to check for homoskedasticity (a fancy word for "equal variance") is writing `check="homogeneity"` in the `check_model()` function:
+
+```{r}
+#| message: false
+variance_check <- check_model(price_mileage_model, check="homogeneity",
+                              panel=FALSE
+                              )
+plot(variance_check, data=price_mileage_model)
+```
+
+### Checking Normality with a Normal-Quantile plot
+
+```{r}
+normality_check <- check_model(price_mileage_model, check="qq",
+                              panel=FALSE
+                              )
+plot(normality_check, data=price_mileage_model)
+```
+
+## Transformations/Reexpressions
+
+Section 1.4 introduces a new data set and new model into the mix, to demonstrate how transformations of the outcome and/or explantory variable may be useful when the conditions for a simple linear regression model are not met.
+
+The `CountyHealth` data set measures the number of doctors and the number of hospitals from 53 Counties in the United States.
+
+```{r}
+data(CountyHealth)
+CountyHealth
+```
+
+Example 1.7 explores a simple linear model which casts the number doctors in the county as a function of how many hospitals are in the county. However, when we fit this model, we see that not all the conditions for inference seem reasonable
+
+```{r}
+doctor_model <- lm(MDs ~ Hospitals, data = CountyHealth)
+extract_eq(doctor_model, use_coefs = TRUE)
+```
+
+```{r}
+ggplot(CountyHealth, aes(x=Hospitals, y= MDs)) +
+  geom_point() +
+  geom_smooth(method=lm, se=FALSE, formula=y~x) +
+  scale_y_continuous(breaks=seq(0,8000,by=2000))
+```
+
+```{r}
+check_model(doctor_model, check=c("homogeneity", "qq"))
+```
+
+The residual errors around this model's predictions grow larger and more variable as the number of hospitals increases, and they don't follow a Normal distribution.
+But, modeling the **square root** of the number of doctor's alleviates these problems.
+
+There are several ways you can adjust to modeling the square root ofa variable. One method is to make a new variable in the data set that holds the transformed values, following the process we did in @sec-centering-the-mileage-variable (where we used the `mutate()` function to help center the Mileage variable).
+
+Another method is to apply the transformation *within the model formula itself*! We can apply the `sqrt()` function to the `MDs` variable at the same time fit the model:
+
+```{r}
+sqrt_doctor_model <- lm(sqrt(MDs) ~ Hospitals, data = CountyHealth)
+coef(sqrt_doctor_model)
+```
+
+One advantage of doing the transformation directly in the model formula  is that the `extract_eq()` function is able to detect the transformation, and include it in the equation!
+
+```{r}
+extract_eq(sqrt_doctor_model, use_coefs = TRUE)
+```
+
+The diagnostics plots based on the model using the $\sqrt{MDs}$ variable indicate that the Normality assumption is met, and the Equal Variance is much more tenable on the transformed scale:
+
+```{r}
+sqrt_doctor_model <- lm(sqrt(MDs) ~ Hospitals, data = CountyHealth)
+check_model(sqrt_doctor_model, check=c("homogeneity", "qq"))
+```
+
+### Visualizing Transformed Models
+
+Often times when an assumption is violated, we may decide to *fit* the model on a transformed scale, but visualize the model's predictions on the original scale (since the original scale is more interpretable than say, the square-root scale).
+
+The easiest way to do this when plotting with ggplot and geom_smooth() is to use a square root scale transformation, following by a coordinate transformation that squares the y-axis values (thus reversing the square root operation). What makes this work is that the scale transformation occurs first, so geom_smooth() fits and draws the model on the transformed (and linear!) scale, and coordinate transformation follows, so the model's predictions are *presented* on the "raw" scale.
+
+```{r}
+#| warning: false
+
+ggplot(CountyHealth, aes(x=Hospitals, y= MDs)) +
+  geom_point() +
+  geom_smooth(method=lm, se=FALSE, formula=y~x) +
+  scale_y_sqrt(breaks=seq(0,8000,by=2000), expand=c(0,10)) +
+  coord_trans(y = scales::trans_new("square", function(x) x^2, "sqrt"))
+```
+
+Another approach is to manually compute a grid of predictions for each x-axis position using the fitted model equation, then square and plot each predicted value. Though not demonstrated with transformations specifically, this type of approach is demonstrated in Chapter 2, when [plotting prediction intervals](02_inference_for_simple_linear_regression.html#intervals-for-predictions).
+
+### Log-Transformed Outcome Variables
+
+All the previous techniques for modeling and visualizing the square-root of an outcome variable applicable to modeling with variables that have been transformed with the logarithmic function as well: we just use the `log()` function instead of the `sqrt()` function!
+
+As an example, we can reproduce the fitted model, predictions and visualizations from Example 1.8, where the logarithm of the number of mammal species from 13 islands in Southeast Asia is modeled using the logarithm of the Area of the island as an explanatory variable. Since both variables have been transformed, this type of model is know as a "log-log model".
+
+```{r}
+data("SpeciesArea")
+SpeciesArea
+```
+
+```{r}
+log_species_model <- lm(log(Species) ~ log(Area), data = SpeciesArea)
+extract_eq(log_species_model, use_coefs = TRUE)
+```
+
+```{r}
+#| warning: false
+#| fig.cap: "Reproduces Figure 1.19(b), but uses axis labels on the raw instead of logarithmic scale"
+ggplot(SpeciesArea, aes(x = Area, y = Species)) +
+  geom_point() +
+  geom_smooth(method=lm, se=FALSE, formula=y~x) +
+  scale_x_continuous(trans = "log") +
+  scale_y_continuous(trans = "log")
+```
