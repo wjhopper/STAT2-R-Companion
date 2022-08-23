@@ -1,3 +1,10 @@
 # Preface {.unnumbered}
 
 This is a guide to conducting the analysis demonstrated in [Stat2: Modeling with Regression and ANOVA](https://www.macmillanlearning.com/college/us/product/STAT2/p/1319054072) [@Cannon2018stat2] using R, with a focus on using tools and techniques from the [Tidyverse](https://www.tidyverse.org/).
+
+This guide assumes some prior familiarity with R programming, so that it may focus on demonstrating the content from STAT2, rather than teaching R wholesale. Thankfully, there are many free resources introducing R programming and `tidyverse` packages the reader may take advantage of to gain this familiarity. Below are a few books which provide a mostly comprehensive introduction:
+
+- [Statistical Inference via Data Science: A ModernDive into R and the Tidyverse](https://moderndive.com/)
+- [Data Science: A First Introduction](https://datasciencebook.ca/)
+- [YaRrr! The Pirate’s Guide to R](https://bookdown.org/ndphillips/YaRrr/test-your-r-might-1.html) (focused more on 'base' R than the tidyverse, but still good.)
+- [Hands-On Programming with R](https://jjallaire.github.io/hopr/)
