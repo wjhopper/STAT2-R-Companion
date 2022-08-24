@@ -168,7 +168,7 @@ regression_plane(winPct_multiple_reg)
 
 Since the `regression_plane()` function builds it's visualizations with [plotly](https://plotly.com/r/) instead of `ggplot2`, you can interact with these plots (e.g., zoom, rotate, etc.) in RStudio or a web browser.
 
-### Assessing a Multiple Regression Model
+## Assessing a Multiple Regression Model
 
 Section 3.2 is more focused on inferential statistics in the context of multiple regression, but as we know, it's unwise to focus on inferential statistics without first examining the pre-conditions (the linearity, equal variance, and Normality assumptions).
 
@@ -286,6 +286,7 @@ cat("<pre>", "<code>", x[2:length(x)], "</code>", "</pre>", sep = "\n")
 The easiest way to compute confidence and prediction intervals around our model's predicted outcome is to hand our fitted model object off to the `predict()` function. For example:
 
 ```{r}
+#| R.options: !expr list(max.print=30)
 predict(winPct_multiple_reg, interval = "confidence")
 ```
 
@@ -313,3 +314,206 @@ predict(winPct_multiple_reg, newdata = points_grid,
 ```
 
 At the time of writing^[August 23, 2022], there is straightforward way to visualize the confidence interval or prediction interval around the model using the `regression_plane()` function from the `regplanely` package. So for the time being, your confidence intervals around the conditional means will have to live in a table, rather that in a visualization.
+
+## Comparing Two Regression Lines
+
+The inauspicious name of Section 3.3 hides an important development: using a categorical variable as an explanatory variable in a regression model! This section introduces the reader to models with one numeric and one categorical explanatory variable. As the author's point out, this development will allow us compare linear relationships across the groups determined by this categorical explanatory variable, and test whether aspects of the model (such as the slope, the intercept, or possibly both) differ reliably between groups.
+
+Example 3.9 uses the `ButterfliesBc` data set in order to introduce a **parallel slopes** regression model. This data set measures average wing length for male and female [Boloria chariclea](https://en.wikipedia.org/wiki/Boloria_chariclea) butterflies in Greenland, along with the average summer temperatures the butterflies were exposed to, for each year from 1996 through 2013.
+
+```{r}
+library(Stat2Data)
+data("ButterfliesBc")
+```
+
+```{r}
+#| echo: false
+ButterfliesBc
+```
+
+Figure 3.5 displays a scatter plot showing the relationship between the average wing length of the sampled butterflies, and the prior summer's average temperature, with the "points" in the plot color-coded by the sex of the butterfly. Instead of providing a legend to map these colors back to the sex of the butterfly, the authors use the letters "m" and "f" as the "points" in this scatter plot. While this is a bit *too* clever (a legend is optimal), it's worth recreating this figure because it teaches us a bit about ggplot:
+
+First, need a column in the data set that holds an "m" or an "f" in each row, depending on the sex of the butterfly
+
+```{r}
+ButterfliesBc <- ButterfliesBc |>
+  mutate(Sex2 = recode(Sex, Male = "m", Female = "f")
+         )
+```
+
+Then, we'll map this new `Sex2` variable to the `label` aesthetic of the plot, which will enable us to draw each observation on the plot using `geom_text()` (instead of `geom_point()`):
+
+```{r}
+ggplot(data = ButterfliesBc,
+       mapping = aes(x = Temp, y = Wing, color = Sex, label = Sex2)) +
+  geom_text() +
+  guides(label = "none", color = "none")
+```
+
+Figure 3.6 shows the same scatter plot, but with the predictions of the fitted parallel slopes model drawn on top of the observations. If you intuition is that we could easily create the same figure using the geom_smooth() function, your mind in this right place. However, mapping the `color` aesthetic to the `Sex` function means that within the internals of `ggplot()`, the data is grouped into separate sets (a male set and a female set), meaning `geom_smooth()` will fit a regression model to *each sex seprately*. Fitting the model separately for each sex removes the constraint that there is one slope coefficient for both groups (fitting two separate models means estimating two slopes, by definition).
+
+We could still reproduce Figure 3.6 by *manually* computing the predicted Wing lengths for a large number of closely-spaced temperature values (much like we did in Chapter 2, when [constructing the bounds of the 95% prediction interval](02_inference_for_simple_linear_regression.html#intervals-for-predictions)). But, there is also a slightly easier way: the `geom_parallel_slopes()` function from the [moderndive]() R package
+
+```{r}
+library(moderndive)
+
+ggplot(data = ButterfliesBc,
+       mapping = aes(x = Temp, y = Wing, color = Sex, label = Sex2)) +
+  geom_text() +
+  guides(label = "none", color = "none") +
+  geom_parallel_slopes(se = FALSE)
+```
+
+Note that `geom_parallel_slopes()` **does not** need a `method = lm` argument: a parallel slopes model is a linear model by definition, so need to specify that with additional arguments!
+
+We could always produce a more "traditional" version of this plot by dropping the `label` aesthetic, swapping `geom_point()` in place of `geom_text()`, and remove the `guides()` function (which suppressed ggplot's automatic legend drawing):
+
+```{r}
+library(moderndive)
+
+ggplot(data = ButterfliesBc,
+       mapping = aes(x = Temp, y = Wing, color = Sex)) +
+  geom_point() +
+  geom_parallel_slopes(se = FALSE)
+```
+
+### Fitting the parallel slopes model  {.unnumbered}
+
+Fitting the parallel slopes model visualized just above is in the same manner as fitting any other multiple regression model (e.g., The NFL win percentage model from Section 3.2): with the `lm()` function! To fit a regression model that allows the Wing vs. Temp regression line for male and female butteries to differ *only* by their intercept values, simply include `+ Sex` on the right-hand side of your model formula
+
+```{r}
+wing_by_sex_model <- lm(Wing ~ Temp + Sex, data = ButterfliesBc)
+summary(wing_by_sex_model)
+```
+
+The intercept, slope, and "intercept offset" coefficients in this regression table have identical values to those from the regression table shown beneath the "Assess" heading in Example 3.9 (whew!), but the term labels differ. In the STAT2 textbook, the change in the intercept is labeled `IMale`, while R does not use any notation to indicate the explanatory variable is an indicator, and labels the term `SexMale`. R will always use the naming convention `{NameOfVariable}{NameOfGroup}` when labeling coefficients that reflect a categorical effect.
+
+The fitted model equation extracted by the `extract_eq()` function also follows this notation, naming the explanatory variable $\operatorname{Sex}$, and indicating this term applies to the "Male" sex group specifically by including ${}_{Male}$ in the subscript.
+
+```{r}
+library(equatiomatic)
+extract_eq(wing_by_sex_model, use_coefs = TRUE)
+```
+
+If you wish to change this notation, you can always use the `extract_eq()` function in the R console, copy the raw $\LaTeX$ markup it produces, and edit it as you see fit. For example, the call to `extract_eq()` above produces the raw $\LaTeX$ markup: 
+
+```
+$$
+\operatorname{\widehat{Wing}} = 19.34 - 0.24(\operatorname{Temp}) - 0.93(\operatorname{Sex}_{\operatorname{Male}})
+$$
+```
+
+We could edit the `0.93\operatorname{Sex}_{\operatorname{Male}}` portion to be ` 0.93 \cdot 1_{\operatorname{Male}}(\operatorname{Sex})` instead, which produces the equation:
+
+$$
+\operatorname{\widehat{Wing}} = 19.34 - 0.24(\operatorname{Temp}) - 0.93 \cdot 1_{\operatorname{Male}}(\operatorname{Sex})
+$$
+
+which allows the reader to easily identify the final term as an indicator variable
+
+### Assessing the parallel slopes model  {.unnumbered}
+
+Luckily, checking the Linearity, Normality, and Equal Variance assumptions by creating Fitted vs. Residuals plots and Normal quantile plots proceeds in familiar fashion, with no deviation from how we've previous used the `performance` package. For example, we can reproduce Figure 3.7 using the  `check_model()` function (though the plots are displayed in a different order):
+
+```{r}
+library(performance)
+
+check_model(wing_by_sex_model, check = c("qq", "normality", "linearity", "homogeneity"))
+```
+
+### Removing the Parallel Slopes constraint
+
+Example 3.10 presents a situation where, unlike the Male and Female butterflies, the simplifying assumption that both groups of observations share the same slope would be misleading. The `Kids198` data set holds age (measured in months) and weight measurements of from a sample of 198 children:
+
+```{r}
+library(Stat2Data)
+data("Kids198")
+```
+
+```{r}
+#| echo: false
+Kids198
+```
+
+Both male and female children are measured in this sample (or, boys and girls I suppose), and Figure 3.10 shows that males tend to gain more weight for each month older they get compared to females. In other words: the slope of the Age vs. Weight regression line is steeper for males as compared to females. A first attempt at reproducing Figure 3.10 using ggplot does not go *quite* as planned:
+
+```{r}
+ggplot(data = Kids198,
+       mapping = aes(x = Age, y = Weight, color = Sex)
+       ) +
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE, formula = y~x)
+```
+
+In the previous example with male and female butterflies, mapping the `Sex` variable to the `color` aesthetic resulted in points that were color-coded by Sex, with one distinct color representing males and another distinct color for females. And, we obtained separate regression lines for male butterflies and female butterflies. But now, we we have males and females represented as two ends of a blue-ish color spectrum and only one regression line. What gives?
+
+The issue that in the previous butterflies example, the `Sex` column held the words `"Male"` and `"Female"`; R treats variables holding character data as inherently categorical. But in the `Kids198` data set, the `Sex` column holds 0's and 1's as "abbreviations" for male and female, respectively. R treats these 0's and 1's as *quantities* instead of categories, so we'll need to make some adjustments to obtain the plot we want.
+
+There are several ways to get the job done, but perhaps the most straightforward is to use the `recode()` and `mutate()` functions from the `dplyr` package to change each 0 in the `Sex` variable to the word `"Male`", and every 1 to the word `"Female"`:
+
+```{r}
+Kids198 <- Kids198 |>
+  mutate(Sex = recode(Sex, `0` = "Male", `1` = "Female"))
+select(Kids198, Weight, Age, Sex)
+```
+
+With the `Sex` variable re-coded to be words instead of numbers, the same `ggplot()` code produces the plot we're after:
+
+```{r kids198_interaction_plot}
+ggplot(data = Kids198,
+       mapping = aes(x = Age, y = Weight, color = Sex)
+       ) +
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE, formula = y~x)
+```
+
+Since we *do* want to estimate a separate slope of the regression line for males and females, we can return to using the familiar `geom_smooth()` function to draw the regression lines on top of the observations.
+
+We can also fit this model using `lm()`, but obtaining a model that allows the effect of age to vary across the sexes requires a small change to our model formula notation. Instead of combining the effects of our two explanatory variables, Age and Sex, with a `+` sign operator, we combine them using the `*` multiplication operator:
+
+```{r weight_age_model}
+weight_age_model <- lm(Weight ~ Age * Sex, data = Kids198)
+```
+
+The reason we swapped our `+` sign for a multiplication operator is revealed by looking at the fitted model equation:
+
+```{r}
+extract_eq(weight_age_model, use_coefs = FALSE)
+```
+
+Notice that in the final term of the equation, *the Age variable is multiplied by the Sex variable*[Remember of course, Age isn't multiplied by "Male" or "Female", age is multiplied by 1 or 0, because the Sex variable is wrapped in an indicator function when used in the model]! This multiplicative term is what allows for a different slope between the regression line for male and female children, and this is why R's model formula adopts the convention to use `*` when you to estimate a different slope for each group.
+
+Reading the regression table can be a bit tricky for these models, but a little "algorithmic thinking" helps. Take a look at the regression table for the regression table for the `Weight ~ Age * Sex` below (displaying just the term labels and coefficient estimates):
+
+```{r}
+#| echo: false
+#| layout-ncol: 2
+tidy(weight_age_model) |>
+  select(term, estimate)
+<<kids198_interaction_plot>>
+```
+
+If you look in the (small) figure to the right that visualizes the model, we can see that to fully describe both lines (i.e., both models) we need two intercepts, and two slopes (one for each line!). So, the question becomes: where can we find those pieces of information in the regression table?
+
+The `(Intercept)` term (-1.84) represents the y-axis intercept for the **baseline** group's regression line. In this case, the baseline group are the female children. By default, R will put the groups into alphanumeric order, and choose the first group in that list to serve as the baseline group. We can also determine "Female" is the baseline group because it's the only category from the Sex variable **not** mentioned in any of the term labels
+
+The coefficient for the `Age` variable (.627) represents the slope for the baseline group (female children). How are we supposed to know it's the baseline group's slope? In this model, each group gets it's own slope. In other words, the slope of the regression line depends on the group. So, to know what the slope is, you have to know the group. Since the term **doesn't** mention a group, you know it *must* apply to the baseline group.
+
+The final two coefficients are a bit different than the first two: these coefficients represent differences between the intercept and slope of the regression lines for the male and female groups
+
+The `SexMale` coefficient (-31.9) represents the difference in the intercept between the male and female regression lines. Since this coefficient is labeled with the `Male` category name, we know the intercept for the Male regression line is 31.9 pounds below the intercept for the female regression line. How do we know it is the difference in the intercept, and not the difference in the slope? In this model, the "slope" comes from the gradual change in weight that is produced by a gradual change in age. And, the Age variable is not mentioned any where in this term label: so, we know this term can't be interpreted as anything slope-related, because it doesn't involve the Age variable!
+
+Finally, the coefficient for the `Age:SexMale` term (0.281) represents the difference in the slope between the male and female regression lines. We can infer this because the term label mentions *both* explanatory variables: the presence of `SexMale` in the label tells us we are contrasting the male group with the baseline group (females), and the presence of `Age` in the label tells us we are measuring the effect of Age on our outcome (weight). The difference in the effect of Age on Weight between the male and female groups is exactly what we mean by "change in slope"!
+
+We began our reading of the regression table asking the question: where in the regression table can we find the two intercepts and the two slopes that we need to fully describe his model? We found the intercept and the slope for the baseline group (female children) in the rows labeled `(Intercept)` and `Age`. And, there was a bit of a plot twist for the intercept and slope for the male children's regression line; the regression table doesn't actually hold the intercept and slope for the male children's regression line, but instead tells you how the intercept and slope **differ** from the female children's regression line. 
+
+::: {.callout-warning}
+Based on this example, it might be tempting to conclude "the intercept and slope for the baseline group are in the first two rows, the difference in intercept is in row three, and the difference in slope is in row four". But, consider what happens when the order of the explanatory variables is reversed in the model formula:
+
+```{r}
+<<weight_age_model>>
+tidy(weight_age_model)
+```
+
+The values in the `estimate` column are the same, but their order has changed: Now, the slope for the females is in row three, and the difference in intercept is in row two. This means that the order of the coefficients depends on the order of the variables in the formula! So, always be sure to use the term labels, your knowledge of the variables types, and your knowledge of the category levels to guide your interpretations. Never rely on the order heuristic!
+:::
