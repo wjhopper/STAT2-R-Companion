@@ -168,7 +168,7 @@ regression_plane(winPct_multiple_reg)
 
 Since the `regression_plane()` function builds it's visualizations with [plotly](https://plotly.com/r/) instead of `ggplot2`, you can interact with these plots (e.g., zoom, rotate, etc.) in RStudio or a web browser.
 
-## Assessing a Multiple Regression Model
+### Assessing a Multiple Regression Model
 
 Section 3.2 is more focused on inferential statistics in the context of multiple regression, but as we know, it's unwise to focus on inferential statistics without first examining the pre-conditions (the linearity, equal variance, and Normality assumptions).
 
@@ -227,7 +227,7 @@ tidy(winPct_multiple_reg, conf.int = TRUE)
 
 Notice that the bounds  for the coefficient of the `PointsFor` variable (shown in the `conf.low` and `conf.high` columns) match the bounds shown in Example 3.5
 
-## ANOVA for Multiple Regression
+### ANOVA for Multiple Regression
 
 The ANOVA tables shown in Chapter 3 display 3 rows:
 
