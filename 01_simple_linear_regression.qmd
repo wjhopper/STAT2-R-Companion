@@ -223,13 +223,12 @@ extract_eq(centered_mileage_model, use_coefs = TRUE)
 ::: {.callout-warning}
 As the time of writing, there are problems with using the equatiomatic package to display equations when rendering Quarto documents to PDF. Thankfully, there is a workaround that is not too difficult, which involves saving the equation as a variable, and `cat()`-ing the equation yourself:
 
-````{verbatim}
 ```{r}
 #| results: asis
+#| echo: fenced
 eq <- extract_eq(centered_mileage_model, use_coefs = TRUE)
 cat("$$", eq, "$$", sep = "\n")
 ```
-````
 
 Just be sure to set the `results: asis` chunk option!
 :::
