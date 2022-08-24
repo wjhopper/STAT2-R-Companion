@@ -1,0 +1,315 @@
+---
+title: "Multiple Regression"
+---
+
+The first multiple regression model introduced in Chapter 3 models the winning percentage of the 32 NFL teams during the 2016 regular season as a function of each teams total points scored on offense, and their total points allowed on defense.
+
+These `WinPct`(the outcome variable), `PointsFor`, and `PointsAgainst` (the two explanatory variables) are found in the `NFLStandings2016` data set, which comes with the `Stat2Data` R package:
+
+```{r load_NFL_data}
+library(Stat2Data)
+data("NFLStandings2016")
+```
+
+```{r}
+#| echo: false
+NFLStandings2016
+```
+
+Before introducing the regression model that uses all three variables, the authors explore bivariate relationships between different combinations these variables. To this end, the authors present a scatter plot matrix in Figure 3.1, which holds scatter plots based on each possible two-variable combination that could be made out of these three variables. 
+
+The easiest way to produce a scatter plot matrix for ourselves is to use the `ggpairs()` function from the [GGally](https://ggobi.github.io/ggally/) R package [@GGally_package]. By default, the ggpairs() function will build the scatter plot matrix using *all* the variables in the data set provided to it. Since we only wish to use three of the variables, we'll use the `select()` function from the `dplyr` package to create a new data set holding *just* the `WinPct`, `PointsFor`, and `PointsAgainst` variables, and base our plot on this smaller data set:
+
+```{r}
+#| message: false
+library(dplyr)
+library(GGally)
+
+NFL_minimal <- NFLStandings2016 |>
+  select(WinPct, PointsFor, PointsAgainst)
+
+ggpairs(NFL_minimal)
+```
+
+`ggpairs()` produces a scatter plot matrix with a few differences compared to the one in the book: it displays a density plot of each individual variable along the diagonal of the matrix (instead of the variable names), and prints the correlation coefficient in the upper triangle of the matrix (instead of the same scatter plots from the lower triangle with their axis transposed). The default `ggpairs()` scatter plot does display more information, but if you wish to exactly reproduce the Figure 3.1, you can customize what is displayed on the diagonal and upper triangle:
+
+```{r}
+ggpairs(NFL_minimal,
+        upper = list(continuous = "points"),
+        diag = list("continuous" = function(data, mapping, ...)
+                     { 
+                        ggally_text(rlang::as_label(mapping$x),
+                                    size=10, col="black"
+                                    )
+                      }
+                    )
+          )
+```
+
+Figure 3.2 focuses in on the top-middle and top-right panel of the scatter plot matrix, which show the win percentage vs. points scored relationship, and the win percentage vs. points allowed relationships, respectively. This figure places the two scatter plots side-by-side, adds a  visualization of the bivariate regression model to each panel, and annotates the plot with the value of the $R^2$ statistic.
+
+We learned in Chapter 1 how to [add a visualization of the bivariate regression model](01_simple_linear_regression.html#adding-the-regression-line-to-a-scatterplot) to a scatter plot, but we've yet to learn 1) how to place two separate scatter plots side-by-side, and 2) how to annotate the plot with text.
+
+Let's learn how to annotate the plot with the $R^2$ statistic first. Of course, before we annotate the plot with the $R^2$ statistic, we've got to compute the $R^2$ statistic! So, let's fit the two bivariate models, and extract the $R^2$ statistic from each one:
+
+```{r}
+winPct_pointsFor_model <- lm(WinPct ~ PointsFor, data=NFLStandings2016)
+winPct_pointsFor_R2 <- summary(winPct_pointsFor_model)$r.squared
+winPct_pointsFor_R2
+
+winPct_pointsAgainst_model <- lm(WinPct ~ PointsAgainst, data=NFLStandings2016)
+winPct_pointsAgainst_R2 <- summary(winPct_pointsAgainst_model)$r.squared
+winPct_pointsAgainst_R2
+```
+
+Next, we'll annotate the `WinPct` vs. `PointsFor` scatter plot with the $R^2$ statistic for that model, using the `annotate()` function from the `ggplot2()` package:
+
+```{r}
+ggplot(data=NFLStandings2016, aes(x=PointsFor, y=WinPct)) +
+  geom_point() +
+  geom_smooth(method = lm, se=FALSE, formula = y~x) +
+  annotate(geom="label", x = 475, y = .1,
+           label = paste0("R^2==", round(winPct_pointsFor_R2, 2)),
+           parse = TRUE, size=6
+           )
+```
+
+In order to prepare for juxtaposing *both* annotated scatter plots, we'll save this plot as a variable. Notice that when we do this, no plot is printed out!
+
+```{r}
+panel_A <- 
+  ggplot(data=NFLStandings2016, aes(x=PointsFor, y=WinPct)) +
+  geom_point() +
+  geom_smooth(method = lm, se=FALSE, formula = y~x) +
+  annotate(geom="label", x = 475, y = .1,
+           label = paste0("R^2==", round(winPct_pointsFor_R2, 2)),
+           parse = TRUE, size=6
+           )
+```
+
+Next, we repeat this same basic process with the `WinPct ~ PointsAgainst` model and scatter plot, changing the variable names and x/y position values where appropriate:
+
+```{r}
+panel_B <- 
+  ggplot(data=NFLStandings2016, aes(x=PointsAgainst, y=WinPct)) +
+  geom_point() +
+  geom_smooth(method = lm, se=FALSE, formula = y~x) +
+  annotate(geom="label", x = 425, y = .85,
+           label = paste0("R^2==", round(winPct_pointsAgainst_R2, 2)),
+           parse = TRUE, size=6
+           )
+```
+
+Finally, we'll take advantage of the `grid.arrange()` function from the `gridExtra` package to place the two plots side-by-side:
+
+```{r}
+#| message: false
+#| fig-width: 8
+library(gridExtra)
+
+grid.arrange(panel_A, panel_B, ncol = 2)
+```
+
+
+## Multiple Linear Regression Model
+
+Section 3.1, Example 3.2 introduces the book's first multiple regression model, using both the `PointsFor` and `PointsAgainst` variables to predict the `WinPct` value for each team. We can reproduce the regression table and model equation shown in this example using some familiar tools: the `lm()` function, the `extract_eq()` function, and the `summary()` function
+
+The only place where we'll notice a change in our code when we move from a "simple" linear model with one explanatory variable to a multiple regression with two explanatory variables is with our model formula inside the `lm()` function
+
+```{r winPct_multiple_reg}
+winPct_multiple_reg <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+```
+
+To add a second explanatory variable to the model, you literally add another explanatory variable to the model formula using the `+` sign, and that's all there is to it! Once the model is fit, you can work with it in R just like it was a "simple" linear regression model:
+
+```{r}
+summary(winPct_multiple_reg)
+
+library(equatiomatic)
+extract_eq(winPct_multiple_reg, use_coefs=TRUE, coef_digits = 4)
+```
+
+One thing we did have to do differently here was include the `coef_digits` argument fo the `extract_eq()` function. Because a single point has such a small effect on the win percentage for an entire season, the coefficients of this model as quite small values. Without setting the `coef_digits` argument` to a larger number, the equation would just show the coefficients rounded down to 0!
+
+### Visualizing a Multiple Regression Model
+
+One thing suspiciously **absent** from Section 3.1 is a visualization of the `WinPct ~ PointsFor + PointsAgainst`. Visualization of a model's predictions can be a great aid in understanding the model's structure, so why is such a figure absent?
+
+The answer likely lies in the fact that visualizing a multiple regression model with two numeric explanatory variables requires a 3D plot instead of a 2D plot. Indeed, we need a third dimension to measure our third numeric variable along! So, this visualization omission can be forgiven if we are willing to admit that 3D plots in a 2D book are well, a bit tricky.
+
+Even though 3 dimensions are more complex than 2, it's still not too hard to lean how to do in R. One of easier ways to construct 3D plots showing the predictions of a multiple with two numeric explanatory variables, along with the data the model was fit to, is with the `regplanely` package (the reason for the "plane" in the name will become clear soon!).
+
+Because the `regplanely` package is an "unofficial" R package (i.e., it's not included in the Comprehensive R Archive Network that you normally install packages from), we'll have to install it a different way. First, install the `devtools` package by running this command in your R console:
+
+
+```{r}
+#| eval: false
+
+install.packages("devtools")
+```
+
+Next, use the `install_github` function to install the `regplanely` package straight from the location of it's source code archive, [on github](https://github.com/wjhopper/regplanely).
+
+```{r}
+#| eval: false
+
+devtools::install_github("wjhopper/regplanely")
+```
+
+With the `regplanely` package installed, we can finally put it to use! The `regression_plane()` function takes a fitted regression model object, and uses it to draw the predictions of the regression model as a plane in 3D space.
+
+```{r}
+library(regplanely)
+
+<<winPct_multiple_reg>>
+regression_plane(winPct_multiple_reg)
+```
+
+Since the `regression_plane()` function builds it's visualizations with [plotly](https://plotly.com/r/) instead of `ggplot2`, you can interact with these plots (e.g., zoom, rotate, etc.) in RStudio or a web browser.
+
+## Assessing a Multiple Regression Model
+
+Section 3.2 is more focused on inferential statistics in the context of multiple regression, but as we know, it's unwise to focus on inferential statistics without first examining the pre-conditions (the linearity, equal variance, and Normality assumptions).
+
+Fortunately, it's just as easy to examine these assumptions for a multiple regression model with several numeric explanatory variables as it is for a 'simple' linear regression model. We can use the exact same tools from the `performance()` package we used back in Chapter 1.
+
+In example with the [Honda Accord prices](01_simple_linear_regression.html#conditions-for-a-simple-linear-model), we examined the linearity, equal variance, and Normality assumption with three separate plots (two Fitted vs. Residuals plots, and one Normal Quantile plot). Since we're more familiar with each individual plot, now, let's save a bit of time and ask the `performance()` package to display them all each of them within a single visualization:
+
+```{r}
+library(performance)
+
+<<winPct_multiple_reg>>
+check_model(winPct_multiple_reg,
+            check = c("linearity", "homogeneity", "qq", "normality")
+            )
+```
+
+The plots in the bottom row (the Normal quantile plot, and the Normal density plot) are two ways of assessing the same thing (the assumption that the residuals are Normally distributed). But, the Normal density plot complements the Normal quantile plot for a reader who might not be comfortable with a QQ plot (and who wants to leave 1/4 of their plot blank?).
+
+### t-Tests for Coefficients 
+
+The t-tests (and the associated p-values) for each coefficient are in the 
+
+```{r}
+#| eval: false
+
+<<winPct_multiple_reg>>
+summary(winPct_multiple_reg)
+```
+
+```{r}
+#| echo: false
+#| results: asis
+x <- capture.output(summary(winPct_multiple_reg))
+t_column_starts <- regexpr("t value[ ]+Pr\\(>\\|t\\|\\)[ ]+$", x[10])
+t_column_ends <- t_column_starts + attr(t_column_starts, "match.length")
+replacement_content <- paste0('<span style="background-color: pink;">',
+                              substr(x[10:13], t_column_starts, t_column_ends),
+                              '</span>'
+                              )
+x[10:13] <- paste0(substr(x[10:13], 1, t_column_starts-1),
+                   replacement_content,
+                   substr(x[10:13], t_column_ends, nchar(x[10:13]))
+                   )
+cat('<pre style="line-height: 1.2;">', "<code>", x[-1], "</code>", "</pre>", sep="\n")
+```
+
+### Confidence Intervals for Coefficients 
+
+Confidence intervals around the coefficients of a multiple linear regression model have the same mathematical form as for confidence intervals around the coefficients of a "simple" linear regression model. And, we can still use the `tidy()` function from the `broom` package to obtain a regression table supplemented with confidence intervals for each coefficient:
+
+```{r}
+library(broom)
+
+tidy(winPct_multiple_reg, conf.int = TRUE)
+```
+
+Notice that the bounds  for the coefficient of the `PointsFor` variable (shown in the `conf.low` and `conf.high` columns) match the bounds shown in Example 3.5
+
+## ANOVA for Multiple Regression
+
+The ANOVA tables shown in Chapter 3 display 3 rows:
+
+1. The degrees of freedom, sum of squares, mean square and F-statistic for the "Model" or "Regression" source of variance
+2. The degrees of freedom, sum of squares, and mean square for the "Error" source of variance
+3. The total degrees of freedom, sum of squares, and mean square for both the outcome variable
+
+However, R's `anova()` function produces a slightly different ANOVA table, as shown below:
+
+```{r}
+<<winPct_multiple_reg>>
+anova(winPct_multiple_reg)
+```
+
+The most important different is that R does not report a single row for the "Model" source of variance; instead, R reports the degrees of freedom, sum of squares, mean square and F-statistic **for each explanatory variable in the model**.
+
+Each row in the table before the "Residuals" row summarizes the variance in the outcome explained by each explanatory variable, *after each previously summarized explanatory variable is taken into account*. For example, the 0.55884 value for the sums of squares associated with the `PointsAgainst` variable represents the additional variability in team win percentage *after* the `PointsFor` variable is taken into account.
+
+Notice that the "Regression" row in the ANOVA table shown in Example 3.6 can be recovered by summing the `PointsFor` and `PointsAgainst` rows of R's ANOVA table:
+
+```{r}
+anova(winPct_multiple_reg) |>
+  as_tibble() |>
+  slice(1:2) |> # keeps just the first two rows of the table 
+  summarize(Df = sum(Df),
+            `Sum Sq` = sum(`Sum Sq`),
+            ) |>
+  mutate(`Mean Sq` = `Sum Sq`/Df)
+```
+
+### Coefficient of Multiple Determination 
+
+The *adjusted* $R^2$ statistic is introduced in Section 3.2. The adjusted $R^2$ statistic is a penalized version of the "plain" $R^2$ statistic, with the penalty growing with the number explanatory variables in the model.
+
+There's no need for you to implement the rather tricky computation for the adjusted $R^2$ statistic: just like its "plain" counterpart, the adjusted $R^2$ statistic can be found in the output from the `summary()` function, beneath the table of regression coefficients:
+
+```{r}
+#| eval: false
+
+summary(winPct_multiple_reg)
+```
+
+```{r}
+#| echo: false
+#| results: asis
+x <- capture.output(summary(winPct_multiple_reg))
+x[18] <- paste0('<span style="background-color: pink;">',
+                x[18],
+                '</span>'
+                )
+cat("<pre>", "<code>", x[2:length(x)], "</code>", "</pre>", sep = "\n")
+```
+
+### Confidence and Prediction Intervals 
+
+The easiest way to compute confidence and prediction intervals around our model's predicted outcome is to hand our fitted model object off to the `predict()` function. For example:
+
+```{r}
+predict(winPct_multiple_reg, interval = "confidence")
+```
+
+returns the conditional mean win percentage, upper confidence interval bound on the mean win percentage, and lower confidence interval bound on the mean win percentage for each observation in the `NFLStandings2016` data set.
+
+And we can still generate the confidence interval boundaries on the mean win percentage for arbitrary values of our explanatory variables by supplying a new data frame of "observed" values to the `precict()` function. But, constructing this new data frame of values can be a bit more involved when dealing with a multiple regression model: now, we need to create a data frame with multiple columns in it, because our model uses **combination** of explanatory variables to generate it's predictions.
+
+One function that is quite useful in this context is the `expand.grid()` function^[Tidyverse aficionados will prefer the `expand_grid()` function from the `tidyr` package, which performs the same task, but never converts strings to factors, does not add any additional attributes, can expand any generalized vector, including data frames and lists.]. You supply the `expand.grid()` function one or more vector of values, and it constructs a data frame whose rows hold all possible combinations of the values from that variable. This is quite useful for generating a grid of values at which to evaluate the predictions of your multiple regression model!
+
+For example, consider the example below, which constructs a data frame whose 9 rows hold all 9 possible combinations of 200, 300, and 400 points allowed, and 200, 300, and 400 points scored:
+
+```{r}
+points_grid <- expand.grid(PointsFor = c(200, 300, 400),
+                           PointsAgainst = c(200, 300, 400)
+                           )
+points_grid
+```
+
+We can pass this grid of combinations to the `predict()` function to find the 99% prediction interval at each location:
+
+```{r}
+predict(winPct_multiple_reg, newdata = points_grid,
+        interval = "prediction", level = .99
+        )
+```
+
+At the time of writing^[August 23, 2022], there is straightforward way to visualize the confidence interval or prediction interval around the model using the `regression_plane()` function from the `regplanely` package. So for the time being, your confidence intervals around the conditional means will have to live in a table, rather that in a visualization.
