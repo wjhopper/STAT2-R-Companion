@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>The R Companion to STATS2 - 2&nbsp; Inference for Simple Linear Regression</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03_multiple_regression.html" rel="next">
+<link href="./01_simple_linear_regression.html" rel="prev">
+<link href="./favicon.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Inference for Simple Linear Regression</span></h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./" class="sidebar-logo-link">
+      <img src="./STAT2_logo_small.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">The R Companion to STATS2</a> 
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Preface</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Unit A: Linear Regression</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_simple_linear_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Simple Linear Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_inference_for_simple_linear_regression.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Inference for Simple Linear Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_multiple_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Multiple Regression</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#inference-for-regression-slope" id="toc-inference-for-regression-slope" class="nav-link active" data-scroll-target="#inference-for-regression-slope"> <span class="header-section-number">2.1</span> Inference for Regression Slope</a>
+  <ul class="collapse">
+  <li><a href="#a-t-test-for-the-slope-coefficient" id="toc-a-t-test-for-the-slope-coefficient" class="nav-link" data-scroll-target="#a-t-test-for-the-slope-coefficient"> <span class="header-section-number">2.1.1</span> A t-test for the slope coefficient</a></li>
+  <li><a href="#a-confidence-interval-for-the-slope-coefficient" id="toc-a-confidence-interval-for-the-slope-coefficient" class="nav-link" data-scroll-target="#a-confidence-interval-for-the-slope-coefficient"> <span class="header-section-number">2.1.2</span> A Confidence Interval for the slope coefficient</a></li>
+  </ul></li>
+  <li><a href="#partitioning-variability---anova" id="toc-partitioning-variability---anova" class="nav-link" data-scroll-target="#partitioning-variability---anova"> <span class="header-section-number">2.2</span> Partitioning Variability - ANOVA</a></li>
+  <li><a href="#regression-and-correlation" id="toc-regression-and-correlation" class="nav-link" data-scroll-target="#regression-and-correlation"> <span class="header-section-number">2.3</span> Regression and Correlation</a>
+  <ul class="collapse">
+  <li><a href="#the-coefficient-of-determination-r2" id="toc-the-coefficient-of-determination-r2" class="nav-link" data-scroll-target="#the-coefficient-of-determination-r2"> <span class="header-section-number">2.3.1</span> The Coefficient of Determination <span class="math inline">\(R^2\)</span></a></li>
+  <li><a href="#the-correlation-coefficient" id="toc-the-correlation-coefficient" class="nav-link" data-scroll-target="#the-correlation-coefficient"> <span class="header-section-number">2.3.2</span> The Correlation Coefficient</a></li>
+  </ul></li>
+  <li><a href="#intervals-for-predictions" id="toc-intervals-for-predictions" class="nav-link" data-scroll-target="#intervals-for-predictions"> <span class="header-section-number">2.4</span> Intervals for Predictions</a>
+  <ul class="collapse">
+  <li><a href="#visualizing-intervals-around-a-regression-model" id="toc-visualizing-intervals-around-a-regression-model" class="nav-link" data-scroll-target="#visualizing-intervals-around-a-regression-model"> <span class="header-section-number">2.4.1</span> Visualizing Intervals Around a Regression Model</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Inference for Simple Linear Regression</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<p>Chapter 2 uses the same simple linear regression model from Chapter 1 (the mode that uses mileage to explain the price of a used Honda Accord) as example to explain the logic of inferences based on Null Hypothesis Significance Tests (NHST) and the resulting <em>p-values</em>.</p>
+<p>Luckily for us, we don’t have to learn many new tricks to execute the same hypothesis tests reported in Chapter 2, because the content of these tests were already present in the summaries we learned how to create in the previous chapter! However, we’ll reproduce those tables here, and point out where you can find the relevant statistics seen in Chapter 2 in the output seen from R.</p>
+<section id="inference-for-regression-slope" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="inference-for-regression-slope"><span class="header-section-number">2.1</span> Inference for Regression Slope</h2>
+<section id="a-t-test-for-the-slope-coefficient" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="a-t-test-for-the-slope-coefficient"><span class="header-section-number">2.1.1</span> A t-test for the slope coefficient</h3>
+<p>Chapter 2.1 demonstrates that the t-statistic for the slope coefficient can be found by dividing the slope coefficient’s value by it’s estimated standard error. In this example, the t-statistic for the Mileage slope was shown to be -8.5. We can find the same standard error and t-statistic in the regression table produced by calling the <code>summary()</code> function on the fitted model object:</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"AccordPrice"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Price ~ Mileage, data = AccordPrice)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-6.5984 -1.8169 -0.4148  1.4502  6.5655 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  20.8096     0.9529   21.84  &lt; 2e-16 ***
+Mileage      -0.1198     0.0141   -8.50 3.06e-09 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 3.085 on 28 degrees of freedom
+Multiple R-squared:  0.7207,    Adjusted R-squared:  0.7107 
+F-statistic: 72.25 on 1 and 28 DF,  p-value: 3.055e-09</code></pre>
+</div>
+</div>
+<p>Looking in the “Coefficients” section of the out, The standard error values for the intercept and slope are found in the column labeled <code>Std. Error</code>, and the t-statistic values are found in the adjacent column labeled <code>t value</code>.</p>
+<p>In the last column of this regression table are the <em>p</em>-values associated with each t-statistic. Since the p-values for the intercept and slope coefficient in this model very small numbers, R displays their value in scientific notation. You can tell R is using scientific notation by the presence of the lower case <code>e</code> in the value, followed by a negative integer.</p>
+<p>For example, the <em>p</em> value shown for the Mileage slope’s t-statistic is <code>3.06e-09</code>. This notation means “move the decimal place to the left by 9 places to find the precise value”. So <code>3.06e-09</code> in scientific notation translates to an actual p-value of 0.00000000306 - a very small number indeed! It’s easy to misread the p-values given in scientific notation as very large numbers instead of very small numbers if you are quickly glancing over the table, so be sure to read them carefully!</p>
+</section>
+<section id="a-confidence-interval-for-the-slope-coefficient" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="a-confidence-interval-for-the-slope-coefficient"><span class="header-section-number">2.1.2</span> A Confidence Interval for the slope coefficient</h3>
+<p>One piece of information about the slope coefficient the is noticeably <em>absent</em> from the regression table is the 95% confidence interval. Example 2.1 demonstrates how to find the bounds of the 95% confidence interval by applying the formula:</p>
+<p><span class="math display">\[
+\beta_1 \pm t^* \cdot SE_{\beta_1}
+\]</span></p>
+<p>where <span class="math inline">\(t^*\)</span> is the value of the 97.5<sup>th</sup> percentile of the <span class="math inline">\(t_{n-2}\)</span> distribution. <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(SE_{\beta_1}\)</span> are easily found in the regression table, but finding the value of <span class="math inline">\(t^*\)</span> will require one more computation. We can find this “critical value” by using the <code>qt()</code> function:</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>crit_t <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="at">p =</span> .<span class="dv">975</span>, <span class="at">df=</span><span class="dv">30-2</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>crit_t</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.048407</code></pre>
+</div>
+</div>
+<p>The <code>p</code> argument reflects the fact that we’re interested in the 97.5<sup>th</sup> percentile (expressed as the proportion .975, instead of a percentage). And, we need to supply the appropriate degrees of freedom for this t-distribution, which in this case is 28 (30 cars gives us 30 degrees to freedom to begin with, minus two for the intercept and slope coefficients estimated while fitting the model).</p>
+<p>Now, we have the “ingredients” for our confidence interval formula:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>beta_1 <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">0.1198</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>crit_t <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="at">p =</span> .<span class="dv">975</span>, <span class="at">df=</span><span class="dv">30-2</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>SE_beta <span class="ot">&lt;-</span> <span class="fl">0.0141</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>lower <span class="ot">&lt;-</span> beta_1 <span class="sc">+-</span> crit_t <span class="sc">*</span> SE_beta</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>upper <span class="ot">&lt;-</span> beta_1 <span class="sc">+</span> crit_t <span class="sc">*</span> SE_beta</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="st">"Lower"</span> <span class="ot">=</span> lower, <span class="st">"Upper"</span> <span class="ot">=</span> upper)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Lower       Upper 
+-0.14868254 -0.09091746 </code></pre>
+</div>
+</div>
+<p>Luckily, we don’t <strong>have</strong> to take the time and effort to implement this formula manually; there are several high-level ways to perform this computation more quickly (and with less rounding error!). The <code>confint()</code> function is one such method:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 2.5 %      97.5 %
+(Intercept) 18.8577657 22.76146004
+Mileage     -0.1486848 -0.09093915</code></pre>
+</div>
+</div>
+<p>The default setting for the <code>confint()</code> function is to produce a 95% confidence interval, but you can customize the confidence level by providing a different proportion as the <code>level</code> argument:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(price_mileage_model, <span class="at">level =</span> .<span class="dv">99</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 0.5 %      99.5 %
+(Intercept) 18.1766079 23.44261776
+Mileage     -0.1587608 -0.08086308</code></pre>
+</div>
+</div>
+<p>As useful as the <code>confint()</code> function is, it’s often a bit awkward to have your regression table separated from the confidence interval for your coefficient. A useful function that can produce the regression table <em>including</em> the confidence interval boundaries is the <code>tidy</code> function from the <a href="https://broom.tidymodels.org/index.html">broom package</a> <span class="citation" data-cites="broom_package">(<a href="references.html#ref-broom_package" role="doc-biblioref">Robinson, Hayes, and Couch 2022</a>)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(price_mileage_model, <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">conf.level =</span> .<span class="dv">99</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["conf.low"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["conf.high"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"20.8096129","3":"0.95286096","4":"21.839086","5":"3.988532e-19","6":"18.1766079","7":"23.44261776"},{"1":"Mileage","2":"-0.1198119","3":"0.01409525","4":"-8.500167","5":"3.055011e-09","6":"-0.1587608","7":"-0.08086308"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>This regression table has all the same information as the one produced by the <code>summary()</code>, just with slightly different names:</p>
+<table class="table">
+<caption>Correspondence between columns in the <code>summary()</code> regression table and the <code>broom::tidy()</code> regression table</caption>
+<thead>
+<tr class="header">
+<th><code>broom::tidy()</code> regression table</th>
+<th><code>summary()</code> regression table</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>term</code></td>
+<td>row names</td>
+</tr>
+<tr class="even">
+<td><code>estimate</code></td>
+<td><code>Estimate</code></td>
+</tr>
+<tr class="odd">
+<td><code>std.error</code></td>
+<td><code>Std. Error</code></td>
+</tr>
+<tr class="even">
+<td><code>statistic</code></td>
+<td><code>t value</code></td>
+</tr>
+<tr class="odd">
+<td><code>p.value</code></td>
+<td><code>Pr(&gt;|t|)</code></td>
+</tr>
+<tr class="even">
+<td><code>conf.low</code></td>
+<td>No corresponding column</td>
+</tr>
+<tr class="odd">
+<td><code>conf.high</code></td>
+<td>No corresponding column</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="partitioning-variability---anova" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="partitioning-variability---anova"><span class="header-section-number">2.2</span> Partitioning Variability - ANOVA</h2>
+<p>Although the ANOVA table isn’t <em>explained</em> until Chapter 2, we already saw how to produce it for ourselves back in <a href="01_simple_linear_regression.html#reporting-the-anova-table">Chapter 1</a> using R’s <code>anova()</code> function.</p>
+<p>However, there is one discrepancy between the output shown in the textbook, and R’s <code>anova()</code> function: R does not display an “SS Total” row in it’s ANOVA table. This is a minor loss, since the “SS Total” is of course, based on the sum of all the previous rows.</p>
+<p>However, if you <em>do</em> need that row for some particular reason, it is easily reproduced with a little help from <code>dplyr</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>original_table <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">anova</span>(price_mileage_model), <span class="at">rownames =</span> <span class="st">"Term"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>total_row <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Term =</span> <span class="st">"Total"</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">Df =</span> <span class="fu">sum</span>(original_table<span class="sc">$</span>Df),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                    <span class="st">`</span><span class="at">Sum Sq</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(original_table<span class="sc">$</span><span class="st">`</span><span class="at">Sum Sq</span><span class="st">`</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                    ) <span class="sc">%&gt;%</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Mean Sq</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Sum Sq</span><span class="st">`</span><span class="sc">/</span>Df)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>full_table <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(original_table, total_row)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>full_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Df"],"name":[2],"type":["int"],"align":["right"]},{"label":["Sum Sq"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Mean Sq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["F value"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"Mileage","2":"1","3":"687.6644","4":"687.664433","5":"72.25284","6":"3.055011e-09"},{"1":"Residuals","2":"28","3":"266.4892","4":"9.517473","5":"NA","6":"NA"},{"1":"Total","2":"29","3":"954.1537","4":"32.901851","5":"NA","6":"NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section>
+<section id="regression-and-correlation" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="regression-and-correlation"><span class="header-section-number">2.3</span> Regression and Correlation</h2>
+<section id="the-coefficient-of-determination-r2" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="the-coefficient-of-determination-r2"><span class="header-section-number">2.3.1</span> The Coefficient of Determination <span class="math inline">\(R^2\)</span></h3>
+<p>Once again, we don’t need to learn how to do any new computations to find the <span class="math inline">\(R^2\)</span> value of a linear model: it’s already shown in the output from R’s <code>summary()</code> command:</p>
+<pre><code>
+Call:
+lm(formula = Price ~ Mileage, data = AccordPrice)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-6.5984 -1.8169 -0.4148  1.4502  6.5655 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  20.8096     0.9529   21.84  &lt; 2e-16 ***
+Mileage      -0.1198     0.0141   -8.50 3.06e-09 ***
+
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 3.085 on 28 degrees of freedom
+<span style="background-color: pink;">Multiple R-squared:  0.7207,  Adjusted R-squared:  0.7107 </span>
+F-statistic: 72.25 on 1 and 28 DF,  p-value: 3.055e-09
+
+</code>
+</pre>
+</section>
+<section id="the-correlation-coefficient" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="the-correlation-coefficient"><span class="header-section-number">2.3.2</span> The Correlation Coefficient</h3>
+<p>The correlation coefficient between two variables can be computed using R’s <code>cor()</code> function, supplying <em>either</em> the outcome explanatory variable as the <code>x</code> argument, and the remaining argument as the <code>y</code> argument. Here, we use <code>cor()</code> as a summary function inside of dplyr’s <code>summarize()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>AccordPrice <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">r =</span> <span class="fu">cor</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["r"],"name":[1],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.8489441"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>To perform a t-test on the correlation coefficient, you can use the <code>cor.test()</code> function. The syntax for using the <code>cor.test()</code> closely resembles the syntax for the <code>lm()</code> function, using a formula and a data argument. However, since the correlation coefficient is symmetric (and neither variable is considered the ‘outcome’ or ‘explanatory’ variable), both variables go on the <strong>right</strong> hand side of the tilde, separated by a <code>+</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(<span class="at">formula =</span> <span class="sc">~</span> Mileage <span class="sc">+</span> Price, <span class="at">data=</span>AccordPrice)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's product-moment correlation
+
+data:  Mileage and Price
+t = -8.5002, df = 28, p-value = 3.055e-09
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.9259982 -0.7039888
+sample estimates:
+       cor 
+-0.8489441 </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="intervals-for-predictions" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="intervals-for-predictions"><span class="header-section-number">2.4</span> Intervals for Predictions</h2>
+<p>In Section 2.4, two intervals around the regression line are introduced:</p>
+<ul>
+<li>The confidence interval around the conditional mean of the outcome variable</li>
+<li>The “prediction interval” around the conditional value of the outcome variable.</li>
+</ul>
+<p>The formulas given for these intervals are similar to that for the confidence interval around the value of the slope coefficient, only with a more complex standard error estimator. Rather than implement these formulas ourselves, we’ll rely on R’s <code>predict()</code> function to get the job done.</p>
+<p>R’s <code>predict()</code> function relies on using a fitted model object to generate predictions about the outcome variable. For example, if you give the <code>predict()</code> function our fitted Accord price model, it will return the <em>predicted</em> price of each car in the original data set, based on the known Mileage value and the fitted regression equation that relates Mileage to Price.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        1         2         3         4         5         6         7         8 
+11.835698 14.459580 11.332488 14.807034 13.381272 20.234515 10.098425 18.317524 
+        9        10        11        12        13        14        15        16 
+20.234515 15.022696 15.238357 20.450177 13.129667 19.815174 17.562709 18.377430 
+       17        18        19        20        21        22        23        24 
+12.614476 10.397955 13.081742  2.777915 12.997874 14.088163  4.107827 19.144227 
+       25        26        27        28        29        30 
+18.581111 18.928565 16.196853 18.437336  6.516047  6.132649 </code></pre>
+</div>
+</div>
+<p>The <code>predict()</code> function isn’t limited to generating predictions for Mileage values in the original data set - we can generate prediction for any Mileage value we choose by including a new data frame of Mileage values as the <code>newdata</code> argument to the <code>predict()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>new_mileages <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Mileage =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>))</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(price_mileage_model, <span class="at">newdata =</span> new_mileages)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        1         2         3 
+18.413374 14.819015  8.828418 </code></pre>
+</div>
+</div>
+<p>And by changing the <code>interval</code> argument to either <code>"confidence"</code> or <code>"prediction"</code>, we can find the upper and lower boundaries of the 95% confidence interval or prediction interval respectively:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>new_mileages <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Mileage =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>))</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 95% confidence interval around conditional mean of y</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(price_mileage_model, <span class="at">newdata =</span> new_mileages, <span class="at">interval =</span> <span class="st">"confidence"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        fit       lwr      upr
+1 18.413374 16.888598 19.93815
+2 14.819015 13.657874 15.98016
+3  8.828418  7.080566 10.57627</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 95% Prediction interval around conditional value of y</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(price_mileage_model, <span class="at">newdata =</span> new_mileages, <span class="at">interval =</span> <span class="st">"prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        fit       lwr      upr
+1 18.413374 11.912606 24.91414
+2 14.819015  8.393807 21.24422
+3  8.828418  2.271739 15.38510</code></pre>
+</div>
+</div>
+<section id="visualizing-intervals-around-a-regression-model" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="visualizing-intervals-around-a-regression-model"><span class="header-section-number">2.4.1</span> Visualizing Intervals Around a Regression Model</h3>
+<p>In Chapter 1, we learned how to <a href="01_simple_linear_regression.html#adding-the-regression-line-to-a-scatterplot">visualize the predictions of a regression model</a> using <code>ggplot()</code> and the <code>geom_smooth()</code> function specifically. In that example, we included the argument <code>se = FALSE</code> to suppress the confidence interval band around the regression line, since this interval had not been introduced yet.</p>
+<p>This means that drawing the 95% confidence interval around your model’s predictions is as easy as removing <code>se = FALSE</code> from your code!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">formula =</span> y<span class="sc">~</span>x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="02_inference_for_simple_linear_regression_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Drawing the 95% <em>prediction</em> interval is a bit more involved, since <code>geom_smooth()</code> doesn’t include the ability to draw them auto-magically.</p>
+<p>To draw the boundaries of this interval as a smooth line across the entire range of the plot, we’ll first need to compute the upper and lower boundaries of the interval across a fine grid of x-axis values. Here, we’ll use the <code>seq()</code> function to create a sequence of Mileage values spaced out by .1 miles, starting at 0 and ending at 150:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>new_mileages <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Mileage =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">150</span>, <span class="at">by =</span> .<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, we’ll give these new Mileage values to the <code>predict()</code> function, and ask for boundaries of the 95% prediction interval around each of these <code>nrow(new_mileages)</code> Mileage values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>prediction_interval <span class="ot">&lt;-</span> <span class="fu">predict</span>(price_mileage_model,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">newdata =</span> new_mileages,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">interval =</span> <span class="st">"prediction"</span>, </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                               )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Since we need to eventually supply these values to <code>ggplot</code>, and <code>ggplot</code> only deals with data frames, we’ll need to coerce these values from a matrix into a data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>prediction_interval <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(prediction_interval)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Lastly, we need to combine these predictions about the outcome variable with the Mileage values we based on them on. Each row of the <code>new_mileage</code> data frame represents a Mileage value, and each row of the <code>predcition_interval</code> data frame represents the corresponding predicted Price. So, what we need to is combine these two data frames together “side by side”, so each row matches up! Let’s use the <code>bind_cols()</code> function from the <code>dplyr()</code> package to do this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>prediction_interval <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(new_mileages, prediction_interval)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we’re ready to plot! Here, we demonstrate two ways of adding this interval to the plot. First, we’ll draw the boundaries of this interval as two separate dashed lines:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
+<span id="cb33-2"><a href="#cb33-2"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price)</span>
+<span id="cb33-3"><a href="#cb33-3"></a>       ) <span class="sc">+</span></span>
+<span id="cb33-4"><a href="#cb33-4"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb33-5"><a href="#cb33-5"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">formula =</span> y<span class="sc">~</span>x) <span class="sc">+</span></span>
+<span id="cb33-6"><a href="#cb33-6"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> prediction_interval, </span>
+<span id="cb33-7"><a href="#cb33-7"></a>            <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y=</span>upr),</span>
+<span id="cb33-8"><a href="#cb33-8"></a>            <span class="at">color=</span><span class="st">"red"</span>, <span class="at">linetype=</span><span class="dv">2</span></span>
+<span id="cb33-9"><a href="#cb33-9"></a>            ) <span class="sc">+</span></span>
+<span id="cb33-10"><a href="#cb33-10"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> prediction_interval, </span>
+<span id="cb33-11"><a href="#cb33-11"></a>            <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y=</span>lwr),</span>
+<span id="cb33-12"><a href="#cb33-12"></a>            <span class="at">color=</span><span class="st">"red"</span>, <span class="at">linetype=</span><span class="dv">2</span></span>
+<span id="cb33-13"><a href="#cb33-13"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="02_inference_for_simple_linear_regression_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Note that we had to supply the <code>prediction_interval</code> data frame as a layer-specific data frame for the <code>geom_line</code> function.</p>
+<p>If you prefer the “filled in” style of interval (like how the confidence interval appears from <code>geom_smooth())</code>, you can use <code>geom_ribbon()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
+<span id="cb34-2"><a href="#cb34-2"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price)</span>
+<span id="cb34-3"><a href="#cb34-3"></a>       ) <span class="sc">+</span></span>
+<span id="cb34-4"><a href="#cb34-4"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb34-5"><a href="#cb34-5"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">formula =</span> y<span class="sc">~</span>x) <span class="sc">+</span></span>
+<span id="cb34-6"><a href="#cb34-6"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> prediction_interval, </span>
+<span id="cb34-7"><a href="#cb34-7"></a>              <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y=</span>fit, <span class="at">ymax=</span>upr, <span class="at">ymin=</span>lwr),</span>
+<span id="cb34-8"><a href="#cb34-8"></a>              <span class="at">color=</span><span class="st">"red"</span>, <span class="at">fill=</span><span class="st">"red"</span>,</span>
+<span id="cb34-9"><a href="#cb34-9"></a>              <span class="at">alpha=</span>.<span class="dv">05</span>, <span class="at">linetype=</span><span class="dv">2</span></span>
+<span id="cb34-10"><a href="#cb34-10"></a>              )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="02_inference_for_simple_linear_regression_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Take note of a few important things about this version of the prediction interval:</p>
+<ol type="1">
+<li>We drew it <em>before</em> drawing the confidence interval and the regression line, so the shading of the confidence interval would not be affected by the shading of the prediction interval.</li>
+<li>The names of the <code>y</code>, <code>ymax</code> and <code>ymin</code> aesthetic matched the names of the columns in the <code>prediction_interval</code> data set</li>
+<li>We set the <code>alpha</code> argument to a very small number, in order to make the interval transparent, and avoid obscuring the data points. We recommend that you use an alpha value between .02 and .1 for your plots.</li>
+</ol>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="ref-broom_package" class="csl-entry" role="doc-biblioentry">
+Robinson, David, Alex Hayes, and Simon Couch. 2022. <em>Broom: Convert Statistical Objects into Tidy Tibbles</em>. <a href="https://CRAN.R-project.org/package=broom">https://CRAN.R-project.org/package=broom</a>.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./01_simple_linear_regression.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Simple Linear Regression</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./03_multiple_regression.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Multiple Regression</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
