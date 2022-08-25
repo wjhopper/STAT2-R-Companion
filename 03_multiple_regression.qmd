@@ -377,7 +377,7 @@ ggplot(data = ButterfliesBc,
   geom_parallel_slopes(se = FALSE)
 ```
 
-### Fitting the parallel slopes model  {.unnumbered}
+### Fitting the parallel slopes model {.unnumbered}
 
 Fitting the parallel slopes model visualized just above is in the same manner as fitting any other multiple regression model (e.g., The NFL win percentage model from Section 3.2): with the `lm()` function! To fit a regression model that allows the Wing vs. Temp regression line for male and female butteries to differ *only* by their intercept values, simply include `+ Sex` on the right-hand side of your model formula
 

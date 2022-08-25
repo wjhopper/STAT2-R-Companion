@@ -14,6 +14,7 @@ book:
         - "01_simple_linear_regression.qmd"
         - "02_inference_for_simple_linear_regression.qmd"
         - "03_multiple_regression.qmd"
+        - "04_additional_topics_in_regression.qmd"
     - references.qmd
 
 bibliography: references.bib
