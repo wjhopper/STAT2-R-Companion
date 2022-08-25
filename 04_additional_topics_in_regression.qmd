@@ -169,6 +169,35 @@ visualise(null_correlation_dist) +
   shade_p_value(obs_stat = observed_correlation, direction = "both")
 ```
 
+### Randomization for inference in Multiple Regression
+
+This random permutation-based procedure can be extended to inference on the coefficients of a multiple regression model as well. All you need to do is:
+
+1. Adapt your formula argument in the `specify()` function to reflect the structure of your model
+2. Complete your pipeline with the `fit()` function, instead of the `calcuate()` function (which makes sense, since there isn't one single summary statistic for all the relationships encoded by a multiple regression model)
+
+For example, we could perform a permutation test on all four of the coefficients in the `GPA ~ VerbalSAT * MathSAT` model:
+
+```{r}
+#| cache: true
+null_models <- SATGPA |>
+  specify(GPA ~ VerbalSAT * MathSAT) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
+  fit()
+
+observed_model <- SATGPA |>
+  specify(GPA ~ VerbalSAT * MathSAT) |>
+  fit()
+
+get_p_value(null_models, obs_stat = observed_model,
+            direction = "both"
+            )
+
+visualise(null_models) +
+  shade_p_value(obs_stat = observed_model, direction = "both")
+```
+
 ### A note about controlling randomness
 We're used to our R code producing identical results every time we run it. For example, we don't expect the correlation to change the first and second times we calculate it:
 
