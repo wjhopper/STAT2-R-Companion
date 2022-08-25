@@ -418,7 +418,9 @@ Luckily, checking the Linearity, Normality, and Equal Variance assumptions by cr
 ```{r}
 library(performance)
 
-check_model(wing_by_sex_model, check = c("qq", "normality", "linearity", "homogeneity"))
+check_model(wing_by_sex_model,
+            check = c("qq", "normality", "linearity", "homogeneity")
+            )
 ```
 
 ### Removing the Parallel Slopes constraint
@@ -453,11 +455,11 @@ There are several ways to get the job done, but perhaps the most straightforward
 
 ```{r}
 Kids198 <- Kids198 |>
-  mutate(Sex = recode(Sex, `0` = "Male", `1` = "Female"))
+  mutate(Sex = factor(Sex, labels = c("Male", "Female")))
 select(Kids198, Weight, Age, Sex)
 ```
 
-With the `Sex` variable re-coded to be words instead of numbers, the same `ggplot()` code produces the plot we're after:
+With the `Sex` variable re-coded to clearly represent categories  instead of numbers, the same `ggplot()` code produces the plot we're after:
 
 ```{r kids198_interaction_plot}
 ggplot(data = Kids198,
@@ -481,7 +483,7 @@ The reason we swapped our `+` sign for a multiplication operator is revealed by 
 extract_eq(weight_age_model, use_coefs = FALSE)
 ```
 
-Notice that in the final term of the equation, *the Age variable is multiplied by the Sex variable*[Remember of course, Age isn't multiplied by "Male" or "Female", age is multiplied by 1 or 0, because the Sex variable is wrapped in an indicator function when used in the model]! This multiplicative term is what allows for a different slope between the regression line for male and female children, and this is why R's model formula adopts the convention to use `*` when you to estimate a different slope for each group.
+Notice that in the final term of the equation, *the Age variable is multiplied by the Sex variable*!^[Remember of course, Age isn't multiplied by "Male" or "Female", age is multiplied by 1 or 0, because the Sex variable is wrapped in an indicator function when used in the model] This multiplicative term is what allows for a different slope between the regression line for male and female children, and this is why R's model formula adopts the convention to use `*` when you to estimate a different slope for each group.
 
 Reading the regression table can be a bit tricky for these models, but a little "algorithmic thinking" helps. Take a look at the regression table for the regression table for the `Weight ~ Age * Sex` below (displaying just the term labels and coefficient estimates):
 
@@ -495,17 +497,17 @@ tidy(weight_age_model) |>
 
 If you look in the (small) figure to the right that visualizes the model, we can see that to fully describe both lines (i.e., both models) we need two intercepts, and two slopes (one for each line!). So, the question becomes: where can we find those pieces of information in the regression table?
 
-The `(Intercept)` term (-1.84) represents the y-axis intercept for the **baseline** group's regression line. In this case, the baseline group are the female children. By default, R will put the groups into alphanumeric order, and choose the first group in that list to serve as the baseline group. We can also determine "Female" is the baseline group because it's the only category from the Sex variable **not** mentioned in any of the term labels
+The `(Intercept)` term (-1.84) represents the y-axis intercept for the **baseline** group's regression line. In this case, the baseline group are the male children. By default, R will put the groups into alphanumeric order, and choose the first group in that list to serve as the baseline group. Knowing this, it's bit confusing as to why "Female" isn't the baseline group (since "F" comes before "M"). This is because we used the `factor()` function to make categories out of the 0's and 1's in the original `Sex` variable, males were coded as 0's, and this males were "first" and become the baseline group. Even if we didn't know this, we can also determine "Male" is the baseline group because it's the only category from the Sex variable **not** mentioned in any of the term labels
 
-The coefficient for the `Age` variable (.627) represents the slope for the baseline group (female children). How are we supposed to know it's the baseline group's slope? In this model, each group gets it's own slope. In other words, the slope of the regression line depends on the group. So, to know what the slope is, you have to know the group. Since the term **doesn't** mention a group, you know it *must* apply to the baseline group.
+The coefficient for the `Age` variable (.627) represents the slope for the baseline group (male children). How are we supposed to know it's the baseline group's slope? In this model, each group gets it's own slope. In other words, the slope of the regression line depends on the group. So, to know what the slope is, you have to know the group. Since the term **doesn't** mention a group, you know it *must* apply to the baseline group.
 
 The final two coefficients are a bit different than the first two: these coefficients represent differences between the intercept and slope of the regression lines for the male and female groups
 
-The `SexMale` coefficient (-31.9) represents the difference in the intercept between the male and female regression lines. Since this coefficient is labeled with the `Male` category name, we know the intercept for the Male regression line is 31.9 pounds below the intercept for the female regression line. How do we know it is the difference in the intercept, and not the difference in the slope? In this model, the "slope" comes from the gradual change in weight that is produced by a gradual change in age. And, the Age variable is not mentioned any where in this term label: so, we know this term can't be interpreted as anything slope-related, because it doesn't involve the Age variable!
+The `SexFemale` coefficient (-31.9) represents the difference in the intercept between the male and female regression lines. Since this coefficient is labeled with the `Female` category name, we know the intercept for the female regression line is 31.9 pounds above the intercept for the male regression line. How do we know it is the difference in the intercept, and not the difference in the slope? In this model, the "slope" comes from the gradual change in weight that is produced by a gradual change in age. And, the Age variable is not mentioned any where in this term label; so, we know this term can't be interpreted as anything slope-related, because it doesn't involve the Age variable!
 
-Finally, the coefficient for the `Age:SexMale` term (0.281) represents the difference in the slope between the male and female regression lines. We can infer this because the term label mentions *both* explanatory variables: the presence of `SexMale` in the label tells us we are contrasting the male group with the baseline group (females), and the presence of `Age` in the label tells us we are measuring the effect of Age on our outcome (weight). The difference in the effect of Age on Weight between the male and female groups is exactly what we mean by "change in slope"!
+Finally, the coefficient for the `Age:SexFemale` term (-0.281) represents the difference in the slope between the male and female regression lines. We can infer this because the term label mentions *both* explanatory variables: the presence of `SexFemale` in the label tells us we are contrasting the female group with the baseline group (males), and the presence of `Age` in the label tells us we are measuring the effect of Age on our outcome (weight). The difference in the effect of Age on Weight between the male and female groups is exactly what we mean by "change in slope"!
 
-We began our reading of the regression table asking the question: where in the regression table can we find the two intercepts and the two slopes that we need to fully describe his model? We found the intercept and the slope for the baseline group (female children) in the rows labeled `(Intercept)` and `Age`. And, there was a bit of a plot twist for the intercept and slope for the male children's regression line; the regression table doesn't actually hold the intercept and slope for the male children's regression line, but instead tells you how the intercept and slope **differ** from the female children's regression line. 
+We began our reading of the regression table asking the question: where in the regression table can we find the two intercepts and the two slopes that we need to fully describe his model? We found the intercept and the slope for the baseline group (male children) in the rows labeled `(Intercept)` and `Age`. And, there was a bit of a plot twist for the intercept and slope for the female children's regression line; the regression table doesn't actually hold the intercept and slope for the female children's regression line, but instead tells you how the intercept and slope **differ** from the male children's regression line. 
 
 ::: {.callout-warning}
 Based on this example, it might be tempting to conclude "the intercept and slope for the baseline group are in the first two rows, the difference in intercept is in row three, and the difference in slope is in row four". But, consider what happens when the order of the explanatory variables is reversed in the model formula:
@@ -517,3 +519,173 @@ tidy(weight_age_model)
 
 The values in the `estimate` column are the same, but their order has changed: Now, the slope for the females is in row three, and the difference in intercept is in row two. This means that the order of the coefficients depends on the order of the variables in the formula! So, always be sure to use the term labels, your knowledge of the variables types, and your knowledge of the category levels to guide your interpretations. Never rely on the order heuristic!
 :::
+
+## New Predictors from Old
+
+Section 3.4 extends the idea of allowing your regression to model a change in the relationship between two numeric variables (i.e., a change in slope) across distinct categories of observations into the domain of allowing your regression to model a smooth, gradual changing in the relationship between two numeric variables as yet another numeric explanatory variable also changes. Just as in the case of the interaction between categorical and numeric explanatory variables in section 3.3, the interaction effect between numeric variables is made possible by introducing an explanatory variable that is a product of two explanatory variables in the model.
+
+Example 3.11 introduces a regression model with two numeric explanatory variables, as well as an interaction term based on those two numeric explanatory variables. This example uses the `Perch` data set, which holds measurements of the weight (in grams), length (in centimeters), and width (in centimeters) for each of 56 [Perch](https://en.wikipedia.org/wiki/Perch) caught at [Lake Laengelmavesi(https://en.wikipedia.org/wiki/L%C3%A4ngelm%C3%A4vesi)] in Finland.
+
+```{r}
+library(Stat2Data)
+data("Perch")
+```
+
+```{r}
+#| echo: false
+Perch
+```
+
+We can fit a multiple regression model that includes an interaction between two numeric variables in the same fashion that we first a the multiple regression model that included an interaction between Sex and Age in (Section 3.3)[#removing-the-parallel-slopes-constraint]: by combining the two variables in our model formula using the `*` multiplication operator:
+
+```{r perch_weight_model}
+#| echo: false
+perch_weight_model <- lm(Weight ~ Length * Width, data = Perch)
+```
+
+```{r}
+<<perch_weight_model>>
+summary(perch_weight_model)
+```
+
+
+::: {callout-info}
+The author's also show a model based just on the $\operatorname{Length} \times \operatorname{Width}$ product term, *without* the individual variables that go into the product. Don't ever do this yourself, but for completeness, here's how you would execute this bad idea in R:
+
+```{r}
+perch_missing_terms_model <- lm(Weight ~ Length:Width, data = Perch)
+coef(perch_missing_terms_model)
+```
+:::
+
+### Interpreting the coefficients of a two-way numeric interaction model
+
+The author's treat the `Weight ~ Length * Width` model of the Perch fish weights mostly as a "modeling for prediction" exercise, noting the high $R^2$ statistic this model achieves. But, they don't offer much advice about how you should think about the meaning of the model's three coefficients.
+
+```{r}
+tidy(perch_weight_model)
+```
+
+- The `(Intercept)` term (113.93) is the "z-axis" intercept: it represents the predicted fish weight when the Fish has 0 width and 0 length (a bit of an overestimate if you ask me!)
+- The coefficient for the `Length` variable (-3.48) represents the change in weight for each additional centimeter of width **when the fish has a length of 0"
+- The coefficient for the `Width` variable (-94.63) represents the change in weight for each additional centimeter of length **when the fish has a width of 0"
+- The coefficient for the `Length:Width` variable (i.e., the $\operatorname{Length} \times \operatorname{Width}$ product) can be interpreted in two ways, both equally valid:
+    - The change in the slope of the Weight vs. Width relationship, each time the Length variable increases by 1 cm.
+    - The change in the slope of the Weight vs. Length relationship, each time the Width variable increases by 1 cm.
+
+Visualizing the model may help you believe some of these interpretations:
+
+```{r}
+library(regplanely)
+
+regression_plane(perch_weight_model)
+```
+
+### Polynomial Regression
+
+Example 3.13 introduces polynomial regression through the lens of a regression model that attempts to predict atmospheric Carbon Dioxide levels recorded at a monitoring station in Brotjacklriegel, Germany as a function of time; specifically, as a function of the day of the year between April 1st and November 30th, 2001. These data are found in the `CO2Germany` data set:
+
+```{r}
+library(Stat2Data)
+data("CO2Germany")
+```
+
+```{r}
+#| echo: false
+CO2Germany
+```
+
+CO_2_ levels and day of the year show a clear curvilinear relationship, with the high levels towards the beginning decreasing as time goes own, gradually tapering off towards the middle of the year, and accelerating back up towards high levels at the end of the year:
+
+```{r}
+ggplot(data = CO2Germany, mapping = aes(x = Day, y = CO2)) +
+  geom_point()
+```
+
+This U-shaped pattern is a good candidate for a polynomial regression model, which will include a $Day^2$ coefficient. What makes a polynomial regression different from a "plain" transformation of the explanatory variable is that the model will include *both* the linear term $Day$ and the quadratic term $Day^2$.
+
+As is often the case when programming, there are a variety of ways to accomplish this in R. One method is simply to add a new column to the data set holding the squared values of the `Day` variable (just as we did in Chapter 1 when [centering the Honda Accord Mileage variable](01_simple_linear_regression.html#sec-centering-the-mileage-variable)).
+
+```{r}
+CO2Germany <- CO2Germany |>
+  mutate(Day_squared = Day^2)
+CO2Germany
+```
+
+Then we can use both the `Day` and `Day_squared` variables in our model formula. Combining these variables with the `+` sign operator yields the polynomial model from Example 3.13:
+
+```{r}
+co2_poly_model <- lm(CO2 ~ Day + Day_squared, data= CO2Germany)
+coef(co2_poly_model)
+```
+
+We could also skip the "create a new variable in the data set" step, and square the day variable right in the model formula! But, it takes more adaptation to the model formula syntax than you might expect. Let's see what happens if you try to use the `^` operator to square the `Day` variable inside the model formula:
+
+```{r}
+co2_poly_model <- lm(CO2 ~ Day + Day^2, data = CO2Germany)
+coef(co2_poly_model)
+```
+
+Our model has two coefficients, not three? That's not right - it seems that the whole term involving `^` is completely ignored! Well, as it turns out, the `^` isn't *ignored*: it just has a different meaning than "square this number" inside a model formula^[The quote the help page for [?formula](): "The ^ operator indicates crossing to the specified degree. For example (a+b+c)^2 is identical to (a+b+c)*(a+b+c) which in turn expands to a formula containing the main effects for a, b and c together with their second-order interactions."]. If we want `^` to mean "square this number", we can wrap the operation inside the `I()` function (short for "inhibit"):
+
+```{r}
+co2_poly_model <- lm(CO2 ~ Day + I(Day^2), data= CO2Germany)
+coef(co2_poly_model)
+```
+
+The term label for this coefficient is a bit awkward this way, but the model is fit correctly! One advantage to doing the squaring directly in the model formula is that some R functions are able to detect the transformation, and use the appropriate methods to reverse or account for the transformation.
+
+::: {.callout-warning}
+The `extract_eq()` doesn't produce the correct equation describing this polynomial model, due to the `I()` in the term label.
+
+```{r}
+#| eval: false
+extract_eq(co2_poly_model, use_coefs = TRUE, coef_digits = 5)
+```
+
+$$
+\operatorname{\widehat{CO2}} = 414.97475 - 0.47603(\operatorname{Day}) + 0.00116(\operatorname{Day\texttt{\^{}}2})
+$$
+Notice how the 2 isn't properly superscipted, and the `^` is showing up in the equation? Luckily, it's not too hard to remove the offending portion of the markup using the string substitution function `gsub()`, and print the correct equation using `cat():`
+
+```{r}
+poly_eq <- extract_eq(co2_poly_model, use_coefs = TRUE, coef_digits = 5)
+gsub("\\texttt{^}2}", "}^2", poly_eq, fixed = TRUE)
+```
+:::
+
+### Visualizing a polynomial regression model
+
+We can still visualize our model using the `geom_smooth()` function; all we need to do is include the quadratic transformation as part of our argument to the `formula` argument:
+
+```{r}
+ggplot(data = CO2Germany, mapping = aes(x = Day, y = CO2)) +
+  geom_point() +
+  geom_smooth(method = lm, formula = y ~ x + I(x^2), se=FALSE)
+```
+
+Not that when writing a model formula inside the `geom_smooth()` function, the formula is written with variables referring to **plot aesthetics**, not to referring to variables in the original data set!
+
+## Complete Second-Order Model
+
+Example 3.14 introduces a "complete second order" model: one that uses two numeric explanatory variables, a quadratic transformation of both variables, *and* and interaction between these variables. In Example 3.14, these two numeric variables are the "drop height" and "funnel height" from an experiment seeking to find the combination of these variables that would maximize the amount of time a marble dropped into the funnel would spend circling the funnel before dropping through. These data are found the `FunnelDrop` data set:
+
+```{r}
+library(Stat2Data)
+data("FunnelDrop")
+```
+
+```{r}
+#| echo: false
+FunnelDrop
+```
+
+Since it's not reasonable to test **every** combination of drop height and funnel height, modeling their relationship to the circling time is useful to help find a potential maximum that might occur at an untested combination. To obtain this "full second order" model, we'll have to craft the right hand side our model formula carefully:
+
+```{r}
+full_second_order_model<- lm(Time ~ Tube * Funnel + I(Funnel^2) + I(Tube^2),
+                             data = FunnelDrop
+                             )
+broom::tidy(full_second_order_model)
+```
+
