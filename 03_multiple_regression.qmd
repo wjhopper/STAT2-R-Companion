@@ -352,7 +352,7 @@ ggplot(data = ButterfliesBc,
 
 Figure 3.6 shows the same scatter plot, but with the predictions of the fitted parallel slopes model drawn on top of the observations. If you intuition is that we could easily create the same figure using the geom_smooth() function, your mind in this right place. However, mapping the `color` aesthetic to the `Sex` function means that within the internals of `ggplot()`, the data is grouped into separate sets (a male set and a female set), meaning `geom_smooth()` will fit a regression model to *each sex seprately*. Fitting the model separately for each sex removes the constraint that there is one slope coefficient for both groups (fitting two separate models means estimating two slopes, by definition).
 
-We could still reproduce Figure 3.6 by *manually* computing the predicted Wing lengths for a large number of closely-spaced temperature values (much like we did in Chapter 2, when [constructing the bounds of the 95% prediction interval](02_inference_for_simple_linear_regression.html#intervals-for-predictions)). But, there is also a slightly easier way: the `geom_parallel_slopes()` function from the [moderndive]() R package
+We could still reproduce Figure 3.6 by *manually* computing the predicted Wing lengths for a large number of closely-spaced temperature values (much like we did in Chapter 2, when [constructing the bounds of the 95% prediction interval](02_inference_for_simple_linear_regression.html#intervals-for-predictions)). But, there is also a slightly easier way: the `geom_parallel_slopes()` function from the [moderndive]() R package [@moderndive_package].
 
 ```{r}
 library(moderndive)
@@ -654,7 +654,7 @@ gsub("\\texttt{^}2}", "}^2", poly_eq, fixed = TRUE)
 ```
 :::
 
-### Visualizing a polynomial regression model
+#### Visualizing a polynomial regression model
 
 We can still visualize our model using the `geom_smooth()` function; all we need to do is include the quadratic transformation as part of our argument to the `formula` argument:
 
@@ -666,7 +666,7 @@ ggplot(data = CO2Germany, mapping = aes(x = Day, y = CO2)) +
 
 Not that when writing a model formula inside the `geom_smooth()` function, the formula is written with variables referring to **plot aesthetics**, not to referring to variables in the original data set!
 
-## Complete Second-Order Model
+### Complete Second-Order Model
 
 Example 3.14 introduces a "complete second order" model: one that uses two numeric explanatory variables, a quadratic transformation of both variables, *and* and interaction between these variables. In Example 3.14, these two numeric variables are the "drop height" and "funnel height" from an experiment seeking to find the combination of these variables that would maximize the amount of time a marble dropped into the funnel would spend circling the funnel before dropping through. These data are found the `FunnelDrop` data set:
 
@@ -689,3 +689,132 @@ full_second_order_model<- lm(Time ~ Tube * Funnel + I(Funnel^2) + I(Tube^2),
 broom::tidy(full_second_order_model)
 ```
 
+## Correlated Predictors
+
+Example 3.15 introduces the `HousesNY` data set, which contains estimated prices (measured in thousands of dollars) for a sample of 53 city of [Canton, NY](https://en.wikipedia.org/wiki/Canton,_New_York), along with the size of each house (in 1,000s of square feet), the number of bedrooms, bathrooms, and the size of the lot (in acres).
+
+```{r}
+library(Stat2Data)
+data("HousesNY")
+```
+
+```{r}
+#| echo: false
+HousesNY
+```
+
+The predictive accuracy of a regression model estimating the price of a home improves with each attribute of the home added to the model as an explanatory variable. For example, the `Price ~ Size + Beds` produces a higher $R^2$ value than either the `Price ~ Size` or `Price ~ Beds` models (though, *adjusted* $R^2$ decreases): 
+
+```{r mapped_glance_example}
+#| echo: false
+price_beds <- lm(Price ~ Size, data = HousesNY)
+price_size <- lm(Price ~ Beds, data = HousesNY)
+price_size_beds <- lm(Price ~ Size + Beds, data = HousesNY)
+
+all_models <- list(price_beds, price_size, price_size_beds)
+model_formulas <- purrr::map_chr(all_models, ~as.character(.x$terms))
+names(all_models) <- model_formulas
+
+purrr::map_df(all_models, broom::glance, .id = "model") |>
+  dplyr::select(model, r.squared, adj.r.squared)
+```
+
+Note that if you want to make a compact table of the summaries from multiple models like the one above, you can generalize the code below. It uses the `broom::glance()` function to create a table of model summaries (which includes the adjusted $R^2$ value), and then uses `purrr::map_df()` to apply the `broom::glance()` function to each model in the list and assemble the results into a single table:
+
+```{r}
+#| ref.label: mapped_glance_example
+#| code-fold: true
+#| eval: false
+```
+
+But, these models give very different impressions about the importance of the Price vs. Beds relationship
+
+```{r}
+#| layout-ncol: 3
+#| echo: false
+tidy(price_beds) |>
+  select(term, estimate)
+
+tidy(price_size) |>
+  select(term, estimate)
+
+tidy(price_size_beds) |>
+  select(term, estimate)
+```
+
+As we learn in Section 3.5, this change in the estimated magnitude of the `Beds` effect from one model to the next owes to **multicollinearity**: the *explanatory* variables in the `Price ~ Size + Beds` model are linearly related to one another!
+
+Multicollinearity is not necessarily a *bad* thing; in general, the ability to estimate the effect of one variable after accounting for the other predictors in the mode is a feature of multiple regression. Using information about how the explanatory variables relate to one another makes this possible. But, there are limits to how *reliably* a regression model can estimate the effect of one variable after accounting for the other predictors when there are relationships between those explanatory variables. The stronger the relationship between explanatory variables, the more difficult it is to attribute changes in the outcome to one variable or the other
+
+When multicollinearity exists between just *two* explanatory variables (such as the home size and number of bedrooms variables), constructing a scatter plot matrix of all the variables used in your model may reveal this relationship:
+
+```{r}
+library(GGally)
+
+HousesNY |>
+  select(Price, Beds, Size) |>
+  ggpairs()
+```
+
+But when your model grows to include more than two explanatory variables, there may not be a strong relationship between any single *pair* of explanatory variable, but instead a strong relationship between one of your explanatory variables *and a combination of multiple other explanatory variables*. A scatter plot matrix won't reveal this relationship to you, so it is better to rely on the Variance Inflation Factor statistic (VIF) as a robust method to detect multicollinearity.
+
+The formula for the VIF statistic is fairly simple, but since it needs to be computed for every single explanatory variable in your model, it can be quite tedious to implement when models grow large. Instead, we'll use the `vif()` function from the [car](https://cran.r-project.org/web/packages/car/index.html) package [@car_package].
+
+Instead of of demonstrating how to compute the VIF using the `CountyHealth` data set (as done in Example 3.17), we'll build another model using the `HousesNY` data set, but this time using *all* the remaining variables in the data as explanatory variable of the home price. Notice the handy shortcut `.` on the right hand side of the model formula, which R expands to mean "all other variables in the data set":
+
+```{r}
+#| message: false
+price_all_variables <- lm(Price ~ ., data = HousesNY)
+
+library(car)
+vif(price_all_variables)
+```
+
+These VIF statistics are relatively low: a VIF of 5 is a cutoff for a "concerning" amount of multicollinearity between predictors, and 10 is cutoff for "very concerning" amount of multicollinearity between predictors. So, a VIF of at most 2.4 means we should consider our coefficient estimates in the model reliable.
+
+## Testing Subsets of Predictors
+
+Section 3.6 introduces the *Nested* F-test as formal model comparison technique. The Nested F Statistic measures the amount of *additional* variability explained by adding one or more predictor to an existing more, and the F-test based on this statistic helps you decide if this additional variability explained is large enough for you to prefer this more complex model.
+
+While the formula given for the Nested F statistic given in Section 3.6 is a bit complicated, there is good news: R makes it easy to perform a nestd F-test *without* implementing the formula yourself! We've previously used the `anova()` function to perform F-tests on the individual sources of variable identified in a single model (i.e., F-test on the explanatory variables). But, when you supply **several** models to the anova function, it performs a Nested F-test comparing those models.
+
+Consider this example based on the data from the `HousesNY` data set, that uses a nested F-test to compare two regression models:
+
+```{r}
+price_size <- lm(Price ~ Size, data = HousesNY)
+price_size_beds_lot <- lm(Price ~ Size + Beds + Lot, data = HousesNY)
+
+anova(price_size, price_size_beds_lot)
+```
+
+The statistic given in the `F` column is the nested F-statistic, and the p-value helps you decide whether you should reject the null hypothesis that the $\beta_{Beds} = \beta_{Lots} = 0$ in favor of the alternative that either $\beta_{Beds} \ne 0$ *or* $\beta_{lots} \ne 0$. Here, the large p-value gives us no reason to reject the null hypothesis, indicating we should favor the simpler `Price ~ Size` model.
+
+You can provide the models in any order (the F-statistic and p-values won't change), but ordering the models in ascending order of complexity (models with fewer predictors first, models with more predictors last) is preferred. That way, you won't have negative sums of square and degrees of freedom, which can be a bit confusing:
+
+```{r}
+#| layout-ncol: 2
+anova(price_size, price_size_beds_lot)
+anova(price_size_beds_lot, price_size)
+```
+
+If you provide 3 or more models, R will perform nested F-tests in pairs:
+
+```{r}
+price_size <- lm(Price ~ Size, data = HousesNY)
+price_size_beds_lot <- lm(Price ~ Size + Beds + Lot, data = HousesNY)
+price_all_variables <- lm(Price ~ ., data = HousesNY)
+
+
+anova(price_size, price_size_beds_lot, price_all_variables)
+```
+
+So the F-test in row 2 of the table compares model 2 (`Price ~ Size + Beds + Lot`) to model 1 (`Price ~ Size`), while the F-test in row 3 of the table compares model 3 (`Price ~ Beds + Baths + Size + Lot`) model 2 (`Price ~ Size + Beds + Lot`).
+
+If you ever attempt to supply *non*-nested model to the `anova()` function, you won't get an error, but you also won't get any F-statistics - R does its best to protect you from yourself!
+
+```{r}
+price_size <- lm(Price ~ Size, data = HousesNY)
+price_beds_lot <- lm(Price ~ Beds + Lot, data = HousesNY)
+
+anova(price_size, price_beds_lot)
+```
