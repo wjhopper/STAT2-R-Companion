@@ -583,7 +583,7 @@ regression_plane(perch_weight_model)
 
 ### Polynomial Regression
 
-Example 3.13 introduces polynomial regression through the lens of a regression model that attempts to predict atmospheric Carbon Dioxide levels recorded at a monitoring station in Brotjacklriegel, Germany as a function of time; specifically, as a function of the day of the year between April 1st and November 30th, 2001. These data are found in the `CO2Germany` data set:
+Example 3.13 introduces polynomial regression through the lens of a regression model that attempts to predict atmospheric Carbon Dioxide levels recorded at a monitoring station on [Brotjacklriegel mountain](https://en.wikipedia.org/wiki/Brotjacklriegel) in Germany as a function of time; specifically, as a function of the day of the year between April 1st and November 30th, 2001. These data are found in the `CO2Germany` data set:
 
 ```{r}
 library(Stat2Data)
@@ -595,7 +595,7 @@ data("CO2Germany")
 CO2Germany
 ```
 
-CO_2_ levels and day of the year show a clear curvilinear relationship, with the high levels towards the beginning decreasing as time goes own, gradually tapering off towards the middle of the year, and accelerating back up towards high levels at the end of the year:
+CO~2~ levels and day of the year show a clear curvilinear relationship, with the high levels towards the beginning decreasing as time goes own, gradually tapering off towards the middle of the year, and accelerating back up towards high levels at the end of the year:
 
 ```{r}
 ggplot(data = CO2Germany, mapping = aes(x = Day, y = CO2)) +
@@ -646,7 +646,8 @@ extract_eq(co2_poly_model, use_coefs = TRUE, coef_digits = 5)
 $$
 \operatorname{\widehat{CO2}} = 414.97475 - 0.47603(\operatorname{Day}) + 0.00116(\operatorname{Day\texttt{\^{}}2})
 $$
-Notice how the 2 isn't properly superscripted, and the `^` is showing up in the equation? Luckily, it's not too hard to remove the offending portion of the markup using the string substitution function `gsub()`, and print the correct equation using `cat():`
+
+Notice how the 2 isn't properly superscripted, and the `^` is showing up in the equation? Luckily, it's not too hard to remove the offending portion of the markup using the string substitution function `gsub()` before printing it:
 
 ```{r}
 poly_eq <- extract_eq(co2_poly_model, use_coefs = TRUE, coef_digits = 5)
@@ -656,7 +657,7 @@ gsub("\\texttt{^}2}", "}^2", poly_eq, fixed = TRUE)
 
 #### Visualizing a polynomial regression model
 
-We can still visualize our model using the `geom_smooth()` function; all we need to do is include the quadratic transformation as part of our argument to the `formula` argument:
+We can still visualize our model using the `geom_smooth()` function; all we need to do is include the quadratic transformation as part of the formula given to the `formula` argument:
 
 ```{r}
 ggplot(data = CO2Germany, mapping = aes(x = Day, y = CO2)) +
