@@ -13,7 +13,7 @@ library(infer)
 
 ## Cross-validation
 
-## Identifyin Unusual Points in Regression
+## Identifying Unusual Points in Regression
 
 ## Coding Categorical Predictors
 

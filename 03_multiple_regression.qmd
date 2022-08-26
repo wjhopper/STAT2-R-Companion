@@ -350,7 +350,7 @@ ggplot(data = ButterfliesBc,
   guides(label = "none", color = "none")
 ```
 
-Figure 3.6 shows the same scatter plot, but with the predictions of the fitted parallel slopes model drawn on top of the observations. If you intuition is that we could easily create the same figure using the geom_smooth() function, your mind in this right place. However, mapping the `color` aesthetic to the `Sex` function means that within the internals of `ggplot()`, the data is grouped into separate sets (a male set and a female set), meaning `geom_smooth()` will fit a regression model to *each sex seprately*. Fitting the model separately for each sex removes the constraint that there is one slope coefficient for both groups (fitting two separate models means estimating two slopes, by definition).
+Figure 3.6 shows the same scatter plot, but with the predictions of the fitted parallel slopes model drawn on top of the observations. If you intuition is that we could easily create the same figure using the geom_smooth() function, your mind in this right place. However, mapping the `color` aesthetic to the `Sex` function means that within the internals of `ggplot()`, the data is grouped into separate sets (a male set and a female set), meaning `geom_smooth()` will fit a regression model to *each sex separately*. Fitting the model separately for each sex removes the constraint that there is one slope coefficient for both groups (fitting two separate models means estimating two slopes, by definition).
 
 We could still reproduce Figure 3.6 by *manually* computing the predicted Wing lengths for a large number of closely-spaced temperature values (much like we did in Chapter 2, when [constructing the bounds of the 95% prediction interval](02_inference_for_simple_linear_regression.html#intervals-for-predictions)). But, there is also a slightly easier way: the `geom_parallel_slopes()` function from the [moderndive]() R package [@moderndive_package].
 
@@ -524,7 +524,7 @@ The values in the `estimate` column are the same, but their order has changed: N
 
 Section 3.4 extends the idea of allowing your regression to model a change in the relationship between two numeric variables (i.e., a change in slope) across distinct categories of observations into the domain of allowing your regression to model a smooth, gradual changing in the relationship between two numeric variables as yet another numeric explanatory variable also changes. Just as in the case of the interaction between categorical and numeric explanatory variables in section 3.3, the interaction effect between numeric variables is made possible by introducing an explanatory variable that is a product of two explanatory variables in the model.
 
-Example 3.11 introduces a regression model with two numeric explanatory variables, as well as an interaction term based on those two numeric explanatory variables. This example uses the `Perch` data set, which holds measurements of the weight (in grams), length (in centimeters), and width (in centimeters) for each of 56 [Perch](https://en.wikipedia.org/wiki/Perch) caught at [Lake Laengelmavesi(https://en.wikipedia.org/wiki/L%C3%A4ngelm%C3%A4vesi)] in Finland.
+Example 3.11 introduces a regression model with two numeric explanatory variables, as well as an interaction term based on those two numeric explanatory variables. This example uses the `Perch` data set, which holds measurements of the weight (in grams), length (in centimeters), and width (in centimeters) for each of 56 [Perch](https://en.wikipedia.org/wiki/Perch) caught at [Lake Laengelmavesi](https://en.wikipedia.org/wiki/L%C3%A4ngelm%C3%A4vesi) in Finland.
 
 ```{r}
 library(Stat2Data)
@@ -646,7 +646,7 @@ extract_eq(co2_poly_model, use_coefs = TRUE, coef_digits = 5)
 $$
 \operatorname{\widehat{CO2}} = 414.97475 - 0.47603(\operatorname{Day}) + 0.00116(\operatorname{Day\texttt{\^{}}2})
 $$
-Notice how the 2 isn't properly superscipted, and the `^` is showing up in the equation? Luckily, it's not too hard to remove the offending portion of the markup using the string substitution function `gsub()`, and print the correct equation using `cat():`
+Notice how the 2 isn't properly superscripted, and the `^` is showing up in the equation? Luckily, it's not too hard to remove the offending portion of the markup using the string substitution function `gsub()`, and print the correct equation using `cat():`
 
 ```{r}
 poly_eq <- extract_eq(co2_poly_model, use_coefs = TRUE, coef_digits = 5)
@@ -776,7 +776,7 @@ These VIF statistics are relatively low: a VIF of 5 is a cutoff for a "concernin
 
 Section 3.6 introduces the *Nested* F-test as formal model comparison technique. The Nested F Statistic measures the amount of *additional* variability explained by adding one or more predictor to an existing more, and the F-test based on this statistic helps you decide if this additional variability explained is large enough for you to prefer this more complex model.
 
-While the formula given for the Nested F statistic given in Section 3.6 is a bit complicated, there is good news: R makes it easy to perform a nestd F-test *without* implementing the formula yourself! We've previously used the `anova()` function to perform F-tests on the individual sources of variable identified in a single model (i.e., F-test on the explanatory variables). But, when you supply **several** models to the anova function, it performs a Nested F-test comparing those models.
+While the formula given for the Nested F statistic given in Section 3.6 is a bit complicated, there is good news: R makes it easy to perform a nested F-test *without* implementing the formula yourself! We've previously used the `anova()` function to perform F-tests on the individual sources of variable identified in a single model (i.e., F-test on the explanatory variables). But, when you supply **several** models to the anova function, it performs a Nested F-test comparing those models.
 
 Consider this example based on the data from the `HousesNY` data set, that uses a nested F-test to compare two regression models:
 
