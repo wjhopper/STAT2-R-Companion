@@ -171,6 +171,34 @@ regression model is the `method = lm` argument. Without the `method=lm` argument
 
 The `se = FALSE` argument is included to stop ggplot from drawing confidence interval bands around the regression line. And, the `formula = y~x` argument is included simply to prevent ggplot from printing an annoying message that says <span style="font-color="red><code>`geom_smooth()` using formula 'y ~ x'</code></span> when creating the plot.
 
+### Residual Errors
+
+An important component of any statistical model is the residual error - the difference between the observed value of the outcome variable, and the value your model predicted that outcome to be, based on the same explanatory variable value. No model will predict every observation in your data literally *perfectly*, and measuring the kinds of errors your model makes is crucial for knowing whether you've built a reasonable model of you data. 
+
+The residual errors will feature prominently when we [assess the conditions for inference](#assessing-conditions) later in this chapter. For now, we'll just learn how to compute the residual errors around your model predictions, but we won't *do* anything more with those values.
+
+The simplest way to compute the difference between observed outcome and predicted outcome for each observation in your data set is to use the `residuals()` function on your fitted model object:
+
+```{r}
+<<price_mileage_model>>
+residuals(price_mileage_model)
+```
+
+This returns a vector with as many elements as there are rows in your data set, and each element in the vector measures the residual error between model and data for that particular row. For example, the residual error for the Accord price in the first row of the data set was 0.1643021, meaning the model over-predicted it's price by 0.1643021 thousand dollars (or, 164 dollars).
+
+But, one shortcoming of this function is that the residual errors are separated from the observed outcome values and the predicted outcome values. If you *only* need the residuals this is not an issue, but more often than the not, you'll need context to help understand and use the residuals effectively.
+
+The `augment()` function from the `broom()` package produces a table that contains the original data the model was fit to, the predicted value for each observation, and the residual error for that observation:
+
+```{r}
+library(broom)
+
+<<price_mileage_model>>
+augment(price_mileage_model)
+```
+
+The predicted values are in the `.fitted` columns, and the residual errors are in the `.resid` column. The output holds many other pieces of information which will become useful in the future, but for now we can ignore the `.hat`, `.sigma`, `.cooks`, `.std.resid` columns.
+
 ### Centering the Mileage Variable {#sec-centering-the-mileage-variable}
 
 Example 1.4 demonstrates how centering a variable (i.e., shifting all the values left or right by a single chosen number) changes the interpretation of the intercept coefficient, but not the slope coefficient. In this example, the Mileage variable is shifted to the left by 50; in other words, 50 is subtracted from all the Mileage values *before* fitting the model.
@@ -272,7 +300,7 @@ There are many ways of generating thse plots from a linear model in R, but perha
 The `check_model()` function from the `performance` package can be used to create both fitted vs. residuals plots, and Normal Quantile plots. What's more, it can create different variations of fitted vs. residuals plots that are customized to help you check either the Linearity or the Homogeneity of Variance assumptions.
 
 ::: {.callout-tip}
-You'll also want to install the `patchwork` and `see` packages at the same time you isntall the `performance` package, as these supplemental packages are very useful for constructing visualiations with the `performance` package.
+You'll also want to install the `patchwork` and `see` packages at the same time you install the `performance` package, as these supplemental packages are very useful for constructing visualiations with the `performance` package.
 :::
 
 ### Checking Linearity with a Fitted vs. Residuals plot
