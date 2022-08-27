@@ -197,7 +197,7 @@ library(broom)
 augment(price_mileage_model)
 ```
 
-The predicted values are in the `.fitted` columns, and the residual errors are in the `.resid` column. The output holds many other pieces of information which will become useful in the future, but for now we can ignore the `.hat`, `.sigma`, `.cooks`, `.std.resid` columns.
+The predicted values are in the `.fitted` columns, and the residual errors are in the `.resid` column. The output holds many other pieces of information which will become useful in the future, but for now we can ignore the `.hat`, `.sigma`, `.cooksd` and `.std.resid` columns.
 
 ### Centering the Mileage Variable {#sec-centering-the-mileage-variable}
 

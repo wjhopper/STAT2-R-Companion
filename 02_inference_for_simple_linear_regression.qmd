@@ -169,30 +169,37 @@ In Section 2.4, two intervals around the regression line are introduced:
 - The confidence interval around the conditional mean of the outcome variable
 - The "prediction interval" around the conditional value of the outcome variable.
 
-The formulas given for these intervals are similar to that for the confidence interval around the value of the slope coefficient, only with a more complex standard error estimator. Rather than implement these formulas ourselves, we'll rely on R's `predict()` function to get the job done.
+The formulas given for these intervals are similar to that for the confidence interval around the value of the slope coefficient, only with a more complex standard error estimator. There are several ways to compute these intervals in R without implementing the formula's yourself; The "classic" way to compute these intervals to use the `predict()` function (which is included with base R). But, since our ultimate goal will be *visualizing* these intervals around our regression line, using the `augment()` function from the `broom` package will be a better choice in the long run.
 
-R's `predict()` function relies on using a fitted model object to generate predictions about the outcome variable. For example, if you give the `predict()` function our fitted Accord price model, it will return the *predicted* price of each car in the original data set, based on the known Mileage value and the fitted regression equation that relates Mileage to Price.
+As we learned when [computing residual errors](01_simple_linear_regression.html#residual-errors) in Chapter 1, the `augment()` function uses the fitted model object to compute it's predictions. But by default, the `augment()` function doesn't compute any confidence or predictions intervals; To obtain these intervals, we'll need to include the `interval` argument. For example, including `interval="confidence"` will instruct `augment()` to include the upper and lower boundaries of the 95% confidence interval around the predicted outcome value for each point in the original data set:
 
 ```{r}
+library(broom) # for the augment() function
+library(dplyr) # for the select() function
+
 <<price_mileage_model>>
-predict(price_mileage_model)
+augment(price_mileage_model, interval="confidence")
 ```
 
-The `predict()` function isn't limited to generating predictions for Mileage values in the original data set - we can generate prediction for any Mileage value we choose by including a new data frame of Mileage values as the `newdata` argument to the `predict()` function:
+The upper bound of the 95% confidence interval is in the `.upper` column, and the lower bound of the interval is in the `.lower` column. To obtain, say, a 99% confidence interval, we simply specify the confidence level as a proportion using the `conf.level` argument:
+
+```{r}
+augment(price_mileage_model, interval="confidence", conf.level=.99)
+```
+
+To obtain a prediction interval instead of a confidence interval, simply change the `interval` argument to `"prediction"` instead of `"confidence"`
+
+```{r}
+augment(price_mileage_model, interval="prediction", conf.level=.99)
+```
+
+### Computing intervals around new observations
+
+The `agument()` function isn't limited to generating confidence and prediction intervals based on the Mileage values in the original data set - we can generate intervals for any Mileage values we choose! All we have to do is include a new data frame of Mileage values as the `newdata` argument to the `augment()` function:
 
 ```{r}
 new_mileages <- data.frame(Mileage = c(20, 50, 100))
-predict(price_mileage_model, newdata = new_mileages)
-```
-
-And by changing the `interval` argument to either `"confidence"` or `"prediction"`, we can find the upper and lower boundaries of the 95% confidence interval or prediction interval respectively:
-
-```{r}
-new_mileages <- data.frame(Mileage = c(20, 50, 100))
-# 95% confidence interval around conditional mean of y
 predict(price_mileage_model, newdata = new_mileages, interval = "confidence")
-# 95% Prediction interval around conditional value of y
-predict(price_mileage_model, newdata = new_mileages, interval = "prediction")
 ```
 
 ### Visualizing Intervals Around a Regression Model
@@ -211,9 +218,11 @@ ggplot(data = AccordPrice,
   geom_smooth(method = lm, formula = y~x)
 ```
 
-Drawing the 95% *prediction* interval is a bit more involved, since `geom_smooth()` doesn't include the ability to draw them auto-magically.
+However, `geom_smooth()` doens't have to option to draw prediction intervals instead of confidence; so if you want one, you'll have to plot it "manually": by computing the boundary values yourself using `augment()` and drawing those values on the plot using `geom_line()` or `geom_ribbon()`
 
-To draw the boundaries of this interval as a smooth line across the entire range of the plot, we'll first need to compute the upper and lower boundaries of the interval across a fine grid of x-axis values. Here, we'll use the `seq()` function to create a sequence of Mileage values spaced out by .1 miles, starting at 0 and ending at 150:
+Since we want the boundaries of the prediction interval to appear as a smooth curve across the entire range of the plot, we'll first need to compute the upper and lower boundaries of the interval across a fine grid of x-axis values. So, we'll need to create a series of many closely space mileage values, ranging from the minimum and maximum mileage values in the original data, and supply them to the `augment()` function as the `newdata` argument. 
+
+Creating this series of closely spaced mileage values is the perfect job for the `seq()` function! Here, we'll use it to create a sequence of Mileage values spaced out by .1 miles, starting at 0 and ending at 150:
 
 ```{r}
 new_mileages <- data.frame(Mileage = seq(from = 0, to = 150, by = .1))
@@ -222,7 +231,7 @@ new_mileages <- data.frame(Mileage = seq(from = 0, to = 150, by = .1))
 Then, we'll give these new Mileage values to the `predict()` function, and ask for boundaries of the 95% prediction interval around each of these ` nrow(new_mileages)` Mileage values:
 
 ```{r}
-prediction_interval <- predict(price_mileage_model,
+prediction_interval <- augment(price_mileage_model,
                                newdata = new_mileages,
                                interval = "prediction", 
                                )
@@ -230,38 +239,27 @@ prediction_interval <- predict(price_mileage_model,
 
 Since we need to eventually supply these values to `ggplot`, and `ggplot` only deals with data frames, we'll need to coerce these values from a matrix into a data frame:
 
-```{r}
-prediction_interval <- as.data.frame(prediction_interval)
-```
-
-Lastly, we need to combine these predictions about the outcome variable with the  Mileage values we based on them on. Each row of the `new_mileage` data frame represents a Mileage value, and each row of the `predcition_interval` data frame represents the corresponding predicted Price. So, what we need to is combine these two data frames together "side by side", so each row matches up! Let's use the `bind_cols()` function from the `dplyr()` package to do this:
-
-```{r}
-prediction_interval <- bind_cols(new_mileages, prediction_interval)
-```
-
 Now, we're ready to plot! Here, we demonstrate two ways of adding this interval to the plot. First, we'll draw the boundaries of this interval as two separate dashed lines:
 
 ```{r}
-#| code-line-numbers: "3|4|5"
 ggplot(data = AccordPrice,
        mapping = aes(x = Mileage, y = Price)
        ) +
   geom_point() +
   geom_smooth(method = lm, formula = y~x) +
   geom_line(data = prediction_interval, 
-            mapping = aes(y=upr),
-            color="red", linetype=2
+            mapping = aes(y = .upper),
+            color = "red", linetype = 2
             ) +
   geom_line(data = prediction_interval, 
-            mapping = aes(y=lwr),
-            color="red", linetype=2
+            mapping = aes(y = .lower),
+            color = "red", linetype = 2
             )
 ```
 
-Note that we had to supply the `prediction_interval` data frame as a layer-specific data frame for the `geom_line` function.
+Note that we had to supply the `prediction_interval` data frame as a layer-specific data frame for the `geom_line()` function.
 
-If you prefer the "filled in" style of interval (like how the confidence interval appears from `geom_smooth())`, you can use `geom_ribbon()`:
+If you prefer the "filled in" style of interval (like how the confidence interval appears from `geom_smooth()`), you can use `geom_ribbon()` to plot the interval:
 
 ```{r}
 #| code-line-numbers: "3"
@@ -271,9 +269,9 @@ ggplot(data = AccordPrice,
   geom_point() +
   geom_smooth(method = lm, formula = y~x) +
   geom_ribbon(data = prediction_interval, 
-              mapping = aes(y=fit, ymax=upr, ymin=lwr),
-              color="red", fill="red",
-              alpha=.05, linetype=2
+              mapping = aes(y = .fitted, ymax = .upper, ymin = .lower),
+              color = "red", fill = "red",
+              alpha = .05, linetype = 2
               )
 ```
 
