@@ -1273,15 +1273,15 @@
     },
     "regplanely": {
       "Package": "regplanely",
-      "Version": "0.0.0.9001",
+      "Version": "0.0.0.9002",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "regplanely",
       "RemoteUsername": "wjhopper",
       "RemoteRef": "HEAD",
-      "RemoteSha": "87781473c3201d29f95f80e2ff26978e044a7ad4",
-      "Hash": "64cebf9983896ac0b2c48a5c537ae0c7",
+      "RemoteSha": "388837a80ee4a1c97c0fd083b203c2272dfea453",
+      "Hash": "87ea951a75e83207aa02f72f78cd804c",
       "Requirements": [
         "magrittr",
         "plotly"

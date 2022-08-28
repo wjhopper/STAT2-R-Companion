@@ -690,6 +690,13 @@ full_second_order_model<- lm(Time ~ Tube * Funnel + I(Funnel^2) + I(Tube^2),
 broom::tidy(full_second_order_model)
 ```
 
+the `regression_plane()` function can be used to visualize this model, provided the quadratic terms have been created inside the model formula using the `I(x^2)` method:
+
+```{r}
+library(regplanely)
+regression_plane(full_second_order_model)
+```
+
 ## Correlated Predictors
 
 Example 3.15 introduces the `HousesNY` data set, which contains estimated prices (measured in thousands of dollars) for a sample of 53 city of [Canton, NY](https://en.wikipedia.org/wiki/Canton,_New_York), along with the size of each house (in 1,000s of square feet), the number of bedrooms, bathrooms, and the size of the lot (in acres).
