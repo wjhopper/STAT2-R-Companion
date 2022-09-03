@@ -109,7 +109,7 @@ Example 1.3 shows a summary of a simple linear regression model fit to the `Mile
 
 ### Fitting a simple linear regression model
 
-The `lm()` function (short for **l**inear **m**odel) does the "heavy lifting' of estimating the coefficients of the simple linear model. In other words, the `lm()` function find the optimal values for $\hat{\beta_0}$ and $\hat{\beta_1}$ in the model $Price = \hat{\beta_0} + \hat{\beta_1} \cdot Mileage + \epsilon$.
+The `lm()` function (short for **l**inear **m**odel) does the "heavy lifting' of estimating the coefficients of the simple linear model. In other words, the `lm()` function fits the model to the observed data by finding the optimal values for $\hat{\beta_0}$ and $\hat{\beta_1}$ in the model $Price = \hat{\beta_0} + \hat{\beta_1} \cdot Mileage + \epsilon$.
 
 To fit a linear regression model using `lm`, you need to supply:
 
