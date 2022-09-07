@@ -582,7 +582,7 @@ Warning
 </section>
 <section id="conditions-for-a-simple-linear-model" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="conditions-for-a-simple-linear-model"><span class="header-section-number">1.2</span> Conditions for a Simple Linear Model</h2>
-<p>Section 1.2 introduces mostly conceptual information about neccesary and sufficient conditions for interference on a linear model, but does introduce the formula for estimating the standard error of the regression (also called the “Residual Standard Error”). You’ll rarely need to use this formula “manually”, since the value of this statistic is included in the output from the <code>summary()</code> function:</p>
+<p>Section 1.2 introduces mostly conceptual information about neccesary and sufficient conditions for inference on a linear model, but does introduce the formula for estimating the standard error of the regression (also called the “Residual Standard Error”). You’ll rarely need to use this formula “manually”, since the value of this statistic is included in the output from the <code>summary()</code> function:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
