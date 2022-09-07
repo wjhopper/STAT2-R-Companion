@@ -263,7 +263,7 @@ Just be sure to set the `results: asis` chunk option!
 
 ## Conditions for a Simple Linear Model
 
-Section 1.2 introduces mostly conceptual information about neccesary and sufficient conditions for interference on a linear model, but does introduce the formula for estimating the standard error of the regression (also called the "Residual Standard Error"). You'll rarely need to use this formula "manually", since the value of this statistic is included in the output from the `summary()` function:
+Section 1.2 introduces mostly conceptual information about neccesary and sufficient conditions for inference on a linear model, but does introduce the formula for estimating the standard error of the regression (also called the "Residual Standard Error"). You'll rarely need to use this formula "manually", since the value of this statistic is included in the output from the `summary()` function:
 
 ```{r}
 #| eval: false
