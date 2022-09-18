@@ -328,7 +328,7 @@ div.csl-indent {
 <h4 class="unnumbered anchored" data-anchor-id="step-1-specify-the-relationship-of-interest">Step 1: Specify the relationship of interest</h4>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA  <span class="sc">|&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>specify()</code> function is where you set up the structure of the model using a the familiar formula notation. We’re specifying that we’re interested in the <code>GPA</code> and <code>VerbalSAT</code> relationship, and that we think the <code>VerbalSAT</code> score explains the <code>GPA</code> outcome.</p>
 </section>
@@ -343,9 +343,9 @@ div.csl-indent {
 <section id="step-3-generate-new-samples-of-data-by-permuting-our-data" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="step-3-generate-new-samples-of-data-by-permuting-our-data">Step 3: Generate new samples of data by permuting our data</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>This is the most import step in our hypothesis testing “pipeline”: This is where we take each Verbal SAT score from our data, and pair it with a random SAT score, where the SAT scores are randomly sampled with replacement from our original data as well. We repeated this process 1,000 times, to generate 1,000 new samples of data that are permutations of our original data.</p>
+<p>This is the most import step in our hypothesis testing “pipeline”: This is where we take each Verbal SAT score from our data, and pair it with a random GPA score that is sampled (without replacement) from our original data as well. We repeated this process 1,000 times, which generates 1,000 new samples of data that are permutations of our original data.</p>
 <p>This permutation process is helpful, because it generates 1,000 new data sets <em>where each Verbal SAT score is completely unrelated to it’s paired GPA value</em>. This how the Null Hypothesis says data is generated in the “real world”, and it’s exactly how we’ve generated our permutations. So, these 1,000 new data sets will show us exactly what kinds of GPA and Verbal SAT pairs we’d expect, if the null hypothesis is true!</p>
 </section>
 <section id="step-4-calculate-the-gpa-verbalsat-slope-from-each-permutation" class="level4 unnumbered">
