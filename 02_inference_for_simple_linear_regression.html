@@ -571,12 +571,14 @@ sample estimates:
 <p>The <code>agument()</code> function isn’t limited to generating confidence and prediction intervals based on the Mileage values in the original data set - we can generate intervals for any Mileage values we choose! All we have to do is include a new data frame of Mileage values as the <code>newdata</code> argument to the <code>augment()</code> function:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>new_mileages <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Mileage =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>))</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(price_mileage_model, <span class="at">newdata =</span> new_mileages, <span class="at">interval =</span> <span class="st">"confidence"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>        fit       lwr      upr
-1 18.413374 16.888598 19.93815
-2 14.819015 13.657874 15.98016
-3  8.828418  7.080566 10.57627</code></pre>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(price_mileage_model, <span class="at">newdata =</span> new_mileages, <span class="at">interval =</span> <span class="st">"confidence"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Mileage"],"name":[1],"type":["dbl"],"align":["right"]},{"label":[".fitted"],"name":[2],"type":["dbl"],"align":["right"]},{"label":[".lower"],"name":[3],"type":["dbl"],"align":["right"]},{"label":[".upper"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"20","2":"18.413374","3":"16.888598","4":"19.93815"},{"1":"50","2":"14.819015","3":"13.657874","4":"15.98016"},{"1":"100","2":"8.828418","3":"7.080566","4":"10.57627"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 </div>
 </div>
 </section>
@@ -585,13 +587,13 @@ sample estimates:
 <p>In Chapter 1, we learned how to <a href="01_simple_linear_regression.html#adding-the-regression-line-to-a-scatterplot">visualize the predictions of a regression model</a> using <code>ggplot()</code> and the <code>geom_smooth()</code> function specifically. In that example, we included the argument <code>se = FALSE</code> to suppress the confidence interval band around the regression line, since this interval had not been introduced yet.</p>
 <p>This means that drawing the 95% confidence interval around your model’s predictions is as easy as removing <code>se = FALSE</code> from your code!</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price)</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">formula =</span> y<span class="sc">~</span>x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">formula =</span> y<span class="sc">~</span>x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="02_inference_for_simple_linear_regression_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -600,31 +602,31 @@ sample estimates:
 <p>Since we want the boundaries of the prediction interval to appear as a smooth curve across the entire range of the plot, we’ll first need to compute the upper and lower boundaries of the interval across a fine grid of x-axis values. So, we’ll need to create a series of many closely space mileage values, ranging from the minimum and maximum mileage values in the original data, and supply them to the <code>augment()</code> function as the <code>newdata</code> argument.</p>
 <p>Creating this series of closely spaced mileage values is the perfect job for the <code>seq()</code> function! Here, we’ll use it to create a sequence of Mileage values spaced out by .1 miles, starting at 0 and ending at 150:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>new_mileages <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Mileage =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">150</span>, <span class="at">by =</span> .<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>new_mileages <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Mileage =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">150</span>, <span class="at">by =</span> .<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Then, we’ll give these new Mileage values to the <code>predict()</code> function, and ask for boundaries of the 95% prediction interval around each of these <code>nrow(new_mileages)</code> Mileage values:</p>
+<p>Then, we’ll give these new Mileage values to the <code>agument()</code> function, and ask for boundaries of the 95% prediction interval around each of these <code>nrow(new_mileages)</code> Mileage values:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>prediction_interval <span class="ot">&lt;-</span> <span class="fu">augment</span>(price_mileage_model,</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">newdata =</span> new_mileages,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">interval =</span> <span class="st">"prediction"</span>, </span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                               )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>prediction_interval <span class="ot">&lt;-</span> <span class="fu">augment</span>(price_mileage_model,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">newdata =</span> new_mileages,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">interval =</span> <span class="st">"prediction"</span>, </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                               )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Since we need to eventually supply these values to <code>ggplot</code>, and <code>ggplot</code> only deals with data frames, we’ll need to coerce these values from a matrix into a data frame:</p>
 <p>Now, we’re ready to plot! Here, we demonstrate two ways of adding this interval to the plot. First, we’ll draw the boundaries of this interval as two separate dashed lines:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">formula =</span> y<span class="sc">~</span>x) <span class="sc">+</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> prediction_interval, </span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> .upper),</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linetype =</span> <span class="dv">2</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">+</span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> prediction_interval, </span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> .lower),</span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linetype =</span> <span class="dv">2</span></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">formula =</span> y<span class="sc">~</span>x) <span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> prediction_interval, </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> .upper),</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linetype =</span> <span class="dv">2</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">+</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> prediction_interval, </span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> .lower),</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linetype =</span> <span class="dv">2</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="02_inference_for_simple_linear_regression_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -632,16 +634,16 @@ sample estimates:
 <p>Note that we had to supply the <code>prediction_interval</code> data frame as a layer-specific data frame for the <code>geom_line()</code> function.</p>
 <p>If you prefer the “filled in” style of interval (like how the confidence interval appears from <code>geom_smooth()</code>), you can use <code>geom_ribbon()</code> to plot the interval:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
-<span id="cb29-2"><a href="#cb29-2"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price)</span>
-<span id="cb29-3"><a href="#cb29-3"></a>       ) <span class="sc">+</span></span>
-<span id="cb29-4"><a href="#cb29-4"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb29-5"><a href="#cb29-5"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">formula =</span> y<span class="sc">~</span>x) <span class="sc">+</span></span>
-<span id="cb29-6"><a href="#cb29-6"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> prediction_interval, </span>
-<span id="cb29-7"><a href="#cb29-7"></a>              <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> .fitted, <span class="at">ymax =</span> .upper, <span class="at">ymin =</span> .lower),</span>
-<span id="cb29-8"><a href="#cb29-8"></a>              <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">fill =</span> <span class="st">"red"</span>,</span>
-<span id="cb29-9"><a href="#cb29-9"></a>              <span class="at">alpha =</span> .<span class="dv">05</span>, <span class="at">linetype =</span> <span class="dv">2</span></span>
-<span id="cb29-10"><a href="#cb29-10"></a>              )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
+<span id="cb28-2"><a href="#cb28-2"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Mileage, <span class="at">y =</span> Price)</span>
+<span id="cb28-3"><a href="#cb28-3"></a>       ) <span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">formula =</span> y<span class="sc">~</span>x) <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> prediction_interval, </span>
+<span id="cb28-7"><a href="#cb28-7"></a>              <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> .fitted, <span class="at">ymax =</span> .upper, <span class="at">ymin =</span> .lower),</span>
+<span id="cb28-8"><a href="#cb28-8"></a>              <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">fill =</span> <span class="st">"red"</span>,</span>
+<span id="cb28-9"><a href="#cb28-9"></a>              <span class="at">alpha =</span> .<span class="dv">05</span>, <span class="at">linetype =</span> <span class="dv">2</span></span>
+<span id="cb28-10"><a href="#cb28-10"></a>              )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="02_inference_for_simple_linear_regression_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
 </div>
