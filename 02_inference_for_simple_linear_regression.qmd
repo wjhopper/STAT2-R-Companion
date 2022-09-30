@@ -199,7 +199,7 @@ The `agument()` function isn't limited to generating confidence and prediction i
 
 ```{r}
 new_mileages <- data.frame(Mileage = c(20, 50, 100))
-predict(price_mileage_model, newdata = new_mileages, interval = "confidence")
+augment(price_mileage_model, newdata = new_mileages, interval = "confidence")
 ```
 
 ### Visualizing Intervals Around a Regression Model
@@ -228,7 +228,7 @@ Creating this series of closely spaced mileage values is the perfect job for the
 new_mileages <- data.frame(Mileage = seq(from = 0, to = 150, by = .1))
 ```
 
-Then, we'll give these new Mileage values to the `predict()` function, and ask for boundaries of the 95% prediction interval around each of these ` nrow(new_mileages)` Mileage values:
+Then, we'll give these new Mileage values to the `agument()` function, and ask for boundaries of the 95% prediction interval around each of these `nrow(new_mileages)` Mileage values:
 
 ```{r}
 prediction_interval <- augment(price_mileage_model,
