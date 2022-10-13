@@ -517,7 +517,7 @@ weight_age_model_v2 <- lm(Weight ~ Sex * Age, data = Kids198)
 tidy(weight_age_model_v2)
 ```
 
-The values in the `estimate` column are the same, but their order has changed: Now, the slope for the females is in row three, and the difference in intercept is in row two. This means that the order of the coefficients depends on the order of the variables in the formula! So, always be sure to use the term labels, your knowledge of the variables types, and your knowledge of the category levels to guide your interpretations. Never rely on the order heuristic!
+The values in the `estimate` column are the same, but their order has changed: Now, the slope for the males group is in row three, and the difference in intercept between the groups is in row two. This means that the order of the coefficients depends on the order of the variables in the formula! So, always be sure to use the term labels, your knowledge of the variables types, and your knowledge of the category levels to guide your interpretations. Never rely on the order heuristic!
 :::
 
 ## New Predictors from Old
