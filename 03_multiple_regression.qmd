@@ -513,8 +513,8 @@ We began our reading of the regression table asking the question: where in the r
 Based on this example, it might be tempting to conclude "the intercept and slope for the baseline group are in the first two rows, the difference in intercept is in row three, and the difference in slope is in row four". But, consider what happens when the order of the explanatory variables is reversed in the model formula:
 
 ```{r}
-<<weight_age_model>>
-tidy(weight_age_model)
+weight_age_model_v2 <- lm(Weight ~ Sex * Age, data = Kids198)
+tidy(weight_age_model_v2)
 ```
 
 The values in the `estimate` column are the same, but their order has changed: Now, the slope for the females is in row three, and the difference in intercept is in row two. This means that the order of the coefficients depends on the order of the variables in the formula! So, always be sure to use the term labels, your knowledge of the variables types, and your knowledge of the category levels to guide your interpretations. Never rely on the order heuristic!
