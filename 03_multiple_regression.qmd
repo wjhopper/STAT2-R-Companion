@@ -536,7 +536,7 @@ data("Perch")
 Perch
 ```
 
-We can fit a multiple regression model that includes an interaction between two numeric variables in the same fashion that we first a the multiple regression model that included an interaction between Sex and Age in (Section 3.3)[#removing-the-parallel-slopes-constraint]: by combining the two variables in our model formula using the `*` multiplication operator:
+We can fit a multiple regression model that includes an interaction between two numeric variables in the same fashion that we first a the multiple regression model that included an interaction between Sex and Age in [Section 3.3](#removing-the-parallel-slopes-constraint): by combining the two variables in our model formula using the `*` multiplication operator:
 
 ```{r perch_weight_model}
 #| echo: false
