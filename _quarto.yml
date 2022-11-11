@@ -15,6 +15,9 @@ book:
         - "02_inference_for_simple_linear_regression.qmd"
         - "03_multiple_regression.qmd"
         - "04_additional_topics_in_regression.qmd"
+    - part: "Unit C: Logistic Regression"
+      chapters:
+        - "09_logistic_regression.qmd"
     - references.qmd
 
 bibliography: references.bib

@@ -1,0 +1,109 @@
+---
+title: "Logistic Regression"
+---
+
+Chapter 9 introduces the topic of logistic regression though the lens of the question: "What is the relationship between a teenager's age in years, and the chances of getting 7 or more hours of sleep a night". In this situation, the outcome variable we seek to model and explain is a binary categorical variable; in other words, a variable that measures a categorical attribute that can only take on two possible values. "Getting 7 or more hours of sleep a night" is a binary categorical variable here because respondents were only allowed to give "yes" or "no" responses to the question.
+
+The data collected from this survey are first summarized in a joint frequency table, showing the number of respondents who answered "Yes" and "No", broken down into groups based on the respondents age. We could re-create the same table by first counting the number of rows with each possible combination of age (14,15,16,17, or 18) and hours slept ("Yes" = seven or more hours, "No" = less than seven hours).
+
+```{r}
+library(Stat2Data)
+data("LosingSleep")
+```
+
+```{r}
+#| message: false
+library(dplyr)
+
+sleep_counts <- LosingSleep |>
+  count(Age, Outcome) |>
+  mutate(Outcome = recode(Outcome, `0` = "No", `1` = "Yes"))
+
+glimpse(sleep_counts)
+```
+
+Then, we can re-arrange the table of counts from a "long" into a "wide" layout, just for the sake of presenting the results in compact form:
+
+```{r}
+#| message: false
+library(tidyr)
+
+sleep_counts |>
+  pivot_wider(names_from = Age, values_from = n) |>
+  mutate(Outcome = recode(Outcome,
+                          "No" = "Fewer than 7 hours",
+                          "Yes" = "7 hours or more"
+                          )
+         )
+```
+
+The results are also visualized in a scatter plot, showing the relationship between the proportion of respondents saying "7 hours or more" for each age group. To reproduce this scatter plot, we must first compute these conditional probabilities; in other words, we have to compute the proportion of respondents saying "7 hours or more", given the respondent is a particular age.
+
+There are several ways to do this, but for reasons that will become clear in later sections, the best approach for us is to create one column holding the number of "Yes" responses for each age group, and one column holding the number of "No" responses for each age group. The, we'll compute the probability of saying "Yes, I get 7 or more hours of sleep a night", given a respondent has a particular age value, by taking the number of "Yes" values in each row, and dividing by the sum of the "Yes" and "No" responses in that row:
+
+```{r}
+sleep_counts <- sleep_counts |>
+  pivot_wider(names_from = Outcome, values_from = n) |>
+  mutate(prob_7_or_more = Yes / (Yes + No))
+
+glimpse(sleep_counts)
+```
+
+Then we can create a scatter plot showing the probability of responding "7 hours or more" for each age using `ggplot`,
+
+```{r}
+library(ggplot2)
+
+ggplot(data = sleep_counts,
+       mapping = aes(x=Age, y=prob_7_or_more)
+       ) +
+  geom_point() +
+  scale_x_continuous('Age', limits = c(0,40)) +
+  scale_y_continuous('Proportion Saying "Yes"', limits = c(0, 1))
+```
+
+We will take the author's advice, and *not* fit a linear regression model to these data. As a consequence, we will not demonstrate how to re-create Figure 9.2, as this figure is included in the book only to illustrate what *not* to do when modeling a binary outcome variable.
+
+## The Logistic Transformation
+
+Rightfully, the next section begins with a visualization of the model you *should* fit to these data, a logistic regression model!
+
+```{r}
+#| echo: false
+#| label: fig-logistic-viz
+#| fig-cap: Reproducing Figure 9.3 from STAT2, which visualizes the predicted probability of sleeping 7 or more hours a night, given a teenager's age, based on a logistic regression model.
+#| 
+ggplot(data = sleep_counts,
+       mapping = aes(x=Age, y=prob_7_or_more, s=Yes, f=No)
+       ) +
+  geom_point() +
+  geom_smooth(method = glm, formula = cbind(s, f) ~ x,
+              method.args = list(family=binomial),
+              fullrange = TRUE,
+              se = FALSE
+              ) +
+  scale_x_continuous('Age', limits = c(0,40)) +
+  scale_y_continuous('Proportion Saying "Yes"', limits = c(0, 1))
+```
+
+But before we learn about how to *visualize* the logistic model shown in @fig-logistic-viz, we'll learn about how to *fit* a logistic model.
+
+To fit a logistic model, we'll need to use a new R function; we'll need to use the `glm()` function (as a opposed to the `lm()` function). The "g" in "glm" is short for "generalized"; logistic regression models are said to be an example of a "generalized" linear model. Below, we fit a logistic regression model that uses a teenager's age to predict the probability they get 7 or more hours of sleep a night:
+
+```{r}
+sleep_model <- glm(cbind(Yes, No) ~ Age, data = sleep_counts,
+                   family = binomial
+                   )
+```
+
+Let's take a moment to point out what is similar, and dissimilar, from our previous work fitting linear regression models with the `lm()` function.
+
+|                  Similarity                    |                    Dissimilarity             |
+|------------------------------------------------|----------------------------------------------|
+| Model structure still specified with a formula | Left-hand side of formula uses two variables |
+| Must include data set as an argument           | Must also include a `family` argument        |
+
+On the left hand side of our model formula, we have a two-column matrix: one column holds the number of "Yes" responses for each row in the data set, and one column holds the number of "No" responses for each row in the data set. If the data set you are using measures the binary categorical outcome using the **number** of observations that fell into each category, then you must supply both of the counts to the `glm()` function in order to fit the model.
+
+The `family=binomial` argument is also crucial; this is what makes R understand that the two values on the left hand side of the formula don't reflect two completely separate variables, but actually measure the number of observations falling into the "yes" and "no" response categories. In other words, the `family=binomial` variable is what tells R you are modeling a binary categorical outcome, instead of a continuous numeric outcome.
+
