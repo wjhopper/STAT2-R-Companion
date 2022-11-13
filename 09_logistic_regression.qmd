@@ -107,3 +107,38 @@ On the left hand side of our model formula, we have a two-column matrix: one col
 
 The `family=binomial` argument is also crucial; this is what makes R understand that the two values on the left hand side of the formula don't reflect two completely separate variables, but actually measure the number of observations falling into the "yes" and "no" response categories. In other words, the `family=binomial` variable is what tells R you are modeling a binary categorical outcome, instead of a continuous numeric outcome.
 
+Fortunately, we can still find the fitted coefficients by summarizing the fitted model object:
+
+```{r}
+summary(sleep_model)$coefficients
+```
+
+The regression table for a logistic regression tables looks extremely similar to the regression table for a linear regression, with the small difference that the hypothesis test for each coefficient is a based on a *z* distribution (i.e., a Normal distribution with mean=0 and standard deviation=1) instead of a t-distribution.
+
+And, we can still say that our estimated outcome is a linear function of our fitted coefficients:
+
+```{r}
+#| echo: false
+#| results: asis
+
+betas <- round(coef(sleep_model), 2)
+cat("$$\n")
+cat(paste0("\\hat{y} = ", betas[1], " + ", betas[2], " \\cdot Age\n"))
+cat("$$ {#eq-linear-version}\n")
+```
+
+But, our $\hat{y}$ is something entirely new! It's not the estimated number of "Yes" responses, the estimated number of "No" responses, or the estimated probability of "Yes" response. Here, $\hat{y}$ represents the estimated the **log-odds** of a "Yes" response:
+
+$$
+\hat{y} = ln\big(\frac{\pi}{1-\pi}\big)
+$$ {#eq-log-odds}
+
+Substituting @eq-log-odds into @eq-linear-version shows us that a linear combination of the explanatory variables used in a logistic regression predicts the log-odds of a "success" from the outcome variable:
+
+```{r}
+cat("$$\n")
+cat(paste0("ln\\big(\\frac{\\pi}{1-\\pi}\\big) = ", betas[1], " + ", betas[2], " \\cdot Age\n"))
+cat("$$\n")
+```
+
+Because of this, the equation for a logistic regression model is sometimes expressed as $\widehat{logit(y)} = b_0 + b_1 \cdot x$, since `logit()` is a commonly used abbreviation for the log-odds transformation.
