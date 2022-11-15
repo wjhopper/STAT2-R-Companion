@@ -15,6 +15,12 @@ book:
         - "02_inference_for_simple_linear_regression.qmd"
         - "03_multiple_regression.qmd"
         - "04_additional_topics_in_regression.qmd"
+    - part: "Unit B: Analysis of Variance"
+      chapters: 
+        - "05_one-way_ANOVA.qmd"
+        - "06_two-way_ANOVA.qmd"
+        - "07_ANOVA_with_interaction.qmd"
+        - "08_additional_topics_in_ANOVA.qmd"
     - part: "Unit C: Logistic Regression"
       chapters:
         - "09_logistic_regression.qmd"

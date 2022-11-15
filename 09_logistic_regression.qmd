@@ -48,7 +48,7 @@ sleep_counts <- sleep_counts |>
   pivot_wider(names_from = Outcome, values_from = n) |>
   mutate(prob_7_or_more = Yes / (Yes + No))
 
-glimpse(sleep_counts)
+sleep_counts
 ```
 
 Then we can create a scatter plot showing the probability of responding "7 hours or more" for each age using `ggplot`,
