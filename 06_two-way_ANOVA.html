@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>The R Companion to STATS2 - References</title>
+<title>The R Companion to STATS2 - 6&nbsp; Blocking and Two-way ANOVA</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -15,25 +15,6 @@ span.underline{text-decoration: underline;}
 div.column{display: inline-block; vertical-align: top; width: 50%;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-}
-.hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}
 </style>
 
 
@@ -44,7 +25,8 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./09_logistic_regression.html" rel="prev">
+<link href="./07_ANOVA_with_interaction.html" rel="next">
+<link href="./05_one-way_ANOVA.html" rel="prev">
 <link href="./favicon.png" rel="icon" type="image/png">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -84,7 +66,7 @@ div.csl-indent {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">References</h1>
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Blocking and Two-way ANOVA</span></h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -160,7 +142,7 @@ div.csl-indent {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./06_two-way_ANOVA.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Blocking and Two-way ANOVA</span></a>
+  <a href="./06_two-way_ANOVA.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Blocking and Two-way ANOVA</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -192,7 +174,7 @@ div.csl-indent {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link active">References</a>
+  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
   </div>
 </li>
     </ul>
@@ -207,7 +189,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">References</h1>
+<h1 class="title d-none d-lg-block"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Blocking and Two-way ANOVA</span></h1>
 </div>
 
 
@@ -221,56 +203,7 @@ div.csl-indent {
 
 </header>
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
-<div id="ref-equatiomatic_package" class="csl-entry" role="doc-biblioentry">
-Anderson, Daniel, Andrew Heiss, and Jay Sumners. 2022. <em>Equatiomatic:
-Transform Models into ’LaTeX’ Equations</em>. <a href="https://CRAN.R-project.org/package=equatiomatic">https://CRAN.R-project.org/package=equatiomatic</a>.
-</div>
-<div id="ref-Cannon2018stat2" class="csl-entry" role="doc-biblioentry">
-Cannon, A. R., G. W. Cobb, B. A. Hartlaub, J. M. Legler, R. H. Lock, T.
-L. Moore, A. J. Rossman, and J. A. Witmer. 2018. <em>Stat2: Modeling
-with Regression and ANOVA</em>. Macmillan Learning. <a href="https://www.macmillanlearning.com/college/us/product/STAT2/p/1319054072">https://www.macmillanlearning.com/college/us/product/STAT2/p/1319054072</a>.
-</div>
-<div id="ref-infer_package" class="csl-entry" role="doc-biblioentry">
-Couch, Simon P., Andrew P. Bray, Chester Ismay, Evgeni Chasnovski,
-Benjamin S. Baumer, and Mine Çetinkaya-Rundel. 2021. <span>“<span class="nocase">infer</span>: An <span>R</span> Package for
-Tidyverse-Friendly Statistical Inference.”</span> <em>Journal of Open
-Source Software</em> 6 (65): 3661. <a href="https://doi.org/10.21105/joss.03661">https://doi.org/10.21105/joss.03661</a>.
-</div>
-<div id="ref-car_package" class="csl-entry" role="doc-biblioentry">
-Fox, John, and Sanford Weisberg. 2019. <em>An <span>R</span> Companion
-to Applied Regression</em>. Third. Thousand Oaks <span>CA</span>: Sage.
-<a href="https://socialsciences.mcmaster.ca/jfox/Books/Companion/">https://socialsciences.mcmaster.ca/jfox/Books/Companion/</a>.
-</div>
-<div id="ref-moderndive_package" class="csl-entry" role="doc-biblioentry">
-Kim, Albert Y., Chester Ismay, and Max Kuhn. 2021. <span>“Take a
-Moderndive into Introductory Linear Regression with r.”</span> <em>The
-Journal of Open Source Education</em> 4 (41, 115). <a href="https://doi.org/10.21105/jose.00115">https://doi.org/10.21105/jose.00115</a>.
-</div>
-<div id="ref-performance_package" class="csl-entry" role="doc-biblioentry">
-Lüdecke, Daniel, Mattan S. Ben-Shachar, Indrajeet Patil, Philip
-Waggoner, and Dominique Makowski. 2021. <span>“<span class="nocase">performance</span>: An <span>R</span> Package for
-Assessment, Comparison and Testing of Statistical Models.”</span>
-<em>Journal of Open Source Software</em> 6 (60): 3139. <a href="https://doi.org/10.21105/joss.03139">https://doi.org/10.21105/joss.03139</a>.
-</div>
-<div id="ref-broom_package" class="csl-entry" role="doc-biblioentry">
-Robinson, David, Alex Hayes, and Simon Couch. 2022. <em>Broom: Convert
-Statistical Objects into Tidy Tibbles</em>. <a href="https://CRAN.R-project.org/package=broom">https://CRAN.R-project.org/package=broom</a>.
-</div>
-<div id="ref-GGally_package" class="csl-entry" role="doc-biblioentry">
-Schloerke, Barret, Di Cook, Joseph Larmarange, Francois Briatte, Moritz
-Marbach, Edwin Thoen, Amos Elberg, and Jason Crowley. 2021. <em>GGally:
-Extension to ’Ggplot2’</em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
-</div>
-<div id="ref-ggplot2package" class="csl-entry" role="doc-biblioentry">
-Wickham, Hadley. 2016. <em>Ggplot2: Elegant Graphics for Data
-Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.
-</div>
-<div id="ref-dplyr_package" class="csl-entry" role="doc-biblioentry">
-Wickham, Hadley, Romain François, Lionel Henry, and Kirill Müller. 2022.
-<em>Dplyr: A Grammar of Data Manipulation</em>. <a href="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</a>.
-</div>
-</div>
+<p>This section is not yet implemented.</p>
 
 
 
@@ -374,11 +307,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./09_logistic_regression.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Logistic Regression</span></span>
+      <a href="./05_one-way_ANOVA.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">One-way ANOVA and Randomized Experiments</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./07_ANOVA_with_interaction.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">ANOVA with Interaction and Factorial Designs</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->
