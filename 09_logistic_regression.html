@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>The R Companion to STATS2 - 5&nbsp; Logistic Regression</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./04_additional_topics_in_regression.html" rel="prev">
+<link href="./favicon.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Logistic Regression</span></h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./" class="sidebar-logo-link">
+      <img src="./STAT2_logo_small.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">The R Companion to STATS2</a> 
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Preface</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Unit A: Linear Regression</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_simple_linear_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Simple Linear Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_inference_for_simple_linear_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Inference for Simple Linear Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_multiple_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Multiple Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_additional_topics_in_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Additional Topics in Regression</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Unit C: Logistic Regression</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09_logistic_regression.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Logistic Regression</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#choosing-a-logistic-regression-model" id="toc-choosing-a-logistic-regression-model" class="nav-link active" data-scroll-target="#choosing-a-logistic-regression-model"> <span class="header-section-number">5.1</span> Choosing a Logistic Regression Model</a>
+  <ul class="collapse">
+  <li><a href="#the-logistic-transformation" id="toc-the-logistic-transformation" class="nav-link" data-scroll-target="#the-logistic-transformation"> <span class="header-section-number">5.1.1</span> The Logistic Transformation</a></li>
+  <li><a href="#example-9.4" id="toc-example-9.4" class="nav-link" data-scroll-target="#example-9.4"> <span class="header-section-number">5.1.2</span> Example 9.4</a></li>
+  </ul></li>
+  <li><a href="#logistic-regression-and-odds-ratios" id="toc-logistic-regression-and-odds-ratios" class="nav-link" data-scroll-target="#logistic-regression-and-odds-ratios"> <span class="header-section-number">5.2</span> Logistic Regression and Odds Ratios</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Logistic Regression</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="choosing-a-logistic-regression-model" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="choosing-a-logistic-regression-model"><span class="header-section-number">5.1</span> Choosing a Logistic Regression Model</h2>
+<p>Chapter 9 introduces the topic of logistic regression though the lens of the question: “What is the relationship between a teenager’s age in years, and the chances of getting 7 or more hours of sleep a night”. In this situation, the outcome variable we seek to model and explain is a binary categorical variable; in other words, a variable that measures a categorical attribute that can only take on two possible values. “Getting 7 or more hours of sleep a night” is a binary categorical variable here because respondents were only allowed to give “yes” or “no” responses to the question.</p>
+<p>The data collected from this survey are first summarized in a joint frequency table, showing the number of respondents who answered “Yes” and “No”, broken down into groups based on the respondents age. We could re-create the same table by first counting the number of rows with each possible combination of age (14,15,16,17, or 18) and hours slept (“Yes” = seven or more hours, “No” = less than seven hours).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"LosingSleep"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sleep_counts <span class="ot">&lt;-</span> LosingSleep <span class="sc">|&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Age, Outcome) <span class="sc">|&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Outcome =</span> <span class="fu">recode</span>(Outcome, <span class="st">`</span><span class="at">0</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"No"</span>, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Yes"</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>sleep_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Age"],"name":[1],"type":["int"],"align":["right"]},{"label":["Outcome"],"name":[2],"type":["chr"],"align":["left"]},{"label":["n"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"14","2":"No","3":"12"},{"1":"14","2":"Yes","3":"34"},{"1":"15","2":"No","3":"35"},{"1":"15","2":"Yes","3":"79"},{"1":"16","2":"No","3":"37"},{"1":"16","2":"Yes","3":"77"},{"1":"17","2":"No","3":"39"},{"1":"17","2":"Yes","3":"65"},{"1":"18","2":"No","3":"27"},{"1":"18","2":"Yes","3":"41"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Then, we can re-arrange the table of counts from a “long” into a “wide” layout, just for the sake of presenting the results in compact form:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>sleep_counts <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Age, <span class="at">values_from =</span> n) <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Outcome =</span> <span class="fu">recode</span>(Outcome,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                          <span class="st">"No"</span> <span class="ot">=</span> <span class="st">"Fewer than 7 hours"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                          <span class="st">"Yes"</span> <span class="ot">=</span> <span class="st">"7 hours or more"</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                          )</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>         )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Outcome"],"name":[1],"type":["chr"],"align":["left"]},{"label":["14"],"name":[2],"type":["int"],"align":["right"]},{"label":["15"],"name":[3],"type":["int"],"align":["right"]},{"label":["16"],"name":[4],"type":["int"],"align":["right"]},{"label":["17"],"name":[5],"type":["int"],"align":["right"]},{"label":["18"],"name":[6],"type":["int"],"align":["right"]}],"data":[{"1":"Fewer than 7 hours","2":"12","3":"35","4":"37","5":"39","6":"27"},{"1":"7 hours or more","2":"34","3":"79","4":"77","5":"65","6":"41"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>The results are also visualized in a scatter plot, showing the relationship between the proportion of respondents saying “7 hours or more” for each age group. To reproduce this scatter plot, we must first compute these conditional probabilities; in other words, we have to compute the proportion of respondents saying “7 hours or more”, given the respondent is a particular age.</p>
+<p>There are several ways to do this, but for reasons that will become clear in later sections, the best approach for us is to create one column holding the number of “Yes” responses for each age group, and one column holding the number of “No” responses for each age group. The, we’ll compute the probability of saying “Yes, I get 7 or more hours of sleep a night”, given a respondent has a particular age value, by taking the number of “Yes” values in each row, and dividing by the sum of the “Yes” and “No” responses in that row:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sleep_counts <span class="ot">&lt;-</span> sleep_counts <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Outcome, <span class="at">values_from =</span> n) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prob_7_or_more =</span> Yes <span class="sc">/</span> (Yes <span class="sc">+</span> No))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(sleep_counts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 5
+Columns: 4
+$ Age            &lt;int&gt; 14, 15, 16, 17, 18
+$ No             &lt;int&gt; 12, 35, 37, 39, 27
+$ Yes            &lt;int&gt; 34, 79, 77, 65, 41
+$ prob_7_or_more &lt;dbl&gt; 0.7391304, 0.6929825, 0.6754386, 0.6250000, 0.6029412</code></pre>
+</div>
+</div>
+<p>Then we can create a scatter plot showing the probability of responding “7 hours or more” for each age using <code>ggplot</code>,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> sleep_counts,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>Age, <span class="at">y=</span>prob_7_or_more)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">'Age'</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">40</span>)) <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">'Proportion Saying "Yes"'</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="09_logistic_regression_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We will take the author’s advice, and <em>not</em> fit a linear regression model to these data. As a consequence, we will not demonstrate how to re-create Figure 9.2, as this figure is included in the book only to illustrate what <em>not</em> to do when modeling a binary outcome variable.</p>
+<section id="the-logistic-transformation" class="level3" data-number="5.1.1">
+<h3 data-number="5.1.1" class="anchored" data-anchor-id="the-logistic-transformation"><span class="header-section-number">5.1.1</span> The Logistic Transformation</h3>
+<p>Rightfully, the next section begins with a visualization of the model you <em>should</em> fit to these data, a logistic regression model!</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-logistic-viz" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="09_logistic_regression_files/figure-html/fig-logistic-viz-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure 5.1: Reproducing Figure 9.3 from STAT2, which visualizes the predicted probability of sleeping 7 or more hours a night, given a teenager’s age, based on a logistic regression model.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>But before we learn about how to <em>visualize</em> the logistic model shown in <a href="#fig-logistic-viz">Figure&nbsp;<span>5.1</span></a>, we’ll learn about how to <em>fit</em> a logistic model.</p>
+<p>To fit a logistic model, we’ll need to use a new R function; we’ll need to use the <code>glm()</code> function (as a opposed to the <code>lm()</code> function). The “g” in “glm” is short for “generalized”; logistic regression models are said to be an example of a “generalized” linear model. Below, we fit a logistic regression model that uses a teenager’s age to predict the probability they get 7 or more hours of sleep a night:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sleep_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(Yes, No) <span class="sc">~</span> Age, <span class="at">data =</span> sleep_counts,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">family =</span> binomial</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                   )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s take a moment to point out what is similar, and dissimilar, from our previous work fitting linear regression models with the <code>lm()</code> function.</p>
+<table class="table">
+<colgroup>
+<col style="width: 51%">
+<col style="width: 48%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Similarity</th>
+<th>Dissimilarity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Model structure still specified with a formula</td>
+<td>Left-hand side of formula uses two variables</td>
+</tr>
+<tr class="even">
+<td>Must include data set as an argument</td>
+<td>Must also include a <code>family</code> argument</td>
+</tr>
+</tbody>
+</table>
+<p>On the left hand side of our model formula, we have a two-column matrix: one column holds the number of “Yes” responses for each row in the data set, and one column holds the number of “No” responses for each row in the data set. If the data set you are using measures the binary categorical outcome using the <strong>number</strong> of observations that fell into each category, then you must supply both of the counts to the <code>glm()</code> function in order to fit the model.</p>
+<p>The <code>family=binomial</code> argument is also crucial; this is what makes R understand that the two values on the left hand side of the formula don’t reflect two completely separate variables, but actually measure the number of observations falling into the “yes” and “no” response categories. In other words, the <code>family=binomial</code> variable is what tells R you are modeling a binary categorical outcome, instead of a continuous numeric outcome.</p>
+<p>Fortunately, we can still find the fitted coefficients by summarizing the fitted model object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sleep_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              Estimate Std. Error   z value   Pr(&gt;|z|)
+(Intercept)  3.1186375 1.33374817  2.338251 0.01937425
+Age         -0.1513594 0.08234823 -1.838041 0.06605631</code></pre>
+</div>
+</div>
+<p>The regression table for a logistic regression tables looks extremely similar to the regression table for a linear regression, with the small difference that the hypothesis test for each coefficient is a based on a <em>z</em> distribution (i.e., a Normal distribution with mean=0 and standard deviation=1) instead of a t-distribution.</p>
+<p>And, we can still say that our estimated outcome is a linear function of our fitted coefficients:</p>
+<p><span id="eq-linear-version"><span class="math display">\[
+\hat{y} = 3.12 + -0.15 \cdot Age
+\tag{5.1}\]</span></span></p>
+<p>But, our <span class="math inline">\(\hat{y}\)</span> is something entirely new! It’s not the estimated number of “Yes” responses, the estimated number of “No” responses, or the estimated probability of “Yes” response. Here, <span class="math inline">\(\hat{y}\)</span> represents the estimated the <strong>log-odds</strong> of a “Yes” response:</p>
+<p><span id="eq-log-odds"><span class="math display">\[
+\hat{y} = ln\big(\frac{\pi}{1-\pi}\big)
+\tag{5.2}\]</span></span></p>
+<p>Substituting <a href="#eq-log-odds">Equation&nbsp;<span>5.2</span></a> into <a href="#eq-linear-version">Equation&nbsp;<span>5.1</span></a> shows us that a linear combination of the explanatory variables used in a logistic regression predicts the log-odds of a “success” from the outcome variable:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"$$</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$$</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">"ln</span><span class="sc">\\</span><span class="st">big(</span><span class="sc">\\</span><span class="st">frac{</span><span class="sc">\\</span><span class="st">pi}{1-</span><span class="sc">\\</span><span class="st">pi}</span><span class="sc">\\</span><span class="st">big) = "</span>, betas[<span class="dv">1</span>], <span class="st">" + "</span>, betas[<span class="dv">2</span>], <span class="st">" </span><span class="sc">\\</span><span class="st">cdot Age</span><span class="sc">\n</span><span class="st">"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ln\big(\frac{\pi}{1-\pi}\big) = 3.12 + -0.15 \cdot Age</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"$$</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$$
+</code></pre>
+</div>
+</div>
+<p>Because of this, the equation for a logistic regression model is sometimes expressed as <span class="math inline">\(\widehat{logit(y)} = b_0 + b_1 \cdot x\)</span>, since <code>logit()</code> is a commonly used abbreviation for the log-odds transformation.</p>
+<p>Figure 9.4 visualizes the observed data, and the logistic model’s predictions, on the log-odds scale. We can re-create this plot be 1) applying the logit transformation directly to our data, and 2) computing the model’s predictions across a fine grid of x-axis points using the <code>broom::augment()</code> function, and plotting the resulting predictions as a line.</p>
+<p>First, we transform the observed probabilities into log-odds:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sleep_counts <span class="ot">&lt;-</span> sleep_counts <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_odds =</span> <span class="fu">log</span>(prob_7_or_more <span class="sc">/</span> (<span class="dv">1</span><span class="sc">-</span>prob_7_or_more) ) )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The, compute the model’s predictions on the log-odds scale as well</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>predicted_log_odds <span class="ot">&lt;-</span> <span class="fu">augment</span>(sleep_model,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                              <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Age =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">40</span>, <span class="at">by=</span>.<span class="dv">1</span>))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                              )</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>predicted_log_odds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Age"],"name":[1],"type":["dbl"],"align":["right"]},{"label":[".fitted"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.0","2":"3.118637500"},{"1":"0.1","2":"3.103501556"},{"1":"0.2","2":"3.088365611"},{"1":"0.3","2":"3.073229666"},{"1":"0.4","2":"3.058093721"},{"1":"0.5","2":"3.042957776"},{"1":"0.6","2":"3.027821831"},{"1":"0.7","2":"3.012685887"},{"1":"0.8","2":"2.997549942"},{"1":"0.9","2":"2.982413997"},{"1":"1.0","2":"2.967278052"},{"1":"1.1","2":"2.952142107"},{"1":"1.2","2":"2.937006163"},{"1":"1.3","2":"2.921870218"},{"1":"1.4","2":"2.906734273"},{"1":"1.5","2":"2.891598328"},{"1":"1.6","2":"2.876462383"},{"1":"1.7","2":"2.861326439"},{"1":"1.8","2":"2.846190494"},{"1":"1.9","2":"2.831054549"},{"1":"2.0","2":"2.815918604"},{"1":"2.1","2":"2.800782659"},{"1":"2.2","2":"2.785646714"},{"1":"2.3","2":"2.770510770"},{"1":"2.4","2":"2.755374825"},{"1":"2.5","2":"2.740238880"},{"1":"2.6","2":"2.725102935"},{"1":"2.7","2":"2.709966990"},{"1":"2.8","2":"2.694831046"},{"1":"2.9","2":"2.679695101"},{"1":"3.0","2":"2.664559156"},{"1":"3.1","2":"2.649423211"},{"1":"3.2","2":"2.634287266"},{"1":"3.3","2":"2.619151321"},{"1":"3.4","2":"2.604015377"},{"1":"3.5","2":"2.588879432"},{"1":"3.6","2":"2.573743487"},{"1":"3.7","2":"2.558607542"},{"1":"3.8","2":"2.543471597"},{"1":"3.9","2":"2.528335653"},{"1":"4.0","2":"2.513199708"},{"1":"4.1","2":"2.498063763"},{"1":"4.2","2":"2.482927818"},{"1":"4.3","2":"2.467791873"},{"1":"4.4","2":"2.452655928"},{"1":"4.5","2":"2.437519984"},{"1":"4.6","2":"2.422384039"},{"1":"4.7","2":"2.407248094"},{"1":"4.8","2":"2.392112149"},{"1":"4.9","2":"2.376976204"},{"1":"5.0","2":"2.361840260"},{"1":"5.1","2":"2.346704315"},{"1":"5.2","2":"2.331568370"},{"1":"5.3","2":"2.316432425"},{"1":"5.4","2":"2.301296480"},{"1":"5.5","2":"2.286160535"},{"1":"5.6","2":"2.271024591"},{"1":"5.7","2":"2.255888646"},{"1":"5.8","2":"2.240752701"},{"1":"5.9","2":"2.225616756"},{"1":"6.0","2":"2.210480811"},{"1":"6.1","2":"2.195344867"},{"1":"6.2","2":"2.180208922"},{"1":"6.3","2":"2.165072977"},{"1":"6.4","2":"2.149937032"},{"1":"6.5","2":"2.134801087"},{"1":"6.6","2":"2.119665142"},{"1":"6.7","2":"2.104529198"},{"1":"6.8","2":"2.089393253"},{"1":"6.9","2":"2.074257308"},{"1":"7.0","2":"2.059121363"},{"1":"7.1","2":"2.043985418"},{"1":"7.2","2":"2.028849474"},{"1":"7.3","2":"2.013713529"},{"1":"7.4","2":"1.998577584"},{"1":"7.5","2":"1.983441639"},{"1":"7.6","2":"1.968305694"},{"1":"7.7","2":"1.953169749"},{"1":"7.8","2":"1.938033805"},{"1":"7.9","2":"1.922897860"},{"1":"8.0","2":"1.907761915"},{"1":"8.1","2":"1.892625970"},{"1":"8.2","2":"1.877490025"},{"1":"8.3","2":"1.862354081"},{"1":"8.4","2":"1.847218136"},{"1":"8.5","2":"1.832082191"},{"1":"8.6","2":"1.816946246"},{"1":"8.7","2":"1.801810301"},{"1":"8.8","2":"1.786674356"},{"1":"8.9","2":"1.771538412"},{"1":"9.0","2":"1.756402467"},{"1":"9.1","2":"1.741266522"},{"1":"9.2","2":"1.726130577"},{"1":"9.3","2":"1.710994632"},{"1":"9.4","2":"1.695858688"},{"1":"9.5","2":"1.680722743"},{"1":"9.6","2":"1.665586798"},{"1":"9.7","2":"1.650450853"},{"1":"9.8","2":"1.635314908"},{"1":"9.9","2":"1.620178963"},{"1":"10.0","2":"1.605043019"},{"1":"10.1","2":"1.589907074"},{"1":"10.2","2":"1.574771129"},{"1":"10.3","2":"1.559635184"},{"1":"10.4","2":"1.544499239"},{"1":"10.5","2":"1.529363295"},{"1":"10.6","2":"1.514227350"},{"1":"10.7","2":"1.499091405"},{"1":"10.8","2":"1.483955460"},{"1":"10.9","2":"1.468819515"},{"1":"11.0","2":"1.453683570"},{"1":"11.1","2":"1.438547626"},{"1":"11.2","2":"1.423411681"},{"1":"11.3","2":"1.408275736"},{"1":"11.4","2":"1.393139791"},{"1":"11.5","2":"1.378003846"},{"1":"11.6","2":"1.362867902"},{"1":"11.7","2":"1.347731957"},{"1":"11.8","2":"1.332596012"},{"1":"11.9","2":"1.317460067"},{"1":"12.0","2":"1.302324122"},{"1":"12.1","2":"1.287188178"},{"1":"12.2","2":"1.272052233"},{"1":"12.3","2":"1.256916288"},{"1":"12.4","2":"1.241780343"},{"1":"12.5","2":"1.226644398"},{"1":"12.6","2":"1.211508453"},{"1":"12.7","2":"1.196372509"},{"1":"12.8","2":"1.181236564"},{"1":"12.9","2":"1.166100619"},{"1":"13.0","2":"1.150964674"},{"1":"13.1","2":"1.135828729"},{"1":"13.2","2":"1.120692785"},{"1":"13.3","2":"1.105556840"},{"1":"13.4","2":"1.090420895"},{"1":"13.5","2":"1.075284950"},{"1":"13.6","2":"1.060149005"},{"1":"13.7","2":"1.045013060"},{"1":"13.8","2":"1.029877116"},{"1":"13.9","2":"1.014741171"},{"1":"14.0","2":"0.999605226"},{"1":"14.1","2":"0.984469281"},{"1":"14.2","2":"0.969333336"},{"1":"14.3","2":"0.954197392"},{"1":"14.4","2":"0.939061447"},{"1":"14.5","2":"0.923925502"},{"1":"14.6","2":"0.908789557"},{"1":"14.7","2":"0.893653612"},{"1":"14.8","2":"0.878517667"},{"1":"14.9","2":"0.863381723"},{"1":"15.0","2":"0.848245778"},{"1":"15.1","2":"0.833109833"},{"1":"15.2","2":"0.817973888"},{"1":"15.3","2":"0.802837943"},{"1":"15.4","2":"0.787701999"},{"1":"15.5","2":"0.772566054"},{"1":"15.6","2":"0.757430109"},{"1":"15.7","2":"0.742294164"},{"1":"15.8","2":"0.727158219"},{"1":"15.9","2":"0.712022274"},{"1":"16.0","2":"0.696886330"},{"1":"16.1","2":"0.681750385"},{"1":"16.2","2":"0.666614440"},{"1":"16.3","2":"0.651478495"},{"1":"16.4","2":"0.636342550"},{"1":"16.5","2":"0.621206606"},{"1":"16.6","2":"0.606070661"},{"1":"16.7","2":"0.590934716"},{"1":"16.8","2":"0.575798771"},{"1":"16.9","2":"0.560662826"},{"1":"17.0","2":"0.545526881"},{"1":"17.1","2":"0.530390937"},{"1":"17.2","2":"0.515254992"},{"1":"17.3","2":"0.500119047"},{"1":"17.4","2":"0.484983102"},{"1":"17.5","2":"0.469847157"},{"1":"17.6","2":"0.454711213"},{"1":"17.7","2":"0.439575268"},{"1":"17.8","2":"0.424439323"},{"1":"17.9","2":"0.409303378"},{"1":"18.0","2":"0.394167433"},{"1":"18.1","2":"0.379031488"},{"1":"18.2","2":"0.363895544"},{"1":"18.3","2":"0.348759599"},{"1":"18.4","2":"0.333623654"},{"1":"18.5","2":"0.318487709"},{"1":"18.6","2":"0.303351764"},{"1":"18.7","2":"0.288215820"},{"1":"18.8","2":"0.273079875"},{"1":"18.9","2":"0.257943930"},{"1":"19.0","2":"0.242807985"},{"1":"19.1","2":"0.227672040"},{"1":"19.2","2":"0.212536095"},{"1":"19.3","2":"0.197400151"},{"1":"19.4","2":"0.182264206"},{"1":"19.5","2":"0.167128261"},{"1":"19.6","2":"0.151992316"},{"1":"19.7","2":"0.136856371"},{"1":"19.8","2":"0.121720427"},{"1":"19.9","2":"0.106584482"},{"1":"20.0","2":"0.091448537"},{"1":"20.1","2":"0.076312592"},{"1":"20.2","2":"0.061176647"},{"1":"20.3","2":"0.046040702"},{"1":"20.4","2":"0.030904758"},{"1":"20.5","2":"0.015768813"},{"1":"20.6","2":"0.000632868"},{"1":"20.7","2":"-0.014503077"},{"1":"20.8","2":"-0.029639022"},{"1":"20.9","2":"-0.044774966"},{"1":"21.0","2":"-0.059910911"},{"1":"21.1","2":"-0.075046856"},{"1":"21.2","2":"-0.090182801"},{"1":"21.3","2":"-0.105318746"},{"1":"21.4","2":"-0.120454691"},{"1":"21.5","2":"-0.135590635"},{"1":"21.6","2":"-0.150726580"},{"1":"21.7","2":"-0.165862525"},{"1":"21.8","2":"-0.180998470"},{"1":"21.9","2":"-0.196134415"},{"1":"22.0","2":"-0.211270359"},{"1":"22.1","2":"-0.226406304"},{"1":"22.2","2":"-0.241542249"},{"1":"22.3","2":"-0.256678194"},{"1":"22.4","2":"-0.271814139"},{"1":"22.5","2":"-0.286950084"},{"1":"22.6","2":"-0.302086028"},{"1":"22.7","2":"-0.317221973"},{"1":"22.8","2":"-0.332357918"},{"1":"22.9","2":"-0.347493863"},{"1":"23.0","2":"-0.362629808"},{"1":"23.1","2":"-0.377765752"},{"1":"23.2","2":"-0.392901697"},{"1":"23.3","2":"-0.408037642"},{"1":"23.4","2":"-0.423173587"},{"1":"23.5","2":"-0.438309532"},{"1":"23.6","2":"-0.453445476"},{"1":"23.7","2":"-0.468581421"},{"1":"23.8","2":"-0.483717366"},{"1":"23.9","2":"-0.498853311"},{"1":"24.0","2":"-0.513989256"},{"1":"24.1","2":"-0.529125201"},{"1":"24.2","2":"-0.544261145"},{"1":"24.3","2":"-0.559397090"},{"1":"24.4","2":"-0.574533035"},{"1":"24.5","2":"-0.589668980"},{"1":"24.6","2":"-0.604804925"},{"1":"24.7","2":"-0.619940869"},{"1":"24.8","2":"-0.635076814"},{"1":"24.9","2":"-0.650212759"},{"1":"25.0","2":"-0.665348704"},{"1":"25.1","2":"-0.680484649"},{"1":"25.2","2":"-0.695620594"},{"1":"25.3","2":"-0.710756538"},{"1":"25.4","2":"-0.725892483"},{"1":"25.5","2":"-0.741028428"},{"1":"25.6","2":"-0.756164373"},{"1":"25.7","2":"-0.771300318"},{"1":"25.8","2":"-0.786436262"},{"1":"25.9","2":"-0.801572207"},{"1":"26.0","2":"-0.816708152"},{"1":"26.1","2":"-0.831844097"},{"1":"26.2","2":"-0.846980042"},{"1":"26.3","2":"-0.862115987"},{"1":"26.4","2":"-0.877251931"},{"1":"26.5","2":"-0.892387876"},{"1":"26.6","2":"-0.907523821"},{"1":"26.7","2":"-0.922659766"},{"1":"26.8","2":"-0.937795711"},{"1":"26.9","2":"-0.952931655"},{"1":"27.0","2":"-0.968067600"},{"1":"27.1","2":"-0.983203545"},{"1":"27.2","2":"-0.998339490"},{"1":"27.3","2":"-1.013475435"},{"1":"27.4","2":"-1.028611380"},{"1":"27.5","2":"-1.043747324"},{"1":"27.6","2":"-1.058883269"},{"1":"27.7","2":"-1.074019214"},{"1":"27.8","2":"-1.089155159"},{"1":"27.9","2":"-1.104291104"},{"1":"28.0","2":"-1.119427048"},{"1":"28.1","2":"-1.134562993"},{"1":"28.2","2":"-1.149698938"},{"1":"28.3","2":"-1.164834883"},{"1":"28.4","2":"-1.179970828"},{"1":"28.5","2":"-1.195106773"},{"1":"28.6","2":"-1.210242717"},{"1":"28.7","2":"-1.225378662"},{"1":"28.8","2":"-1.240514607"},{"1":"28.9","2":"-1.255650552"},{"1":"29.0","2":"-1.270786497"},{"1":"29.1","2":"-1.285922441"},{"1":"29.2","2":"-1.301058386"},{"1":"29.3","2":"-1.316194331"},{"1":"29.4","2":"-1.331330276"},{"1":"29.5","2":"-1.346466221"},{"1":"29.6","2":"-1.361602166"},{"1":"29.7","2":"-1.376738110"},{"1":"29.8","2":"-1.391874055"},{"1":"29.9","2":"-1.407010000"},{"1":"30.0","2":"-1.422145945"},{"1":"30.1","2":"-1.437281890"},{"1":"30.2","2":"-1.452417834"},{"1":"30.3","2":"-1.467553779"},{"1":"30.4","2":"-1.482689724"},{"1":"30.5","2":"-1.497825669"},{"1":"30.6","2":"-1.512961614"},{"1":"30.7","2":"-1.528097559"},{"1":"30.8","2":"-1.543233503"},{"1":"30.9","2":"-1.558369448"},{"1":"31.0","2":"-1.573505393"},{"1":"31.1","2":"-1.588641338"},{"1":"31.2","2":"-1.603777283"},{"1":"31.3","2":"-1.618913227"},{"1":"31.4","2":"-1.634049172"},{"1":"31.5","2":"-1.649185117"},{"1":"31.6","2":"-1.664321062"},{"1":"31.7","2":"-1.679457007"},{"1":"31.8","2":"-1.694592952"},{"1":"31.9","2":"-1.709728896"},{"1":"32.0","2":"-1.724864841"},{"1":"32.1","2":"-1.740000786"},{"1":"32.2","2":"-1.755136731"},{"1":"32.3","2":"-1.770272676"},{"1":"32.4","2":"-1.785408620"},{"1":"32.5","2":"-1.800544565"},{"1":"32.6","2":"-1.815680510"},{"1":"32.7","2":"-1.830816455"},{"1":"32.8","2":"-1.845952400"},{"1":"32.9","2":"-1.861088345"},{"1":"33.0","2":"-1.876224289"},{"1":"33.1","2":"-1.891360234"},{"1":"33.2","2":"-1.906496179"},{"1":"33.3","2":"-1.921632124"},{"1":"33.4","2":"-1.936768069"},{"1":"33.5","2":"-1.951904013"},{"1":"33.6","2":"-1.967039958"},{"1":"33.7","2":"-1.982175903"},{"1":"33.8","2":"-1.997311848"},{"1":"33.9","2":"-2.012447793"},{"1":"34.0","2":"-2.027583737"},{"1":"34.1","2":"-2.042719682"},{"1":"34.2","2":"-2.057855627"},{"1":"34.3","2":"-2.072991572"},{"1":"34.4","2":"-2.088127517"},{"1":"34.5","2":"-2.103263462"},{"1":"34.6","2":"-2.118399406"},{"1":"34.7","2":"-2.133535351"},{"1":"34.8","2":"-2.148671296"},{"1":"34.9","2":"-2.163807241"},{"1":"35.0","2":"-2.178943186"},{"1":"35.1","2":"-2.194079130"},{"1":"35.2","2":"-2.209215075"},{"1":"35.3","2":"-2.224351020"},{"1":"35.4","2":"-2.239486965"},{"1":"35.5","2":"-2.254622910"},{"1":"35.6","2":"-2.269758855"},{"1":"35.7","2":"-2.284894799"},{"1":"35.8","2":"-2.300030744"},{"1":"35.9","2":"-2.315166689"},{"1":"36.0","2":"-2.330302634"},{"1":"36.1","2":"-2.345438579"},{"1":"36.2","2":"-2.360574523"},{"1":"36.3","2":"-2.375710468"},{"1":"36.4","2":"-2.390846413"},{"1":"36.5","2":"-2.405982358"},{"1":"36.6","2":"-2.421118303"},{"1":"36.7","2":"-2.436254248"},{"1":"36.8","2":"-2.451390192"},{"1":"36.9","2":"-2.466526137"},{"1":"37.0","2":"-2.481662082"},{"1":"37.1","2":"-2.496798027"},{"1":"37.2","2":"-2.511933972"},{"1":"37.3","2":"-2.527069916"},{"1":"37.4","2":"-2.542205861"},{"1":"37.5","2":"-2.557341806"},{"1":"37.6","2":"-2.572477751"},{"1":"37.7","2":"-2.587613696"},{"1":"37.8","2":"-2.602749641"},{"1":"37.9","2":"-2.617885585"},{"1":"38.0","2":"-2.633021530"},{"1":"38.1","2":"-2.648157475"},{"1":"38.2","2":"-2.663293420"},{"1":"38.3","2":"-2.678429365"},{"1":"38.4","2":"-2.693565309"},{"1":"38.5","2":"-2.708701254"},{"1":"38.6","2":"-2.723837199"},{"1":"38.7","2":"-2.738973144"},{"1":"38.8","2":"-2.754109089"},{"1":"38.9","2":"-2.769245034"},{"1":"39.0","2":"-2.784380978"},{"1":"39.1","2":"-2.799516923"},{"1":"39.2","2":"-2.814652868"},{"1":"39.3","2":"-2.829788813"},{"1":"39.4","2":"-2.844924758"},{"1":"39.5","2":"-2.860060702"},{"1":"39.6","2":"-2.875196647"},{"1":"39.7","2":"-2.890332592"},{"1":"39.8","2":"-2.905468537"},{"1":"39.9","2":"-2.920604482"},{"1":"40.0","2":"-2.935740427"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Finally, we create a scatter plot using the log-odds, and draw a line representing the model’s predictions for each Age value along the x-axis. Notice that the <code>predicted_log_odds</code> data frame is passed to the <code>geom_line()</code> function as a layer-specific data frame.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> sleep_counts,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>Age, <span class="at">y=</span>log_odds)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y=</span>.fitted),</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> predicted_log_odds,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"blue"</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">'Age'</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">40</span>)) <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">'Log-Odds of Saying "Yes"'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-log-odds-viz" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="09_logistic_regression_files/figure-html/fig-log-odds-viz-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure 5.2: Reproducing Figure 9.4 from STAT2, which visualizes the predicted log-odds of sleeping 7 or more hours a night, given a teenager’s age, based on a logistic regression model.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>However, visualizing your data and model on the log-odds scale is often not very informative, as the log-odds scale is a very abstract measurement scale. Usually, it is preferable to measure your model’s prediction on the probability scale. You can transform values on the log-odds scale into the probability scale using the logistic function:</p>
+<p><span class="math display">\[
+\frac{1}{1 + e^{\hat{y}}}
+\]</span></p>
+<p>where <span class="math inline">\(\hat{y} = b_0 + b_1 \cdot x\)</span>, i.e., where <span class="math inline">\(\hat{y}\)</span> are your model’s predictions on the log-odds scale.</p>
+<p>We don’t have to apply this transformation “manually” before plotting - we can ask the <code>augment()</code> function to apply it for us by using the <code>type.predict</code> argument to ask it to compute the model’s predictions to be on the “response” scale (i.e., the same measurement scale as the original data).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>predicted_probabilities <span class="ot">&lt;-</span> <span class="fu">augment</span>(sleep_model, </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Age =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">40</span>, <span class="at">by=</span>.<span class="dv">1</span>)),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">type.predict =</span> <span class="st">"response"</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                                   )</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>predicted_probabilities</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Age"],"name":[1],"type":["dbl"],"align":["right"]},{"label":[".fitted"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.0","2":"0.95765501"},{"1":"0.1","2":"0.95703695"},{"1":"0.2","2":"0.95641028"},{"1":"0.3","2":"0.95577489"},{"1":"0.4","2":"0.95513067"},{"1":"0.5","2":"0.95447752"},{"1":"0.6","2":"0.95381532"},{"1":"0.7","2":"0.95314395"},{"1":"0.8","2":"0.95246332"},{"1":"0.9","2":"0.95177330"},{"1":"1.0","2":"0.95107377"},{"1":"1.1","2":"0.95036463"},{"1":"1.2","2":"0.94964576"},{"1":"1.3","2":"0.94891703"},{"1":"1.4","2":"0.94817833"},{"1":"1.5","2":"0.94742955"},{"1":"1.6","2":"0.94667055"},{"1":"1.7","2":"0.94590122"},{"1":"1.8","2":"0.94512143"},{"1":"1.9","2":"0.94433107"},{"1":"2.0","2":"0.94353000"},{"1":"2.1","2":"0.94271810"},{"1":"2.2","2":"0.94189525"},{"1":"2.3","2":"0.94106132"},{"1":"2.4","2":"0.94021618"},{"1":"2.5","2":"0.93935971"},{"1":"2.6","2":"0.93849176"},{"1":"2.7","2":"0.93761222"},{"1":"2.8","2":"0.93672095"},{"1":"2.9","2":"0.93581781"},{"1":"3.0","2":"0.93490269"},{"1":"3.1","2":"0.93397543"},{"1":"3.2","2":"0.93303592"},{"1":"3.3","2":"0.93208400"},{"1":"3.4","2":"0.93111956"},{"1":"3.5","2":"0.93014244"},{"1":"3.6","2":"0.92915252"},{"1":"3.7","2":"0.92814965"},{"1":"3.8","2":"0.92713370"},{"1":"3.9","2":"0.92610453"},{"1":"4.0","2":"0.92506200"},{"1":"4.1","2":"0.92400597"},{"1":"4.2","2":"0.92293630"},{"1":"4.3","2":"0.92185284"},{"1":"4.4","2":"0.92075546"},{"1":"4.5","2":"0.91964401"},{"1":"4.6","2":"0.91851835"},{"1":"4.7","2":"0.91737834"},{"1":"4.8","2":"0.91622383"},{"1":"4.9","2":"0.91505469"},{"1":"5.0","2":"0.91387076"},{"1":"5.1","2":"0.91267191"},{"1":"5.2","2":"0.91145799"},{"1":"5.3","2":"0.91022885"},{"1":"5.4","2":"0.90898436"},{"1":"5.5","2":"0.90772436"},{"1":"5.6","2":"0.90644871"},{"1":"5.7","2":"0.90515727"},{"1":"5.8","2":"0.90384989"},{"1":"5.9","2":"0.90252643"},{"1":"6.0","2":"0.90118675"},{"1":"6.1","2":"0.89983070"},{"1":"6.2","2":"0.89845813"},{"1":"6.3","2":"0.89706891"},{"1":"6.4","2":"0.89566289"},{"1":"6.5","2":"0.89423993"},{"1":"6.6","2":"0.89279989"},{"1":"6.7","2":"0.89134261"},{"1":"6.8","2":"0.88986798"},{"1":"6.9","2":"0.88837583"},{"1":"7.0","2":"0.88686604"},{"1":"7.1","2":"0.88533847"},{"1":"7.2","2":"0.88379297"},{"1":"7.3","2":"0.88222941"},{"1":"7.4","2":"0.88064765"},{"1":"7.5","2":"0.87904756"},{"1":"7.6","2":"0.87742901"},{"1":"7.7","2":"0.87579186"},{"1":"7.8","2":"0.87413598"},{"1":"7.9","2":"0.87246123"},{"1":"8.0","2":"0.87076750"},{"1":"8.1","2":"0.86905465"},{"1":"8.2","2":"0.86732256"},{"1":"8.3","2":"0.86557110"},{"1":"8.4","2":"0.86380015"},{"1":"8.5","2":"0.86200959"},{"1":"8.6","2":"0.86019930"},{"1":"8.7","2":"0.85836916"},{"1":"8.8","2":"0.85651906"},{"1":"8.9","2":"0.85464888"},{"1":"9.0","2":"0.85275852"},{"1":"9.1","2":"0.85084787"},{"1":"9.2","2":"0.84891681"},{"1":"9.3","2":"0.84696525"},{"1":"9.4","2":"0.84499308"},{"1":"9.5","2":"0.84300021"},{"1":"9.6","2":"0.84098654"},{"1":"9.7","2":"0.83895198"},{"1":"9.8","2":"0.83689643"},{"1":"9.9","2":"0.83481981"},{"1":"10.0","2":"0.83272204"},{"1":"10.1","2":"0.83060303"},{"1":"10.2","2":"0.82846271"},{"1":"10.3","2":"0.82630100"},{"1":"10.4","2":"0.82411783"},{"1":"10.5","2":"0.82191314"},{"1":"10.6","2":"0.81968686"},{"1":"10.7","2":"0.81743892"},{"1":"10.8","2":"0.81516929"},{"1":"10.9","2":"0.81287789"},{"1":"11.0","2":"0.81056469"},{"1":"11.1","2":"0.80822964"},{"1":"11.2","2":"0.80587270"},{"1":"11.3","2":"0.80349384"},{"1":"11.4","2":"0.80109302"},{"1":"11.5","2":"0.79867022"},{"1":"11.6","2":"0.79622541"},{"1":"11.7","2":"0.79375858"},{"1":"11.8","2":"0.79126972"},{"1":"11.9","2":"0.78875882"},{"1":"12.0","2":"0.78622587"},{"1":"12.1","2":"0.78367088"},{"1":"12.2","2":"0.78109385"},{"1":"12.3","2":"0.77849481"},{"1":"12.4","2":"0.77587376"},{"1":"12.5","2":"0.77323073"},{"1":"12.6","2":"0.77056574"},{"1":"12.7","2":"0.76787884"},{"1":"12.8","2":"0.76517007"},{"1":"12.9","2":"0.76243946"},{"1":"13.0","2":"0.75968707"},{"1":"13.1","2":"0.75691297"},{"1":"13.2","2":"0.75411720"},{"1":"13.3","2":"0.75129984"},{"1":"13.4","2":"0.74846097"},{"1":"13.5","2":"0.74560067"},{"1":"13.6","2":"0.74271902"},{"1":"13.7","2":"0.73981612"},{"1":"13.8","2":"0.73689207"},{"1":"13.9","2":"0.73394698"},{"1":"14.0","2":"0.73098095"},{"1":"14.1","2":"0.72799412"},{"1":"14.2","2":"0.72498660"},{"1":"14.3","2":"0.72195852"},{"1":"14.4","2":"0.71891004"},{"1":"14.5","2":"0.71584128"},{"1":"14.6","2":"0.71275240"},{"1":"14.7","2":"0.70964357"},{"1":"14.8","2":"0.70651495"},{"1":"14.9","2":"0.70336671"},{"1":"15.0","2":"0.70019902"},{"1":"15.1","2":"0.69701209"},{"1":"15.2","2":"0.69380608"},{"1":"15.3","2":"0.69058122"},{"1":"15.4","2":"0.68733769"},{"1":"15.5","2":"0.68407572"},{"1":"15.6","2":"0.68079552"},{"1":"15.7","2":"0.67749732"},{"1":"15.8","2":"0.67418135"},{"1":"15.9","2":"0.67084785"},{"1":"16.0","2":"0.66749707"},{"1":"16.1","2":"0.66412925"},{"1":"16.2","2":"0.66074466"},{"1":"16.3","2":"0.65734356"},{"1":"16.4","2":"0.65392622"},{"1":"16.5","2":"0.65049292"},{"1":"16.6","2":"0.64704395"},{"1":"16.7","2":"0.64357958"},{"1":"16.8","2":"0.64010013"},{"1":"16.9","2":"0.63660589"},{"1":"17.0","2":"0.63309717"},{"1":"17.1","2":"0.62957429"},{"1":"17.2","2":"0.62603756"},{"1":"17.3","2":"0.62248731"},{"1":"17.4","2":"0.61892387"},{"1":"17.5","2":"0.61534758"},{"1":"17.6","2":"0.61175878"},{"1":"17.7","2":"0.60815782"},{"1":"17.8","2":"0.60454505"},{"1":"17.9","2":"0.60092083"},{"1":"18.0","2":"0.59728552"},{"1":"18.1","2":"0.59363949"},{"1":"18.2","2":"0.58998311"},{"1":"18.3","2":"0.58631675"},{"1":"18.4","2":"0.58264081"},{"1":"18.5","2":"0.57895565"},{"1":"18.6","2":"0.57526168"},{"1":"18.7","2":"0.57155928"},{"1":"18.8","2":"0.56784885"},{"1":"18.9","2":"0.56413080"},{"1":"19.0","2":"0.56040552"},{"1":"19.1","2":"0.55667342"},{"1":"19.2","2":"0.55293491"},{"1":"19.3","2":"0.54919041"},{"1":"19.4","2":"0.54544033"},{"1":"19.5","2":"0.54168508"},{"1":"19.6","2":"0.53792510"},{"1":"19.7","2":"0.53416079"},{"1":"19.8","2":"0.53039259"},{"1":"19.9","2":"0.52662092"},{"1":"20.0","2":"0.52284621"},{"1":"20.1","2":"0.51906889"},{"1":"20.2","2":"0.51528939"},{"1":"20.3","2":"0.51150814"},{"1":"20.4","2":"0.50772557"},{"1":"20.5","2":"0.50394212"},{"1":"20.6","2":"0.50015822"},{"1":"20.7","2":"0.49637429"},{"1":"20.8","2":"0.49259079"},{"1":"20.9","2":"0.48880813"},{"1":"21.0","2":"0.48502675"},{"1":"21.1","2":"0.48124709"},{"1":"21.2","2":"0.47746957"},{"1":"21.3","2":"0.47369462"},{"1":"21.4","2":"0.46992269"},{"1":"21.5","2":"0.46615418"},{"1":"21.6","2":"0.46238953"},{"1":"21.7","2":"0.45862917"},{"1":"21.8","2":"0.45487351"},{"1":"21.9","2":"0.45112298"},{"1":"22.0","2":"0.44737800"},{"1":"22.1","2":"0.44363897"},{"1":"22.2","2":"0.43990632"},{"1":"22.3","2":"0.43618046"},{"1":"22.4","2":"0.43246178"},{"1":"22.5","2":"0.42875070"},{"1":"22.6","2":"0.42504762"},{"1":"22.7","2":"0.42135292"},{"1":"22.8","2":"0.41766702"},{"1":"22.9","2":"0.41399028"},{"1":"23.0","2":"0.41032311"},{"1":"23.1","2":"0.40666588"},{"1":"23.2","2":"0.40301897"},{"1":"23.3","2":"0.39938275"},{"1":"23.4","2":"0.39575759"},{"1":"23.5","2":"0.39214385"},{"1":"23.6","2":"0.38854189"},{"1":"23.7","2":"0.38495206"},{"1":"23.8","2":"0.38137471"},{"1":"23.9","2":"0.37781018"},{"1":"24.0","2":"0.37425882"},{"1":"24.1","2":"0.37072094"},{"1":"24.2","2":"0.36719689"},{"1":"24.3","2":"0.36368697"},{"1":"24.4","2":"0.36019151"},{"1":"24.5","2":"0.35671081"},{"1":"24.6","2":"0.35324517"},{"1":"24.7","2":"0.34979490"},{"1":"24.8","2":"0.34636028"},{"1":"24.9","2":"0.34294159"},{"1":"25.0","2":"0.33953912"},{"1":"25.1","2":"0.33615314"},{"1":"25.2","2":"0.33278391"},{"1":"25.3","2":"0.32943169"},{"1":"25.4","2":"0.32609674"},{"1":"25.5","2":"0.32277930"},{"1":"25.6","2":"0.31947960"},{"1":"25.7","2":"0.31619789"},{"1":"25.8","2":"0.31293438"},{"1":"25.9","2":"0.30968931"},{"1":"26.0","2":"0.30646287"},{"1":"26.1","2":"0.30325529"},{"1":"26.2","2":"0.30006675"},{"1":"26.3","2":"0.29689745"},{"1":"26.4","2":"0.29374757"},{"1":"26.5","2":"0.29061730"},{"1":"26.6","2":"0.28750681"},{"1":"26.7","2":"0.28441626"},{"1":"26.8","2":"0.28134581"},{"1":"26.9","2":"0.27829562"},{"1":"27.0","2":"0.27526584"},{"1":"27.1","2":"0.27225659"},{"1":"27.2","2":"0.26926802"},{"1":"27.3","2":"0.26630025"},{"1":"27.4","2":"0.26335341"},{"1":"27.5","2":"0.26042759"},{"1":"27.6","2":"0.25752292"},{"1":"27.7","2":"0.25463949"},{"1":"27.8","2":"0.25177740"},{"1":"27.9","2":"0.24893673"},{"1":"28.0","2":"0.24611758"},{"1":"28.1","2":"0.24332000"},{"1":"28.2","2":"0.24054408"},{"1":"28.3","2":"0.23778987"},{"1":"28.4","2":"0.23505744"},{"1":"28.5","2":"0.23234684"},{"1":"28.6","2":"0.22965811"},{"1":"28.7","2":"0.22699129"},{"1":"28.8","2":"0.22434642"},{"1":"28.9","2":"0.22172353"},{"1":"29.0","2":"0.21912265"},{"1":"29.1","2":"0.21654378"},{"1":"29.2","2":"0.21398695"},{"1":"29.3","2":"0.21145215"},{"1":"29.4","2":"0.20893941"},{"1":"29.5","2":"0.20644870"},{"1":"29.6","2":"0.20398003"},{"1":"29.7","2":"0.20153338"},{"1":"29.8","2":"0.19910874"},{"1":"29.9","2":"0.19670609"},{"1":"30.0","2":"0.19432539"},{"1":"30.1","2":"0.19196662"},{"1":"30.2","2":"0.18962974"},{"1":"30.3","2":"0.18731471"},{"1":"30.4","2":"0.18502150"},{"1":"30.5","2":"0.18275004"},{"1":"30.6","2":"0.18050030"},{"1":"30.7","2":"0.17827221"},{"1":"30.8","2":"0.17606571"},{"1":"30.9","2":"0.17388075"},{"1":"31.0","2":"0.17171724"},{"1":"31.1","2":"0.16957514"},{"1":"31.2","2":"0.16745435"},{"1":"31.3","2":"0.16535480"},{"1":"31.4","2":"0.16327642"},{"1":"31.5","2":"0.16121911"},{"1":"31.6","2":"0.15918280"},{"1":"31.7","2":"0.15716738"},{"1":"31.8","2":"0.15517278"},{"1":"31.9","2":"0.15319888"},{"1":"32.0","2":"0.15124560"},{"1":"32.1","2":"0.14931283"},{"1":"32.2","2":"0.14740048"},{"1":"32.3","2":"0.14550842"},{"1":"32.4","2":"0.14363656"},{"1":"32.5","2":"0.14178479"},{"1":"32.6","2":"0.13995299"},{"1":"32.7","2":"0.13814104"},{"1":"32.8","2":"0.13634883"},{"1":"32.9","2":"0.13457625"},{"1":"33.0","2":"0.13282316"},{"1":"33.1","2":"0.13108945"},{"1":"33.2","2":"0.12937500"},{"1":"33.3","2":"0.12767967"},{"1":"33.4","2":"0.12600335"},{"1":"33.5","2":"0.12434589"},{"1":"33.6","2":"0.12270718"},{"1":"33.7","2":"0.12108708"},{"1":"33.8","2":"0.11948545"},{"1":"33.9","2":"0.11790217"},{"1":"34.0","2":"0.11633709"},{"1":"34.1","2":"0.11479009"},{"1":"34.2","2":"0.11326102"},{"1":"34.3","2":"0.11174974"},{"1":"34.4","2":"0.11025613"},{"1":"34.5","2":"0.10878003"},{"1":"34.6","2":"0.10732132"},{"1":"34.7","2":"0.10587984"},{"1":"34.8","2":"0.10445545"},{"1":"34.9","2":"0.10304802"},{"1":"35.0","2":"0.10165740"},{"1":"35.1","2":"0.10028345"},{"1":"35.2","2":"0.09892602"},{"1":"35.3","2":"0.09758497"},{"1":"35.4","2":"0.09626016"},{"1":"35.5","2":"0.09495145"},{"1":"35.6","2":"0.09365868"},{"1":"35.7","2":"0.09238172"},{"1":"35.8","2":"0.09112041"},{"1":"35.9","2":"0.08987463"},{"1":"36.0","2":"0.08864421"},{"1":"36.1","2":"0.08742902"},{"1":"36.2","2":"0.08622892"},{"1":"36.3","2":"0.08504375"},{"1":"36.4","2":"0.08387337"},{"1":"36.5","2":"0.08271765"},{"1":"36.6","2":"0.08157643"},{"1":"36.7","2":"0.08044958"},{"1":"36.8","2":"0.07933695"},{"1":"36.9","2":"0.07823839"},{"1":"37.0","2":"0.07715378"},{"1":"37.1","2":"0.07608296"},{"1":"37.2","2":"0.07502579"},{"1":"37.3","2":"0.07398213"},{"1":"37.4","2":"0.07295185"},{"1":"37.5","2":"0.07193480"},{"1":"37.6","2":"0.07093085"},{"1":"37.7","2":"0.06993985"},{"1":"37.8","2":"0.06896167"},{"1":"37.9","2":"0.06799617"},{"1":"38.0","2":"0.06704321"},{"1":"38.1","2":"0.06610266"},{"1":"38.2","2":"0.06517439"},{"1":"38.3","2":"0.06425825"},{"1":"38.4","2":"0.06335412"},{"1":"38.5","2":"0.06246186"},{"1":"38.6","2":"0.06158134"},{"1":"38.7","2":"0.06071243"},{"1":"38.8","2":"0.05985500"},{"1":"38.9","2":"0.05900892"},{"1":"39.0","2":"0.05817406"},{"1":"39.1","2":"0.05735029"},{"1":"39.2","2":"0.05653748"},{"1":"39.3","2":"0.05573551"},{"1":"39.4","2":"0.05494426"},{"1":"39.5","2":"0.05416359"},{"1":"39.6","2":"0.05339339"},{"1":"39.7","2":"0.05263353"},{"1":"39.8","2":"0.05188389"},{"1":"39.9","2":"0.05114436"},{"1":"40.0","2":"0.05041480"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Notice how the values in the <code>.fitted</code> are all between 0 and 1 - consistent with the probability scale of measurement. We can visualize these predictions, along with the observed probabilities, using a similar approach as taken in <a href="#fig-log-odds-viz">Figure&nbsp;<span>5.2</span></a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> sleep_counts,</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>Age, <span class="at">y=</span>prob_7_or_more)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y=</span>.fitted),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> predicted_probabilities,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"blue"</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">+</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">'Age'</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">40</span>)) <span class="sc">+</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">'Proportion Saying "Yes"'</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-logistic-probabilities-viz" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="09_logistic_regression_files/figure-html/fig-logistic-probabilities-viz-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure 5.3: Reproducing Figure 9.3 from STAT2, which visualizes the predicted probability of sleeping 7 or more hours a night, given a teenager’s age, based on a logistic regression model.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="example-9.4" class="level3" data-number="5.1.2">
+<h3 data-number="5.1.2" class="anchored" data-anchor-id="example-9.4"><span class="header-section-number">5.1.2</span> Example 9.4</h3>
+<p>Example 9.4 explores a regression model that uses college GPA to predict the probability a medical school applicant is accepted to medical school. The purpose of this example in the text is to explain how to convert log-odds of acceptance into the probability of acceptance using the logistic function. However, here we focus on how to fit and visualize this model in R, because the <code>MedGPA</code> data set is structured differently than the <code>LosingSleep</code> data set.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"MedGPA"</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>MedGPA</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Accept"],"name":[1],"type":["fct"],"align":["left"]},{"label":["Acceptance"],"name":[2],"type":["int"],"align":["right"]},{"label":["Sex"],"name":[3],"type":["fct"],"align":["left"]},{"label":["BCPM"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["GPA"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["VR"],"name":[6],"type":["int"],"align":["right"]},{"label":["PS"],"name":[7],"type":["int"],"align":["right"]},{"label":["WS"],"name":[8],"type":["int"],"align":["right"]},{"label":["BS"],"name":[9],"type":["int"],"align":["right"]},{"label":["MCAT"],"name":[10],"type":["int"],"align":["right"]},{"label":["Apps"],"name":[11],"type":["int"],"align":["right"]}],"data":[{"1":"D","2":"0","3":"F","4":"3.59","5":"3.62","6":"11","7":"9","8":"9","9":"9","10":"38","11":"5"},{"1":"A","2":"1","3":"M","4":"3.75","5":"3.84","6":"12","7":"13","8":"8","9":"12","10":"45","11":"3"},{"1":"A","2":"1","3":"F","4":"3.24","5":"3.23","6":"9","7":"10","8":"5","9":"9","10":"33","11":"19"},{"1":"A","2":"1","3":"F","4":"3.74","5":"3.69","6":"12","7":"11","8":"7","9":"10","10":"40","11":"5"},{"1":"A","2":"1","3":"F","4":"3.53","5":"3.38","6":"9","7":"11","8":"4","9":"11","10":"35","11":"11"},{"1":"A","2":"1","3":"M","4":"3.59","5":"3.72","6":"10","7":"9","8":"7","9":"10","10":"36","11":"5"},{"1":"A","2":"1","3":"M","4":"3.85","5":"3.89","6":"11","7":"12","8":"6","9":"11","10":"40","11":"5"},{"1":"D","2":"0","3":"M","4":"3.26","5":"3.34","6":"11","7":"11","8":"8","9":"9","10":"39","11":"7"},{"1":"A","2":"1","3":"F","4":"3.74","5":"3.71","6":"8","7":"10","8":"6","9":"11","10":"35","11":"5"},{"1":"A","2":"1","3":"F","4":"3.86","5":"3.89","6":"9","7":"9","8":"6","9":"10","10":"34","11":"11"},{"1":"A","2":"1","3":"F","4":"4.00","5":"3.97","6":"11","7":"9","8":"8","9":"11","10":"39","11":"6"},{"1":"A","2":"1","3":"F","4":"3.35","5":"3.49","6":"11","7":"8","8":"4","9":"8","10":"31","11":"9"},{"1":"A","2":"1","3":"M","4":"3.77","5":"3.77","6":"8","7":"10","8":"7","9":"10","10":"35","11":"5"},{"1":"D","2":"0","3":"M","4":"3.60","5":"3.61","6":"9","7":"9","8":"4","9":"10","10":"32","11":"8"},{"1":"D","2":"0","3":"M","4":"3.29","5":"3.30","6":"11","7":"8","8":"6","9":"7","10":"32","11":"15"},{"1":"A","2":"1","3":"F","4":"3.26","5":"3.54","6":"12","7":"8","8":"8","9":"10","10":"38","11":"6"},{"1":"D","2":"0","3":"M","4":"3.75","5":"3.65","6":"8","7":"8","8":"8","9":"11","10":"35","11":"6"},{"1":"A","2":"1","3":"M","4":"3.51","5":"3.54","6":"9","7":"10","8":"9","9":"11","10":"39","11":"1"},{"1":"D","2":"0","3":"M","4":"3.27","5":"3.25","6":"8","7":"9","8":"5","9":"10","10":"32","11":"5"},{"1":"A","2":"1","3":"M","4":"3.95","5":"3.89","6":"13","7":"14","8":"8","9":"13","10":"48","11":"5"},{"1":"A","2":"1","3":"F","4":"3.71","5":"3.71","6":"13","7":"10","8":"8","9":"10","10":"41","11":"6"},{"1":"D","2":"0","3":"M","4":"3.73","5":"3.77","6":"8","7":"10","8":"8","9":"10","10":"36","11":"7"},{"1":"A","2":"1","3":"M","4":"4.00","5":"3.91","6":"10","7":"13","8":"6","9":"12","10":"41","11":"17"},{"1":"A","2":"1","3":"M","4":"3.98","5":"3.88","6":"9","7":"10","8":"8","9":"12","10":"39","11":"17"},{"1":"D","2":"0","3":"M","4":"3.76","5":"3.68","6":"7","7":"9","8":"6","9":"9","10":"31","11":"10"},{"1":"A","2":"1","3":"M","4":"3.51","5":"3.56","6":"6","7":"10","8":"6","9":"10","10":"32","11":"5"},{"1":"D","2":"0","3":"F","4":"3.38","5":"3.44","6":"11","7":"9","8":"4","9":"8","10":"32","11":"10"},{"1":"A","2":"1","3":"F","4":"3.41","5":"3.58","6":"11","7":"11","8":"6","9":"9","10":"37","11":"14"},{"1":"A","2":"1","3":"F","4":"3.15","5":"3.40","6":"10","7":"10","8":"6","9":"10","10":"36","11":"1"},{"1":"A","2":"1","3":"F","4":"3.78","5":"3.82","6":"10","7":"11","8":"10","9":"10","10":"41","11":"5"},{"1":"A","2":"1","3":"M","4":"3.54","5":"3.62","6":"10","7":"12","8":"6","9":"11","10":"39","11":"7"},{"1":"D","2":"0","3":"F","4":"3.14","5":"3.09","6":"7","7":"10","8":"8","9":"9","10":"34","11":"24"},{"1":"A","2":"1","3":"F","4":"3.89","5":"3.89","6":"8","7":"9","8":"8","9":"10","10":"35","11":"7"},{"1":"D","2":"0","3":"M","4":"3.67","5":"3.70","6":"7","7":"10","8":"8","9":"9","10":"34","11":"11"},{"1":"D","2":"0","3":"M","4":"3.22","5":"3.24","6":"11","7":"12","8":"8","9":"10","10":"41","11":"11"},{"1":"A","2":"1","3":"M","4":"3.87","5":"3.86","6":"10","7":"11","8":"8","9":"11","10":"40","11":"8"},{"1":"D","2":"0","3":"M","4":"3.49","5":"3.54","6":"11","7":"9","8":"10","9":"6","10":"36","11":"18"},{"1":"D","2":"0","3":"F","4":"3.08","5":"3.40","6":"8","7":"6","8":"4","9":"9","10":"27","11":"7"},{"1":"A","2":"1","3":"F","4":"3.82","5":"3.87","6":"10","7":"10","8":"5","9":"9","10":"34","11":"12"},{"1":"A","2":"1","3":"M","4":"3.10","5":"3.14","6":"10","7":"9","8":"8","9":"11","10":"38","11":"12"},{"1":"D","2":"0","3":"F","4":"3.56","5":"3.37","6":"6","7":"8","8":"9","9":"8","10":"31","11":"4"},{"1":"D","2":"0","3":"F","4":"3.19","5":"3.38","6":"9","7":"8","8":"8","9":"9","10":"34","11":"6"},{"1":"A","2":"1","3":"F","4":"3.53","5":"3.62","6":"11","7":"10","8":"8","9":"11","10":"40","11":"5"},{"1":"A","2":"1","3":"F","4":"3.98","5":"3.94","6":"13","7":"8","8":"8","9":"10","10":"39","11":"12"},{"1":"D","2":"0","3":"F","4":"3.19","5":"3.37","6":"10","7":"9","8":"6","9":"9","10":"34","11":"5"},{"1":"D","2":"0","3":"F","4":"3.25","5":"3.36","6":"11","7":"8","8":"9","9":"12","10":"40","11":"12"},{"1":"A","2":"1","3":"F","4":"3.98","5":"3.97","6":"11","7":"13","8":"10","9":"14","10":"48","11":"6"},{"1":"D","2":"0","3":"M","4":"2.75","5":"3.04","6":"10","7":"9","8":"8","9":"9","10":"36","11":"7"},{"1":"D","2":"0","3":"F","4":"3.12","5":"3.29","6":"11","7":"10","8":"8","9":"8","10":"37","11":"12"},{"1":"D","2":"0","3":"F","4":"3.53","5":"3.67","6":"12","7":"10","8":"9","9":"8","10":"39","11":"6"},{"1":"D","2":"0","3":"M","4":"2.41","5":"2.72","6":"8","7":"8","8":"8","9":"8","10":"32","11":"7"},{"1":"D","2":"0","3":"M","4":"3.51","5":"3.56","6":"11","7":"8","8":"6","9":"9","10":"34","11":"6"},{"1":"A","2":"1","3":"F","4":"3.43","5":"3.48","6":"7","7":"10","8":"7","9":"10","10":"34","11":"14"},{"1":"D","2":"0","3":"M","4":"2.61","5":"2.80","6":"7","7":"5","8":"NA","9":"6","10":"18","11":"6"},{"1":"D","2":"0","3":"M","4":"3.36","5":"3.44","6":"11","7":"11","8":"8","9":"9","10":"39","11":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>In this data set, the outcome variable is once again a set of 0’s and 1’s, representing “not admitted” and “admitted”, respectively. In the previous example, with the <code>LosingSleep</code> data set, we converted these 0’s and 1’s to category labels, and counted the number of “Yes” answers for each age. This was a sensible way to summarize and explore the data, since the explanatory variable (age) was a discrete variable; it was natural to divide the “Yes” or “No” outcomes into groups based on the age variable.</p>
+<p>But here, the explanatory variable is a continuous variable; there is no natural way to group the observations based on GPA when the GPA values are continuous values like 3.34, and 3.35, and 3.36. It doesn’t make conceptual sense to treat 3.34 as a separate group of GPA values than 3.35. At first glance, this seems to present a practical problem: how can we fit a logistic model in R if we can’t count the number of “success” and “failures” for each GPA value?</p>
+<p>Luckily, this step of counting the number of “success” and “failures” for each value of the explanatory variable isn’t a necessary step. We can use the “raw” 0 and 1 values as our outcome variable in our model formula!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>acceptance_logistic_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(Acceptance <span class="sc">~</span> GPA, <span class="at">data =</span> MedGPA,</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">family =</span> binomial</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                                 )</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(acceptance_logistic_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              Estimate Std. Error   z value     Pr(&gt;|z|)
+(Intercept) -19.206503   5.628726 -3.412229 0.0006443386
+GPA           5.454166   1.579169  3.453821 0.0005527051</code></pre>
+</div>
+</div>
+<p>The <code>family = binomial</code> argument is once again necessary to tell R that these 0’ and 1’s don’t represent quantities, but actually values that represent different categorical outcomes. Let’s check that we obtain the same fitted regression mode that the authors do</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(equatiomatic)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(acceptance_logistic_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><span class="math display">\[
+\log\left[ \frac { \widehat{P( \operatorname{Acceptance} = \operatorname{1} )} }{ 1 - \widehat{P( \operatorname{Acceptance} = \operatorname{1} )} } \right] = -19.21 + 5.45(\operatorname{GPA})
+\]</span></p>
+</div>
+</div>
+<p>We do! We can also re-create Figure 9.8b using the same technique we used to create <a href="#fig-logistic-probabilities-viz">Figure&nbsp;<span>5.3</span></a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>predicted_probabilities <span class="ot">&lt;-</span> <span class="fu">augment</span>(acceptance_logistic_model, </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">GPA =</span> <span class="fu">seq</span>(<span class="fl">2.7</span>, <span class="dv">4</span>, <span class="at">by=</span>.<span class="dv">01</span>)),</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">type.predict =</span> <span class="st">"response"</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                                   )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> MedGPA,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>GPA, <span class="at">y=</span>Acceptance)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">height =</span> .<span class="dv">01</span>) <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y=</span>.fitted),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> predicted_probabilities,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"blue"</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">+</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">'GPA'</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">2.7</span>, <span class="dv">4</span>),</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="fl">2.8</span>, <span class="dv">4</span>, <span class="at">by=</span>.<span class="dv">2</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>                     ) <span class="sc">+</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">'Probability of Acceptance'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-med-acceptance_probabilities" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="09_logistic_regression_files/figure-html/fig-med-acceptance_probabilities-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure 5.4: Reproducing Figure 9.8b from STAT2, which visualizes the predicted probability of being accepted to medical school, based on your college GPA.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Each observed “success” is represented by a point at y=1, and each observed “failure’ is represented by a point at y=0. The logistic curve in blue shows how the estimated probability of acceptance increases as GPA increases.</p>
+</section>
+</section>
+<section id="logistic-regression-and-odds-ratios" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="logistic-regression-and-odds-ratios"><span class="header-section-number">5.2</span> Logistic Regression and Odds Ratios</h2>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./04_additional_topics_in_regression.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Additional Topics in Regression</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
