@@ -110,7 +110,6 @@ library(gridExtra)
 grid.arrange(panel_A, panel_B, ncol = 2)
 ```
 
-
 ## Multiple Linear Regression Model
 
 Section 3.1, Example 3.2 introduces the book's first multiple regression model, using both the `PointsFor` and `PointsAgainst` variables to predict the `WinPct` value for each team. We can reproduce the regression table and model equation shown in this example using some familiar tools: the `lm()` function, the `extract_eq()` function, and the `summary()` function

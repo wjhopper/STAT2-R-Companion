@@ -2,6 +2,8 @@
 title: "Logistic Regression"
 ---
 
+## Choosing a Logistic Regression Model
+
 Chapter 9 introduces the topic of logistic regression though the lens of the question: "What is the relationship between a teenager's age in years, and the chances of getting 7 or more hours of sleep a night". In this situation, the outcome variable we seek to model and explain is a binary categorical variable; in other words, a variable that measures a categorical attribute that can only take on two possible values. "Getting 7 or more hours of sleep a night" is a binary categorical variable here because respondents were only allowed to give "yes" or "no" responses to the question.
 
 The data collected from this survey are first summarized in a joint frequency table, showing the number of respondents who answered "Yes" and "No", broken down into groups based on the respondents age. We could re-create the same table by first counting the number of rows with each possible combination of age (14,15,16,17, or 18) and hours slept ("Yes" = seven or more hours, "No" = less than seven hours).
@@ -19,7 +21,7 @@ sleep_counts <- LosingSleep |>
   count(Age, Outcome) |>
   mutate(Outcome = recode(Outcome, `0` = "No", `1` = "Yes"))
 
-glimpse(sleep_counts)
+sleep_counts
 ```
 
 Then, we can re-arrange the table of counts from a "long" into a "wide" layout, just for the sake of presenting the results in compact form:
@@ -64,7 +66,7 @@ ggplot(data = sleep_counts,
 
 We will take the author's advice, and *not* fit a linear regression model to these data. As a consequence, we will not demonstrate how to re-create Figure 9.2, as this figure is included in the book only to illustrate what *not* to do when modeling a binary outcome variable.
 
-## The Logistic Transformation
+### The Logistic Transformation
 
 Rightfully, the next section begins with a visualization of the model you *should* fit to these data, a logistic regression model!
 
@@ -142,3 +144,134 @@ cat("$$\n")
 ```
 
 Because of this, the equation for a logistic regression model is sometimes expressed as $\widehat{logit(y)} = b_0 + b_1 \cdot x$, since `logit()` is a commonly used abbreviation for the log-odds transformation.
+
+Figure 9.4 visualizes the observed data, and the logistic model's predictions, on the log-odds scale. We can re-create this plot be 1) applying the logit transformation directly to our data, and 2) computing the model's predictions across a fine grid of x-axis points using the `broom::augment()` function, and plotting the resulting predictions as a line.
+
+First, we transform the observed probabilities into log-odds:
+
+```{r}
+sleep_counts <- sleep_counts |>
+  mutate(log_odds = log(prob_7_or_more / (1-prob_7_or_more) ) )
+```
+
+The, compute the model's predictions on the log-odds scale as well
+
+```{r}
+library(broom)
+
+predicted_log_odds <- augment(sleep_model,
+                              newdata = data.frame(Age = seq(0, 40, by=.1))
+                              )
+predicted_log_odds
+```
+
+Finally, we create a scatter plot using the log-odds, and draw a line representing the model's predictions for each Age value along the x-axis. Notice that the `predicted_log_odds` data frame is passed to the `geom_line()` function as a layer-specific data frame.
+
+```{r}
+#| label: fig-log-odds-viz
+#| fig-cap: Reproducing Figure 9.4 from STAT2, which visualizes the predicted log-odds of sleeping 7 or more hours a night, given a teenager's age, based on a logistic regression model.
+
+ggplot(data = sleep_counts,
+       mapping = aes(x=Age, y=log_odds)
+       ) +
+  geom_point() +
+  geom_line(mapping = aes(y=.fitted),
+            data = predicted_log_odds,
+            color = "blue"
+            ) +
+  scale_x_continuous('Age', limits = c(0,40)) +
+  scale_y_continuous('Log-Odds of Saying "Yes"')
+```
+
+However, visualizing your data and model on the log-odds scale is often not very informative, as the log-odds scale is a very abstract measurement scale. Usually, it is preferable to measure your model's prediction on the probability scale. You can transform values on the log-odds scale into the probability scale using the logistic function:
+
+$$
+\frac{1}{1 + e^{\hat{y}}}
+$$
+where $\hat{y} = b_0 + b_1 \cdot x$, i.e., where $\hat{y}$ are your model's predictions on the log-odds scale.
+
+We don't have to apply this transformation "manually" before plotting - we can ask the `augment()` function to apply it for us by using the `type.predict` argument to ask it to compute the model's predictions to be on the "response" scale (i.e., the same measurement scale as the original data).
+
+```{r}
+predicted_probabilities <- augment(sleep_model, 
+                                   newdata = data.frame(Age = seq(0, 40, by=.1)),
+                                   type.predict = "response"
+                                   )
+predicted_probabilities
+```
+
+Notice how the values in the `.fitted` are all between 0 and 1 - consistent with the probability scale of measurement. We can visualize these predictions, along with the observed probabilities, using a similar approach as taken in @fig-log-odds-viz.
+
+```{r}
+#| label: fig-logistic-probabilities-viz
+#| fig-cap: Reproducing Figure 9.3 from STAT2, which visualizes the predicted probability of sleeping 7 or more hours a night, given a teenager's age, based on a logistic regression model.
+ggplot(data = sleep_counts,
+       mapping = aes(x=Age, y=prob_7_or_more)
+       ) +
+  geom_point() +
+  geom_line(mapping = aes(y=.fitted),
+            data = predicted_probabilities,
+            color = "blue"
+            ) +
+  scale_x_continuous('Age', limits = c(0,40)) +
+  scale_y_continuous('Proportion Saying "Yes"', limits = c(0, 1))
+```
+
+### Example 9.4
+
+Example 9.4 explores a regression model that uses college GPA to predict the probability a medical school applicant is accepted to medical school. The purpose of this example in the text is to explain how to convert log-odds of acceptance into the probability of acceptance using the logistic function. However, here we focus on how to fit and visualize this model in R, because the `MedGPA` data set is structured differently than the `LosingSleep` data set.
+
+```{r}
+data("MedGPA")
+MedGPA
+```
+
+In this data set, the outcome variable is once again a set of 0's and 1's, representing "not admitted" and "admitted", respectively. In the previous example, with the `LosingSleep` data set, we converted these 0's and 1's to category labels, and counted the number of "Yes" answers for each age. This was a sensible way to summarize and explore the data, since the explanatory variable (age) was a discrete variable; it was natural to divide the "Yes" or "No" outcomes into groups based on the age variable.
+
+But here, the explanatory variable is a continuous variable; there is no natural way to group the observations based on GPA when the GPA values are continuous values like 3.34, and 3.35, and 3.36. It doesn't make conceptual sense to treat 3.34 as a separate group of GPA values than 3.35. At first glance, this seems to present a practical problem: how can we fit a logistic model in R if we can't count the number of "success" and "failures" for each GPA value?
+
+Luckily, this step of counting the number of "success" and "failures" for each value of the explanatory variable isn't a necessary step. We can use the "raw" 0 and 1 values as our outcome variable in our model formula!
+
+```{r}
+acceptance_logistic_model <- glm(Acceptance ~ GPA, data = MedGPA,
+                                 family = binomial
+                                 )
+summary(acceptance_logistic_model)$coefficients
+```
+
+The `family = binomial` argument is once again necessary to tell R that these 0' and 1's don't represent quantities, but actually values that represent different categorical outcomes. Let's check that we obtain the same fitted regression mode that the authors do
+
+```{r}
+library(equatiomatic)
+extract_eq(acceptance_logistic_model, use_coefs = TRUE)
+```
+
+We do! We can also re-create Figure 9.8b using the same technique we used to create @fig-logistic-probabilities-viz:
+
+```{r}
+predicted_probabilities <- augment(acceptance_logistic_model, 
+                                   newdata = data.frame(GPA = seq(2.7, 4, by=.01)),
+                                   type.predict = "response"
+                                   )
+```
+
+```{r}
+#| label: fig-med-acceptance_probabilities
+#| fig-cap: Reproducing Figure 9.8b from STAT2, which visualizes the predicted probability of being accepted to medical school, based on your college GPA.
+ggplot(data = MedGPA,
+       mapping = aes(x=GPA, y=Acceptance)
+       ) +
+  geom_jitter(height = .01) +
+  geom_line(mapping = aes(y=.fitted),
+            data = predicted_probabilities,
+            color = "blue"
+            ) +
+  scale_x_continuous('GPA', limits = c(2.7, 4),
+                     breaks = seq(2.8, 4, by=.2)
+                     ) +
+  scale_y_continuous('Probability of Acceptance')
+```
+
+Each observed "success" is represented by a point at y=1, and each observed "failure' is represented by a point at y=0. The logistic curve in blue shows how the estimated probability of acceptance increases as GPA increases.
+
+## Logistic Regression and Odds Ratios
