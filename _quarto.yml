@@ -24,6 +24,7 @@ book:
     - part: "Unit C: Logistic Regression"
       chapters:
         - "09_logistic_regression.qmd"
+        - "10_multiple_logistic_regression.qmd"
     - references.qmd
 
 bibliography: references.bib
