@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>The R Companion to STATS2 - 10&nbsp; Multiple Logistic Regression</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./09_logistic_regression.html" rel="prev">
+<link href="./favicon.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Multiple Logistic Regression</span></h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./" class="sidebar-logo-link">
+      <img src="./STAT2_logo_small.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">The R Companion to STATS2</a> 
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Preface</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Unit A: Linear Regression</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_simple_linear_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Simple Linear Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_inference_for_simple_linear_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Inference for Simple Linear Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_multiple_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Multiple Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_additional_topics_in_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Additional Topics in Regression</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Unit B: Analysis of Variance</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_one-way_ANOVA.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">One-way ANOVA and Randomized Experiments</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_two-way_ANOVA.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Blocking and Two-way ANOVA</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_ANOVA_with_interaction.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">ANOVA with Interaction and Factorial Designs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08_additional_topics_in_ANOVA.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Additional Topics in Analysis of Variance</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">Unit C: Logistic Regression</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09_logistic_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Logistic Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10_multiple_logistic_regression.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Multiple Logistic Regression</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"> <span class="header-section-number">10.1</span> Overview</a></li>
+  <li><a href="#choosing-fitting-and-interpreting-models" id="toc-choosing-fitting-and-interpreting-models" class="nav-link" data-scroll-target="#choosing-fitting-and-interpreting-models"> <span class="header-section-number">10.2</span> Choosing, Fitting, and Interpreting Models</a>
+  <ul class="collapse">
+  <li><a href="#example-10.1-the-eyes-have-it" id="toc-example-10.1-the-eyes-have-it" class="nav-link" data-scroll-target="#example-10.1-the-eyes-have-it"> <span class="header-section-number">10.2.1</span> Example 10.1: The eyes have it</a></li>
+  <li><a href="#example-10.2-medical-school-admissions" id="toc-example-10.2-medical-school-admissions" class="nav-link" data-scroll-target="#example-10.2-medical-school-admissions"> <span class="header-section-number">10.2.2</span> Example 10.2: Medical school admissions</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Multiple Logistic Regression</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="overview" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">10.1</span> Overview</h2>
+<p>Section 10.1 serves to orient the reader to the conceptual similarities and differences between the different types of model fit throughout the books. Here, we’ll take the opportunity to the same, but focusing on the computational tools used to fit each type of model:</p>
+<table class="table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 36%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>R Function</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Simple Linear Regression</td>
+<td><code>lm()</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Multiple Linear Regression</td>
+<td><code>lm()</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>One-Way ANOVA</td>
+<td><code>afex::car_aov()</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Two-Way ANOVA</td>
+<td><code>afex::car_aov()</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Simple Logistic Regression</td>
+<td><code>glm()</code></td>
+<td>Must include <code>family=binomial</code> argument</td>
+</tr>
+<tr class="even">
+<td>Multiple Linear Regression</td>
+<td><code>glm()</code></td>
+<td>Must include <code>family=binomial</code> argument</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="choosing-fitting-and-interpreting-models" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="choosing-fitting-and-interpreting-models"><span class="header-section-number">10.2</span> Choosing, Fitting, and Interpreting Models</h2>
+<p>The first multiple logistic regression presented uses the <code>Eyes</code> data set, which reports the results of an experiment measuring the pupil dilation of both male and female participants while they view images of nude males and females. The model presented here estimates the likelihood that the participant is “Gay”, based the change in average pupil dilation between viewing male and females images, and the sex of the participant. Here, “Gay” was not a self-identification made by the participant; “Gay” was operationalized to mean the participant received a composite score of 4 or higher on based on their self-reported answers to several <a href="https://kinseyinstitute.org/research/publications/kinsey-scale.php">Kinsey-scale</a> questions).<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"Eyes"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Eyes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["DilateDiff"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Sex"],"name":[2],"type":["fct"],"align":["left"]},{"label":["Gay"],"name":[3],"type":["int"],"align":["right"]},{"label":["SexMale"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"0.208041788","2":"M","3":"0","4":"1"},{"1":"0.165694129","2":"F","3":"0","4":"0"},{"1":"-0.260443518","2":"M","3":"0","4":"1"},{"1":"-0.359692418","2":"F","3":"0","4":"0"},{"1":"-0.488198507","2":"M","3":"1","4":"1"},{"1":"-0.079313695","2":"F","3":"0","4":"0"},{"1":"-0.030152740","2":"M","3":"0","4":"1"},{"1":"-0.686801371","2":"M","3":"0","4":"1"},{"1":"-0.293930386","2":"F","3":"0","4":"0"},{"1":"0.350519672","2":"M","3":"1","4":"1"},{"1":"-0.302067851","2":"M","3":"0","4":"1"},{"1":"-0.039016242","2":"M","3":"1","4":"1"},{"1":"0.144535119","2":"M","3":"0","4":"1"},{"1":"-0.342877028","2":"M","3":"1","4":"1"},{"1":"1.203672901","2":"M","3":"1","4":"1"},{"1":"0.432329263","2":"F","3":"1","4":"0"},{"1":"-0.027083894","2":"F","3":"1","4":"0"},{"1":"0.276133088","2":"F","3":"0","4":"0"},{"1":"-0.852867305","2":"M","3":"0","4":"1"},{"1":"0.507588283","2":"F","3":"1","4":"0"},{"1":"-0.131692863","2":"F","3":"0","4":"0"},{"1":"-0.099284800","2":"M","3":"1","4":"1"},{"1":"0.029241117","2":"F","3":"0","4":"0"},{"1":"0.226780942","2":"F","3":"1","4":"0"},{"1":"-0.471133492","2":"M","3":"0","4":"1"},{"1":"0.519881017","2":"M","3":"1","4":"1"},{"1":"0.007264614","2":"F","3":"1","4":"0"},{"1":"0.579071255","2":"M","3":"1","4":"1"},{"1":"0.499364754","2":"F","3":"0","4":"0"},{"1":"-0.579841685","2":"F","3":"1","4":"0"},{"1":"0.325152195","2":"M","3":"1","4":"1"},{"1":"-0.164065573","2":"M","3":"0","4":"1"},{"1":"-0.343825906","2":"M","3":"0","4":"1"},{"1":"0.327386710","2":"F","3":"0","4":"0"},{"1":"-1.040595949","2":"M","3":"0","4":"1"},{"1":"-0.370941318","2":"M","3":"1","4":"1"},{"1":"-0.254951727","2":"M","3":"0","4":"1"},{"1":"-0.159328066","2":"M","3":"1","4":"1"},{"1":"0.042470047","2":"M","3":"0","4":"1"},{"1":"-0.381019100","2":"F","3":"0","4":"0"},{"1":"-0.220012607","2":"F","3":"0","4":"0"},{"1":"-0.136248219","2":"F","3":"0","4":"0"},{"1":"-0.075688581","2":"F","3":"0","4":"0"},{"1":"-0.176582688","2":"F","3":"0","4":"0"},{"1":"-0.345347754","2":"F","3":"0","4":"0"},{"1":"-0.492152324","2":"F","3":"0","4":"0"},{"1":"-0.429823867","2":"M","3":"0","4":"1"},{"1":"-0.517083641","2":"F","3":"0","4":"0"},{"1":"-0.233808100","2":"F","3":"0","4":"0"},{"1":"0.496207884","2":"M","3":"1","4":"1"},{"1":"-0.700610275","2":"F","3":"0","4":"0"},{"1":"0.653676336","2":"M","3":"1","4":"1"},{"1":"0.406106936","2":"M","3":"1","4":"1"},{"1":"-0.067930422","2":"M","3":"0","4":"1"},{"1":"0.052067208","2":"F","3":"1","4":"0"},{"1":"-0.096357545","2":"F","3":"1","4":"0"},{"1":"0.914797973","2":"F","3":"1","4":"0"},{"1":"-0.180890872","2":"F","3":"0","4":"0"},{"1":"-0.055411617","2":"F","3":"0","4":"0"},{"1":"0.390878947","2":"M","3":"1","4":"1"},{"1":"0.166962860","2":"F","3":"0","4":"0"},{"1":"-0.120309650","2":"M","3":"1","4":"1"},{"1":"0.323565857","2":"F","3":"1","4":"0"},{"1":"-0.212506218","2":"F","3":"0","4":"0"},{"1":"-0.030229459","2":"M","3":"0","4":"1"},{"1":"0.003975551","2":"F","3":"0","4":"0"},{"1":"-0.576231130","2":"M","3":"0","4":"1"},{"1":"0.575040317","2":"F","3":"1","4":"0"},{"1":"-0.023916307","2":"F","3":"0","4":"0"},{"1":"-0.616353745","2":"F","3":"0","4":"0"},{"1":"-0.494234046","2":"F","3":"0","4":"0"},{"1":"0.068027239","2":"F","3":"0","4":"0"},{"1":"-0.465162504","2":"M","3":"0","4":"1"},{"1":"-0.071593231","2":"M","3":"1","4":"1"},{"1":"-0.511150016","2":"F","3":"0","4":"0"},{"1":"-0.447381092","2":"F","3":"0","4":"0"},{"1":"-0.042778826","2":"M","3":"1","4":"1"},{"1":"-0.023640671","2":"M","3":"0","4":"1"},{"1":"0.049099643","2":"M","3":"1","4":"1"},{"1":"0.068128608","2":"M","3":"1","4":"1"},{"1":"0.011780771","2":"M","3":"1","4":"1"},{"1":"-0.297056858","2":"M","3":"0","4":"1"},{"1":"-0.144810632","2":"M","3":"0","4":"1"},{"1":"-0.069648275","2":"M","3":"0","4":"1"},{"1":"-0.185458770","2":"M","3":"1","4":"1"},{"1":"0.254597640","2":"M","3":"0","4":"1"},{"1":"-0.316489777","2":"M","3":"0","4":"1"},{"1":"-0.056781423","2":"M","3":"1","4":"1"},{"1":"-0.076744940","2":"M","3":"1","4":"1"},{"1":"0.399365064","2":"M","3":"0","4":"1"},{"1":"0.167053994","2":"M","3":"0","4":"1"},{"1":"-0.283371441","2":"F","3":"0","4":"0"},{"1":"-0.228317608","2":"M","3":"0","4":"1"},{"1":"-0.295532495","2":"F","3":"0","4":"0"},{"1":"-0.336690745","2":"F","3":"0","4":"0"},{"1":"0.050091163","2":"F","3":"0","4":"0"},{"1":"-0.040211721","2":"M","3":"0","4":"1"},{"1":"-0.112660542","2":"F","3":"0","4":"0"},{"1":"0.064766117","2":"F","3":"0","4":"0"},{"1":"-0.009050864","2":"F","3":"0","4":"0"},{"1":"-0.155119372","2":"M","3":"1","4":"1"},{"1":"0.684138037","2":"M","3":"1","4":"1"},{"1":"-0.486419955","2":"F","3":"0","4":"0"},{"1":"0.025086247","2":"F","3":"0","4":"0"},{"1":"-1.001986341","2":"M","3":"0","4":"1"},{"1":"0.071492118","2":"M","3":"0","4":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Notice that we have our data stored at the level of individuals, with a 0 or a 1 for each individual “failure” or “success” observed (as opposed to having our data stored as counts, e.g., 10 failure and 19 successes).</p>
+<p>Before continuing with an analysis of these data, it is worth noting using statistical models to predict an individual’s sexual preferences is an activity fraught with ethical peril. It is not difficult to imagine a situation where a device like a smart phone measures a person’s pupil dilation while they consume visual media, and uses other classification techniques to measure whether the person is viewing images of males or females. These measurements could then be used identify individuals likely to be homosexual, and used for a variety of purposes from the annoying (selling targeted ads) to the dangerous (an authoritarian government seeking to target gay individuals).</p>
+<p>In this case, the data were collected in an experiment conducted under the supervision of an Institutional Review Board (IRB) and participants gave informed consent about what measurements would be collected and for what purposes. But, we should always be mindful of ways that the data we collect, and data analysis techniques we develop, present the potential for harmful misuse.</p>
+<section id="example-10.1-the-eyes-have-it" class="level3" data-number="10.2.1">
+<h3 data-number="10.2.1" class="anchored" data-anchor-id="example-10.1-the-eyes-have-it"><span class="header-section-number">10.2.1</span> Example 10.1: The eyes have it</h3>
+<p>One of first ways the <code>Eyes</code> data are explored is with an empirical logit plot; the data are grouped in to discrete “bins” based on the quantiles of the of pupil dilation scores (-1.1 to -.301, -3 to -.074, 0.073 to .07, and .071 to 1.3), and the log-odds of being “Gay” is calculated within each bin. These log-odds are presented in Table 10.3, and Figure 10.2; these items are re-created below as an example of how to create an empirical logit plot.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>bin_upper_bounds <span class="ot">&lt;-</span>  <span class="fu">quantile</span>(Eyes<span class="sc">$</span>DilateDiff, <span class="at">p =</span> <span class="fu">seq</span>(.<span class="dv">25</span>, <span class="dv">1</span>, <span class="at">by=</span>.<span class="dv">25</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>bin_upper_bounds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        25%         50%         75%        100% 
+-0.30081510 -0.07364091  0.07065124  1.20367290 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## We place observations into bins by comparing each observation to the upper</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">## boundary of all 4 intervals.</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="do">## First, we measure whether or not the observation exceeds the upper boundary</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="do">## of each bin. Then, we figure out the position of the smallest boundary value</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="do">## **NOT** exceeded; This is the bin the observation belongs to.</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">## For example, if an observation exceeds the boundary of the first two bins,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="do">## but not the third or fourth, the third boundary is the smallest boundary values not </span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="do">## exceeded. Thus, it belongs to the third bin.</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>Eyes_binned_odds <span class="ot">&lt;-</span> Eyes <span class="sc">|&gt;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bin_number =</span> <span class="fu">min</span>(<span class="fu">which</span>(DilateDiff <span class="sc">&lt;=</span> bin_upper_bounds))) <span class="sc">|&gt;</span> </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(bin_number) <span class="sc">|&gt;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">N =</span> <span class="fu">n</span>(),</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_dilation_diff =</span> <span class="fu">mean</span>(DilateDiff),</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">n_gay =</span> <span class="fu">sum</span>(Gay),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">p_gay =</span> <span class="fu">mean</span>(Gay),</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">log_odds_gay =</span> p_gay <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> p_gay)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>Eyes_binned_odds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["bin_number"],"name":[1],"type":["int"],"align":["right"]},{"label":["N"],"name":[2],"type":["int"],"align":["right"]},{"label":["avg_dilation_diff"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["n_gay"],"name":[4],"type":["int"],"align":["right"]},{"label":["p_gay"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["log_odds_gay"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"27","3":"-0.516925153","4":"4","5":"0.1481481","6":"0.1739130"},{"1":"2","2":"26","3":"-0.179787991","4":"7","5":"0.2692308","6":"0.3684211"},{"1":"3","2":"26","3":"-0.004440283","4":"10","5":"0.3846154","6":"0.6250000"},{"1":"4","2":"27","3":"0.417408707","4":"16","5":"0.5925926","6":"1.4545455"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>We can make an empirical logit plot by construction a scatter plot of the log-odds of being “Gay” against the average dilation difference score in each bin:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(Eyes_binned_odds,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> avg_dilation_diff, <span class="at">y =</span> log_odds_gay)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">se=</span><span class="cn">FALSE</span>, <span class="at">formula =</span> y<span class="sc">~</span>x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="10_multiple_logistic_regression_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>It is worth pointing out that while Figure 10.2, Figure 10.3, and Figure 10.4 all have log-odds on the y-axis, and lines of ‘best fit’ drawn in them, <strong>none</strong> of these plots visualize the predictions of a logistic regression model. These plots all represent linear regression models fit to the log-odds of “success”; this is useful for exploratory purposes, but not suitable for a final analysis.</p>
+<p>To obtain an unbiased estimate of the log-odds of “success”, we need to fit a multiple logistic regression model to the raw “success” and “failure” observations. This is only slightly more difficult that fitting a “simple” logistic regression model; all we are required to do differently is literally add a second explanatory variable to the model formula in R!</p>
+<p>One bit of data wrangling is helpful first; replacing the 0’s representing female participants with the word “Female”, and replacing the 1’s representing male participants with the word “Female”</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Eyes <span class="ot">&lt;-</span> Eyes <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Sex =</span> <span class="fu">recode</span>(SexMale, <span class="st">`</span><span class="at">0</span><span class="st">`</span><span class="ot">=</span><span class="st">"Female"</span>, <span class="st">`</span><span class="at">1</span><span class="st">`</span><span class="ot">=</span><span class="st">"Male"</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>gay_dilation_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(Gay <span class="sc">~</span> DilateDiff <span class="sc">+</span> Sex, <span class="at">data =</span> Eyes,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">family =</span> binomial</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                          )</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gay_dilation_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             Estimate Std. Error   z value     Pr(&gt;|z|)
+(Intercept) -1.265639  0.3820190 -3.313025 9.229257e-04
+DilateDiff   3.290778  0.8180317  4.022800 5.751032e-05
+SexMale      1.289656  0.4952921  2.603830 9.218853e-03</code></pre>
+</div>
+</div>
+<p>Figure 10.5 shows the predictions of the fitted model in both the probability and logit forms. We can reproduce these figures using the same techniques from <a href="09_logistic_regression.html#example-9.4">Chapter 9.1</a>:</p>
+<ol type="1">
+<li>Create a “reference grid”, representing every combination of the explanatory variables we wish to obtain a prediction for</li>
+<li>Use the <code>broom::augment()</code> function to obtain a prediction for every value in the grid</li>
+<li>Plot these predictions using <code>geom_line()</code></li>
+</ol>
+<p>The only added complication is that here, we must use the <code>expand.grid()</code> function to create our “reference grid”, since we care about obtaining a prediction for many, closely spaced values of the <code>DilateDiff</code> variable, for both male <strong>and</strong> female participants.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ref_grid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">DilateDiff =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fu">min</span>(Eyes<span class="sc">$</span>DilateDiff),</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">to =</span> <span class="fu">max</span>(Eyes<span class="sc">$</span>DilateDiff),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">by =</span> .<span class="dv">01</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                                         ),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">Sex =</span> <span class="fu">c</span>(<span class="st">"Female"</span>, <span class="st">"Male"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ref_grid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["DilateDiff"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Sex"],"name":[2],"type":["fct"],"align":["left"]}],"data":[{"1":"-1.0405959","2":"Female","_rn_":"1"},{"1":"-1.0305959","2":"Female","_rn_":"2"},{"1":"-1.0205959","2":"Female","_rn_":"3"},{"1":"-1.0105959","2":"Female","_rn_":"4"},{"1":"-1.0005959","2":"Female","_rn_":"5"},{"1":"-0.9905959","2":"Female","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div><div class="column">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(ref_grid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["DilateDiff"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Sex"],"name":[2],"type":["fct"],"align":["left"]}],"data":[{"1":"1.149404","2":"Male","_rn_":"445"},{"1":"1.159404","2":"Male","_rn_":"446"},{"1":"1.169404","2":"Male","_rn_":"447"},{"1":"1.179404","2":"Male","_rn_":"448"},{"1":"1.189404","2":"Male","_rn_":"449"},{"1":"1.199404","2":"Male","_rn_":"450"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>With our reference grid created, we can move on to step 2 and 3 to re-created Panel B:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>predicted_odds <span class="ot">&lt;-</span> <span class="fu">augment</span>(gay_dilation_model, <span class="at">newdata =</span> ref_grid)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>predicted_odds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["DilateDiff"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Sex"],"name":[2],"type":["fct"],"align":["left"]},{"label":[".fitted"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"-1.040595949","2":"Female","3":"-4.69000919"},{"1":"-1.030595949","2":"Female","3":"-4.65710141"},{"1":"-1.020595949","2":"Female","3":"-4.62419363"},{"1":"-1.010595949","2":"Female","3":"-4.59128585"},{"1":"-1.000595949","2":"Female","3":"-4.55837807"},{"1":"-0.990595949","2":"Female","3":"-4.52547028"},{"1":"-0.980595949","2":"Female","3":"-4.49256250"},{"1":"-0.970595949","2":"Female","3":"-4.45965472"},{"1":"-0.960595949","2":"Female","3":"-4.42674694"},{"1":"-0.950595949","2":"Female","3":"-4.39383916"},{"1":"-0.940595949","2":"Female","3":"-4.36093138"},{"1":"-0.930595949","2":"Female","3":"-4.32802359"},{"1":"-0.920595949","2":"Female","3":"-4.29511581"},{"1":"-0.910595949","2":"Female","3":"-4.26220803"},{"1":"-0.900595949","2":"Female","3":"-4.22930025"},{"1":"-0.890595949","2":"Female","3":"-4.19639247"},{"1":"-0.880595949","2":"Female","3":"-4.16348469"},{"1":"-0.870595949","2":"Female","3":"-4.13057691"},{"1":"-0.860595949","2":"Female","3":"-4.09766912"},{"1":"-0.850595949","2":"Female","3":"-4.06476134"},{"1":"-0.840595949","2":"Female","3":"-4.03185356"},{"1":"-0.830595949","2":"Female","3":"-3.99894578"},{"1":"-0.820595949","2":"Female","3":"-3.96603800"},{"1":"-0.810595949","2":"Female","3":"-3.93313022"},{"1":"-0.800595949","2":"Female","3":"-3.90022243"},{"1":"-0.790595949","2":"Female","3":"-3.86731465"},{"1":"-0.780595949","2":"Female","3":"-3.83440687"},{"1":"-0.770595949","2":"Female","3":"-3.80149909"},{"1":"-0.760595949","2":"Female","3":"-3.76859131"},{"1":"-0.750595949","2":"Female","3":"-3.73568353"},{"1":"-0.740595949","2":"Female","3":"-3.70277575"},{"1":"-0.730595949","2":"Female","3":"-3.66986796"},{"1":"-0.720595949","2":"Female","3":"-3.63696018"},{"1":"-0.710595949","2":"Female","3":"-3.60405240"},{"1":"-0.700595949","2":"Female","3":"-3.57114462"},{"1":"-0.690595949","2":"Female","3":"-3.53823684"},{"1":"-0.680595949","2":"Female","3":"-3.50532906"},{"1":"-0.670595949","2":"Female","3":"-3.47242127"},{"1":"-0.660595949","2":"Female","3":"-3.43951349"},{"1":"-0.650595949","2":"Female","3":"-3.40660571"},{"1":"-0.640595949","2":"Female","3":"-3.37369793"},{"1":"-0.630595949","2":"Female","3":"-3.34079015"},{"1":"-0.620595949","2":"Female","3":"-3.30788237"},{"1":"-0.610595949","2":"Female","3":"-3.27497458"},{"1":"-0.600595949","2":"Female","3":"-3.24206680"},{"1":"-0.590595949","2":"Female","3":"-3.20915902"},{"1":"-0.580595949","2":"Female","3":"-3.17625124"},{"1":"-0.570595949","2":"Female","3":"-3.14334346"},{"1":"-0.560595949","2":"Female","3":"-3.11043568"},{"1":"-0.550595949","2":"Female","3":"-3.07752790"},{"1":"-0.540595949","2":"Female","3":"-3.04462011"},{"1":"-0.530595949","2":"Female","3":"-3.01171233"},{"1":"-0.520595949","2":"Female","3":"-2.97880455"},{"1":"-0.510595949","2":"Female","3":"-2.94589677"},{"1":"-0.500595949","2":"Female","3":"-2.91298899"},{"1":"-0.490595949","2":"Female","3":"-2.88008121"},{"1":"-0.480595949","2":"Female","3":"-2.84717342"},{"1":"-0.470595949","2":"Female","3":"-2.81426564"},{"1":"-0.460595949","2":"Female","3":"-2.78135786"},{"1":"-0.450595949","2":"Female","3":"-2.74845008"},{"1":"-0.440595949","2":"Female","3":"-2.71554230"},{"1":"-0.430595949","2":"Female","3":"-2.68263452"},{"1":"-0.420595949","2":"Female","3":"-2.64972674"},{"1":"-0.410595949","2":"Female","3":"-2.61681895"},{"1":"-0.400595949","2":"Female","3":"-2.58391117"},{"1":"-0.390595949","2":"Female","3":"-2.55100339"},{"1":"-0.380595949","2":"Female","3":"-2.51809561"},{"1":"-0.370595949","2":"Female","3":"-2.48518783"},{"1":"-0.360595949","2":"Female","3":"-2.45228005"},{"1":"-0.350595949","2":"Female","3":"-2.41937226"},{"1":"-0.340595949","2":"Female","3":"-2.38646448"},{"1":"-0.330595949","2":"Female","3":"-2.35355670"},{"1":"-0.320595949","2":"Female","3":"-2.32064892"},{"1":"-0.310595949","2":"Female","3":"-2.28774114"},{"1":"-0.300595949","2":"Female","3":"-2.25483336"},{"1":"-0.290595949","2":"Female","3":"-2.22192558"},{"1":"-0.280595949","2":"Female","3":"-2.18901779"},{"1":"-0.270595949","2":"Female","3":"-2.15611001"},{"1":"-0.260595949","2":"Female","3":"-2.12320223"},{"1":"-0.250595949","2":"Female","3":"-2.09029445"},{"1":"-0.240595949","2":"Female","3":"-2.05738667"},{"1":"-0.230595949","2":"Female","3":"-2.02447889"},{"1":"-0.220595949","2":"Female","3":"-1.99157110"},{"1":"-0.210595949","2":"Female","3":"-1.95866332"},{"1":"-0.200595949","2":"Female","3":"-1.92575554"},{"1":"-0.190595949","2":"Female","3":"-1.89284776"},{"1":"-0.180595949","2":"Female","3":"-1.85993998"},{"1":"-0.170595949","2":"Female","3":"-1.82703220"},{"1":"-0.160595949","2":"Female","3":"-1.79412442"},{"1":"-0.150595949","2":"Female","3":"-1.76121663"},{"1":"-0.140595949","2":"Female","3":"-1.72830885"},{"1":"-0.130595949","2":"Female","3":"-1.69540107"},{"1":"-0.120595949","2":"Female","3":"-1.66249329"},{"1":"-0.110595949","2":"Female","3":"-1.62958551"},{"1":"-0.100595949","2":"Female","3":"-1.59667773"},{"1":"-0.090595949","2":"Female","3":"-1.56376994"},{"1":"-0.080595949","2":"Female","3":"-1.53086216"},{"1":"-0.070595949","2":"Female","3":"-1.49795438"},{"1":"-0.060595949","2":"Female","3":"-1.46504660"},{"1":"-0.050595949","2":"Female","3":"-1.43213882"},{"1":"-0.040595949","2":"Female","3":"-1.39923104"},{"1":"-0.030595949","2":"Female","3":"-1.36632325"},{"1":"-0.020595949","2":"Female","3":"-1.33341547"},{"1":"-0.010595949","2":"Female","3":"-1.30050769"},{"1":"-0.000595949","2":"Female","3":"-1.26759991"},{"1":"0.009404051","2":"Female","3":"-1.23469213"},{"1":"0.019404051","2":"Female","3":"-1.20178435"},{"1":"0.029404051","2":"Female","3":"-1.16887657"},{"1":"0.039404051","2":"Female","3":"-1.13596878"},{"1":"0.049404051","2":"Female","3":"-1.10306100"},{"1":"0.059404051","2":"Female","3":"-1.07015322"},{"1":"0.069404051","2":"Female","3":"-1.03724544"},{"1":"0.079404051","2":"Female","3":"-1.00433766"},{"1":"0.089404051","2":"Female","3":"-0.97142988"},{"1":"0.099404051","2":"Female","3":"-0.93852209"},{"1":"0.109404051","2":"Female","3":"-0.90561431"},{"1":"0.119404051","2":"Female","3":"-0.87270653"},{"1":"0.129404051","2":"Female","3":"-0.83979875"},{"1":"0.139404051","2":"Female","3":"-0.80689097"},{"1":"0.149404051","2":"Female","3":"-0.77398319"},{"1":"0.159404051","2":"Female","3":"-0.74107541"},{"1":"0.169404051","2":"Female","3":"-0.70816762"},{"1":"0.179404051","2":"Female","3":"-0.67525984"},{"1":"0.189404051","2":"Female","3":"-0.64235206"},{"1":"0.199404051","2":"Female","3":"-0.60944428"},{"1":"0.209404051","2":"Female","3":"-0.57653650"},{"1":"0.219404051","2":"Female","3":"-0.54362872"},{"1":"0.229404051","2":"Female","3":"-0.51072093"},{"1":"0.239404051","2":"Female","3":"-0.47781315"},{"1":"0.249404051","2":"Female","3":"-0.44490537"},{"1":"0.259404051","2":"Female","3":"-0.41199759"},{"1":"0.269404051","2":"Female","3":"-0.37908981"},{"1":"0.279404051","2":"Female","3":"-0.34618203"},{"1":"0.289404051","2":"Female","3":"-0.31327425"},{"1":"0.299404051","2":"Female","3":"-0.28036646"},{"1":"0.309404051","2":"Female","3":"-0.24745868"},{"1":"0.319404051","2":"Female","3":"-0.21455090"},{"1":"0.329404051","2":"Female","3":"-0.18164312"},{"1":"0.339404051","2":"Female","3":"-0.14873534"},{"1":"0.349404051","2":"Female","3":"-0.11582756"},{"1":"0.359404051","2":"Female","3":"-0.08291977"},{"1":"0.369404051","2":"Female","3":"-0.05001199"},{"1":"0.379404051","2":"Female","3":"-0.01710421"},{"1":"0.389404051","2":"Female","3":"0.01580357"},{"1":"0.399404051","2":"Female","3":"0.04871135"},{"1":"0.409404051","2":"Female","3":"0.08161913"},{"1":"0.419404051","2":"Female","3":"0.11452691"},{"1":"0.429404051","2":"Female","3":"0.14743470"},{"1":"0.439404051","2":"Female","3":"0.18034248"},{"1":"0.449404051","2":"Female","3":"0.21325026"},{"1":"0.459404051","2":"Female","3":"0.24615804"},{"1":"0.469404051","2":"Female","3":"0.27906582"},{"1":"0.479404051","2":"Female","3":"0.31197360"},{"1":"0.489404051","2":"Female","3":"0.34488139"},{"1":"0.499404051","2":"Female","3":"0.37778917"},{"1":"0.509404051","2":"Female","3":"0.41069695"},{"1":"0.519404051","2":"Female","3":"0.44360473"},{"1":"0.529404051","2":"Female","3":"0.47651251"},{"1":"0.539404051","2":"Female","3":"0.50942029"},{"1":"0.549404051","2":"Female","3":"0.54232808"},{"1":"0.559404051","2":"Female","3":"0.57523586"},{"1":"0.569404051","2":"Female","3":"0.60814364"},{"1":"0.579404051","2":"Female","3":"0.64105142"},{"1":"0.589404051","2":"Female","3":"0.67395920"},{"1":"0.599404051","2":"Female","3":"0.70686698"},{"1":"0.609404051","2":"Female","3":"0.73977476"},{"1":"0.619404051","2":"Female","3":"0.77268255"},{"1":"0.629404051","2":"Female","3":"0.80559033"},{"1":"0.639404051","2":"Female","3":"0.83849811"},{"1":"0.649404051","2":"Female","3":"0.87140589"},{"1":"0.659404051","2":"Female","3":"0.90431367"},{"1":"0.669404051","2":"Female","3":"0.93722145"},{"1":"0.679404051","2":"Female","3":"0.97012924"},{"1":"0.689404051","2":"Female","3":"1.00303702"},{"1":"0.699404051","2":"Female","3":"1.03594480"},{"1":"0.709404051","2":"Female","3":"1.06885258"},{"1":"0.719404051","2":"Female","3":"1.10176036"},{"1":"0.729404051","2":"Female","3":"1.13466814"},{"1":"0.739404051","2":"Female","3":"1.16757592"},{"1":"0.749404051","2":"Female","3":"1.20048371"},{"1":"0.759404051","2":"Female","3":"1.23339149"},{"1":"0.769404051","2":"Female","3":"1.26629927"},{"1":"0.779404051","2":"Female","3":"1.29920705"},{"1":"0.789404051","2":"Female","3":"1.33211483"},{"1":"0.799404051","2":"Female","3":"1.36502261"},{"1":"0.809404051","2":"Female","3":"1.39793040"},{"1":"0.819404051","2":"Female","3":"1.43083818"},{"1":"0.829404051","2":"Female","3":"1.46374596"},{"1":"0.839404051","2":"Female","3":"1.49665374"},{"1":"0.849404051","2":"Female","3":"1.52956152"},{"1":"0.859404051","2":"Female","3":"1.56246930"},{"1":"0.869404051","2":"Female","3":"1.59537708"},{"1":"0.879404051","2":"Female","3":"1.62828487"},{"1":"0.889404051","2":"Female","3":"1.66119265"},{"1":"0.899404051","2":"Female","3":"1.69410043"},{"1":"0.909404051","2":"Female","3":"1.72700821"},{"1":"0.919404051","2":"Female","3":"1.75991599"},{"1":"0.929404051","2":"Female","3":"1.79282377"},{"1":"0.939404051","2":"Female","3":"1.82573156"},{"1":"0.949404051","2":"Female","3":"1.85863934"},{"1":"0.959404051","2":"Female","3":"1.89154712"},{"1":"0.969404051","2":"Female","3":"1.92445490"},{"1":"0.979404051","2":"Female","3":"1.95736268"},{"1":"0.989404051","2":"Female","3":"1.99027046"},{"1":"0.999404051","2":"Female","3":"2.02317824"},{"1":"1.009404051","2":"Female","3":"2.05608603"},{"1":"1.019404051","2":"Female","3":"2.08899381"},{"1":"1.029404051","2":"Female","3":"2.12190159"},{"1":"1.039404051","2":"Female","3":"2.15480937"},{"1":"1.049404051","2":"Female","3":"2.18771715"},{"1":"1.059404051","2":"Female","3":"2.22062493"},{"1":"1.069404051","2":"Female","3":"2.25353272"},{"1":"1.079404051","2":"Female","3":"2.28644050"},{"1":"1.089404051","2":"Female","3":"2.31934828"},{"1":"1.099404051","2":"Female","3":"2.35225606"},{"1":"1.109404051","2":"Female","3":"2.38516384"},{"1":"1.119404051","2":"Female","3":"2.41807162"},{"1":"1.129404051","2":"Female","3":"2.45097941"},{"1":"1.139404051","2":"Female","3":"2.48388719"},{"1":"1.149404051","2":"Female","3":"2.51679497"},{"1":"1.159404051","2":"Female","3":"2.54970275"},{"1":"1.169404051","2":"Female","3":"2.58261053"},{"1":"1.179404051","2":"Female","3":"2.61551831"},{"1":"1.189404051","2":"Female","3":"2.64842609"},{"1":"1.199404051","2":"Female","3":"2.68133388"},{"1":"-1.040595949","2":"Male","3":"-3.40035291"},{"1":"-1.030595949","2":"Male","3":"-3.36744513"},{"1":"-1.020595949","2":"Male","3":"-3.33453735"},{"1":"-1.010595949","2":"Male","3":"-3.30162957"},{"1":"-1.000595949","2":"Male","3":"-3.26872179"},{"1":"-0.990595949","2":"Male","3":"-3.23581401"},{"1":"-0.980595949","2":"Male","3":"-3.20290622"},{"1":"-0.970595949","2":"Male","3":"-3.16999844"},{"1":"-0.960595949","2":"Male","3":"-3.13709066"},{"1":"-0.950595949","2":"Male","3":"-3.10418288"},{"1":"-0.940595949","2":"Male","3":"-3.07127510"},{"1":"-0.930595949","2":"Male","3":"-3.03836732"},{"1":"-0.920595949","2":"Male","3":"-3.00545954"},{"1":"-0.910595949","2":"Male","3":"-2.97255175"},{"1":"-0.900595949","2":"Male","3":"-2.93964397"},{"1":"-0.890595949","2":"Male","3":"-2.90673619"},{"1":"-0.880595949","2":"Male","3":"-2.87382841"},{"1":"-0.870595949","2":"Male","3":"-2.84092063"},{"1":"-0.860595949","2":"Male","3":"-2.80801285"},{"1":"-0.850595949","2":"Male","3":"-2.77510506"},{"1":"-0.840595949","2":"Male","3":"-2.74219728"},{"1":"-0.830595949","2":"Male","3":"-2.70928950"},{"1":"-0.820595949","2":"Male","3":"-2.67638172"},{"1":"-0.810595949","2":"Male","3":"-2.64347394"},{"1":"-0.800595949","2":"Male","3":"-2.61056616"},{"1":"-0.790595949","2":"Male","3":"-2.57765837"},{"1":"-0.780595949","2":"Male","3":"-2.54475059"},{"1":"-0.770595949","2":"Male","3":"-2.51184281"},{"1":"-0.760595949","2":"Male","3":"-2.47893503"},{"1":"-0.750595949","2":"Male","3":"-2.44602725"},{"1":"-0.740595949","2":"Male","3":"-2.41311947"},{"1":"-0.730595949","2":"Male","3":"-2.38021169"},{"1":"-0.720595949","2":"Male","3":"-2.34730390"},{"1":"-0.710595949","2":"Male","3":"-2.31439612"},{"1":"-0.700595949","2":"Male","3":"-2.28148834"},{"1":"-0.690595949","2":"Male","3":"-2.24858056"},{"1":"-0.680595949","2":"Male","3":"-2.21567278"},{"1":"-0.670595949","2":"Male","3":"-2.18276500"},{"1":"-0.660595949","2":"Male","3":"-2.14985721"},{"1":"-0.650595949","2":"Male","3":"-2.11694943"},{"1":"-0.640595949","2":"Male","3":"-2.08404165"},{"1":"-0.630595949","2":"Male","3":"-2.05113387"},{"1":"-0.620595949","2":"Male","3":"-2.01822609"},{"1":"-0.610595949","2":"Male","3":"-1.98531831"},{"1":"-0.600595949","2":"Male","3":"-1.95241053"},{"1":"-0.590595949","2":"Male","3":"-1.91950274"},{"1":"-0.580595949","2":"Male","3":"-1.88659496"},{"1":"-0.570595949","2":"Male","3":"-1.85368718"},{"1":"-0.560595949","2":"Male","3":"-1.82077940"},{"1":"-0.550595949","2":"Male","3":"-1.78787162"},{"1":"-0.540595949","2":"Male","3":"-1.75496384"},{"1":"-0.530595949","2":"Male","3":"-1.72205605"},{"1":"-0.520595949","2":"Male","3":"-1.68914827"},{"1":"-0.510595949","2":"Male","3":"-1.65624049"},{"1":"-0.500595949","2":"Male","3":"-1.62333271"},{"1":"-0.490595949","2":"Male","3":"-1.59042493"},{"1":"-0.480595949","2":"Male","3":"-1.55751715"},{"1":"-0.470595949","2":"Male","3":"-1.52460937"},{"1":"-0.460595949","2":"Male","3":"-1.49170158"},{"1":"-0.450595949","2":"Male","3":"-1.45879380"},{"1":"-0.440595949","2":"Male","3":"-1.42588602"},{"1":"-0.430595949","2":"Male","3":"-1.39297824"},{"1":"-0.420595949","2":"Male","3":"-1.36007046"},{"1":"-0.410595949","2":"Male","3":"-1.32716268"},{"1":"-0.400595949","2":"Male","3":"-1.29425489"},{"1":"-0.390595949","2":"Male","3":"-1.26134711"},{"1":"-0.380595949","2":"Male","3":"-1.22843933"},{"1":"-0.370595949","2":"Male","3":"-1.19553155"},{"1":"-0.360595949","2":"Male","3":"-1.16262377"},{"1":"-0.350595949","2":"Male","3":"-1.12971599"},{"1":"-0.340595949","2":"Male","3":"-1.09680821"},{"1":"-0.330595949","2":"Male","3":"-1.06390042"},{"1":"-0.320595949","2":"Male","3":"-1.03099264"},{"1":"-0.310595949","2":"Male","3":"-0.99808486"},{"1":"-0.300595949","2":"Male","3":"-0.96517708"},{"1":"-0.290595949","2":"Male","3":"-0.93226930"},{"1":"-0.280595949","2":"Male","3":"-0.89936152"},{"1":"-0.270595949","2":"Male","3":"-0.86645373"},{"1":"-0.260595949","2":"Male","3":"-0.83354595"},{"1":"-0.250595949","2":"Male","3":"-0.80063817"},{"1":"-0.240595949","2":"Male","3":"-0.76773039"},{"1":"-0.230595949","2":"Male","3":"-0.73482261"},{"1":"-0.220595949","2":"Male","3":"-0.70191483"},{"1":"-0.210595949","2":"Male","3":"-0.66900704"},{"1":"-0.200595949","2":"Male","3":"-0.63609926"},{"1":"-0.190595949","2":"Male","3":"-0.60319148"},{"1":"-0.180595949","2":"Male","3":"-0.57028370"},{"1":"-0.170595949","2":"Male","3":"-0.53737592"},{"1":"-0.160595949","2":"Male","3":"-0.50446814"},{"1":"-0.150595949","2":"Male","3":"-0.47156036"},{"1":"-0.140595949","2":"Male","3":"-0.43865257"},{"1":"-0.130595949","2":"Male","3":"-0.40574479"},{"1":"-0.120595949","2":"Male","3":"-0.37283701"},{"1":"-0.110595949","2":"Male","3":"-0.33992923"},{"1":"-0.100595949","2":"Male","3":"-0.30702145"},{"1":"-0.090595949","2":"Male","3":"-0.27411367"},{"1":"-0.080595949","2":"Male","3":"-0.24120588"},{"1":"-0.070595949","2":"Male","3":"-0.20829810"},{"1":"-0.060595949","2":"Male","3":"-0.17539032"},{"1":"-0.050595949","2":"Male","3":"-0.14248254"},{"1":"-0.040595949","2":"Male","3":"-0.10957476"},{"1":"-0.030595949","2":"Male","3":"-0.07666698"},{"1":"-0.020595949","2":"Male","3":"-0.04375920"},{"1":"-0.010595949","2":"Male","3":"-0.01085141"},{"1":"-0.000595949","2":"Male","3":"0.02205637"},{"1":"0.009404051","2":"Male","3":"0.05496415"},{"1":"0.019404051","2":"Male","3":"0.08787193"},{"1":"0.029404051","2":"Male","3":"0.12077971"},{"1":"0.039404051","2":"Male","3":"0.15368749"},{"1":"0.049404051","2":"Male","3":"0.18659528"},{"1":"0.059404051","2":"Male","3":"0.21950306"},{"1":"0.069404051","2":"Male","3":"0.25241084"},{"1":"0.079404051","2":"Male","3":"0.28531862"},{"1":"0.089404051","2":"Male","3":"0.31822640"},{"1":"0.099404051","2":"Male","3":"0.35113418"},{"1":"0.109404051","2":"Male","3":"0.38404196"},{"1":"0.119404051","2":"Male","3":"0.41694975"},{"1":"0.129404051","2":"Male","3":"0.44985753"},{"1":"0.139404051","2":"Male","3":"0.48276531"},{"1":"0.149404051","2":"Male","3":"0.51567309"},{"1":"0.159404051","2":"Male","3":"0.54858087"},{"1":"0.169404051","2":"Male","3":"0.58148865"},{"1":"0.179404051","2":"Male","3":"0.61439644"},{"1":"0.189404051","2":"Male","3":"0.64730422"},{"1":"0.199404051","2":"Male","3":"0.68021200"},{"1":"0.209404051","2":"Male","3":"0.71311978"},{"1":"0.219404051","2":"Male","3":"0.74602756"},{"1":"0.229404051","2":"Male","3":"0.77893534"},{"1":"0.239404051","2":"Male","3":"0.81184312"},{"1":"0.249404051","2":"Male","3":"0.84475091"},{"1":"0.259404051","2":"Male","3":"0.87765869"},{"1":"0.269404051","2":"Male","3":"0.91056647"},{"1":"0.279404051","2":"Male","3":"0.94347425"},{"1":"0.289404051","2":"Male","3":"0.97638203"},{"1":"0.299404051","2":"Male","3":"1.00928981"},{"1":"0.309404051","2":"Male","3":"1.04219760"},{"1":"0.319404051","2":"Male","3":"1.07510538"},{"1":"0.329404051","2":"Male","3":"1.10801316"},{"1":"0.339404051","2":"Male","3":"1.14092094"},{"1":"0.349404051","2":"Male","3":"1.17382872"},{"1":"0.359404051","2":"Male","3":"1.20673650"},{"1":"0.369404051","2":"Male","3":"1.23964429"},{"1":"0.379404051","2":"Male","3":"1.27255207"},{"1":"0.389404051","2":"Male","3":"1.30545985"},{"1":"0.399404051","2":"Male","3":"1.33836763"},{"1":"0.409404051","2":"Male","3":"1.37127541"},{"1":"0.419404051","2":"Male","3":"1.40418319"},{"1":"0.429404051","2":"Male","3":"1.43709097"},{"1":"0.439404051","2":"Male","3":"1.46999876"},{"1":"0.449404051","2":"Male","3":"1.50290654"},{"1":"0.459404051","2":"Male","3":"1.53581432"},{"1":"0.469404051","2":"Male","3":"1.56872210"},{"1":"0.479404051","2":"Male","3":"1.60162988"},{"1":"0.489404051","2":"Male","3":"1.63453766"},{"1":"0.499404051","2":"Male","3":"1.66744545"},{"1":"0.509404051","2":"Male","3":"1.70035323"},{"1":"0.519404051","2":"Male","3":"1.73326101"},{"1":"0.529404051","2":"Male","3":"1.76616879"},{"1":"0.539404051","2":"Male","3":"1.79907657"},{"1":"0.549404051","2":"Male","3":"1.83198435"},{"1":"0.559404051","2":"Male","3":"1.86489213"},{"1":"0.569404051","2":"Male","3":"1.89779992"},{"1":"0.579404051","2":"Male","3":"1.93070770"},{"1":"0.589404051","2":"Male","3":"1.96361548"},{"1":"0.599404051","2":"Male","3":"1.99652326"},{"1":"0.609404051","2":"Male","3":"2.02943104"},{"1":"0.619404051","2":"Male","3":"2.06233882"},{"1":"0.629404051","2":"Male","3":"2.09524661"},{"1":"0.639404051","2":"Male","3":"2.12815439"},{"1":"0.649404051","2":"Male","3":"2.16106217"},{"1":"0.659404051","2":"Male","3":"2.19396995"},{"1":"0.669404051","2":"Male","3":"2.22687773"},{"1":"0.679404051","2":"Male","3":"2.25978551"},{"1":"0.689404051","2":"Male","3":"2.29269329"},{"1":"0.699404051","2":"Male","3":"2.32560108"},{"1":"0.709404051","2":"Male","3":"2.35850886"},{"1":"0.719404051","2":"Male","3":"2.39141664"},{"1":"0.729404051","2":"Male","3":"2.42432442"},{"1":"0.739404051","2":"Male","3":"2.45723220"},{"1":"0.749404051","2":"Male","3":"2.49013998"},{"1":"0.759404051","2":"Male","3":"2.52304777"},{"1":"0.769404051","2":"Male","3":"2.55595555"},{"1":"0.779404051","2":"Male","3":"2.58886333"},{"1":"0.789404051","2":"Male","3":"2.62177111"},{"1":"0.799404051","2":"Male","3":"2.65467889"},{"1":"0.809404051","2":"Male","3":"2.68758667"},{"1":"0.819404051","2":"Male","3":"2.72049445"},{"1":"0.829404051","2":"Male","3":"2.75340224"},{"1":"0.839404051","2":"Male","3":"2.78631002"},{"1":"0.849404051","2":"Male","3":"2.81921780"},{"1":"0.859404051","2":"Male","3":"2.85212558"},{"1":"0.869404051","2":"Male","3":"2.88503336"},{"1":"0.879404051","2":"Male","3":"2.91794114"},{"1":"0.889404051","2":"Male","3":"2.95084893"},{"1":"0.899404051","2":"Male","3":"2.98375671"},{"1":"0.909404051","2":"Male","3":"3.01666449"},{"1":"0.919404051","2":"Male","3":"3.04957227"},{"1":"0.929404051","2":"Male","3":"3.08248005"},{"1":"0.939404051","2":"Male","3":"3.11538783"},{"1":"0.949404051","2":"Male","3":"3.14829562"},{"1":"0.959404051","2":"Male","3":"3.18120340"},{"1":"0.969404051","2":"Male","3":"3.21411118"},{"1":"0.979404051","2":"Male","3":"3.24701896"},{"1":"0.989404051","2":"Male","3":"3.27992674"},{"1":"0.999404051","2":"Male","3":"3.31283452"},{"1":"1.009404051","2":"Male","3":"3.34574230"},{"1":"1.019404051","2":"Male","3":"3.37865009"},{"1":"1.029404051","2":"Male","3":"3.41155787"},{"1":"1.039404051","2":"Male","3":"3.44446565"},{"1":"1.049404051","2":"Male","3":"3.47737343"},{"1":"1.059404051","2":"Male","3":"3.51028121"},{"1":"1.069404051","2":"Male","3":"3.54318899"},{"1":"1.079404051","2":"Male","3":"3.57609678"},{"1":"1.089404051","2":"Male","3":"3.60900456"},{"1":"1.099404051","2":"Male","3":"3.64191234"},{"1":"1.109404051","2":"Male","3":"3.67482012"},{"1":"1.119404051","2":"Male","3":"3.70772790"},{"1":"1.129404051","2":"Male","3":"3.74063568"},{"1":"1.139404051","2":"Male","3":"3.77354346"},{"1":"1.149404051","2":"Male","3":"3.80645125"},{"1":"1.159404051","2":"Male","3":"3.83935903"},{"1":"1.169404051","2":"Male","3":"3.87226681"},{"1":"1.179404051","2":"Male","3":"3.90517459"},{"1":"1.189404051","2":"Male","3":"3.93808237"},{"1":"1.199404051","2":"Male","3":"3.97099015"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> predicted_odds, <span class="fu">aes</span>(<span class="at">x=</span>DilateDiff, <span class="at">y=</span>.fitted, <span class="at">color=</span>Sex)) <span class="sc">+</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="10_multiple_logistic_regression_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Panel A can be re-created by asking the <code>augment()</code> function to return it’s predictions on the <code>"response"</code> scale (i.e., with the log-odds squashed between 0 and 1, using the logistic transformation):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>predicted_prob <span class="ot">&lt;-</span> <span class="fu">augment</span>(gay_dilation_model, <span class="at">newdata =</span> ref_grid,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">type.predict =</span> <span class="st">"response"</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                          )</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>predicted_prob</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["DilateDiff"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Sex"],"name":[2],"type":["fct"],"align":["left"]},{"label":[".fitted"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"-1.040595949","2":"Female","3":"0.009102976"},{"1":"-1.030595949","2":"Female","3":"0.009404654"},{"1":"-1.020595949","2":"Female","3":"0.009716232"},{"1":"-1.010595949","2":"Female","3":"0.010038028"},{"1":"-1.000595949","2":"Female","3":"0.010370370"},{"1":"-0.990595949","2":"Female","3":"0.010713596"},{"1":"-0.980595949","2":"Female","3":"0.011068055"},{"1":"-0.970595949","2":"Female","3":"0.011434105"},{"1":"-0.960595949","2":"Female","3":"0.011812117"},{"1":"-0.950595949","2":"Female","3":"0.012202472"},{"1":"-0.940595949","2":"Female","3":"0.012605563"},{"1":"-0.930595949","2":"Female","3":"0.013021793"},{"1":"-0.920595949","2":"Female","3":"0.013451580"},{"1":"-0.910595949","2":"Female","3":"0.013895353"},{"1":"-0.900595949","2":"Female","3":"0.014353552"},{"1":"-0.890595949","2":"Female","3":"0.014826634"},{"1":"-0.880595949","2":"Female","3":"0.015315066"},{"1":"-0.870595949","2":"Female","3":"0.015819330"},{"1":"-0.860595949","2":"Female","3":"0.016339921"},{"1":"-0.850595949","2":"Female","3":"0.016877351"},{"1":"-0.840595949","2":"Female","3":"0.017432144"},{"1":"-0.830595949","2":"Female","3":"0.018004840"},{"1":"-0.820595949","2":"Female","3":"0.018595994"},{"1":"-0.810595949","2":"Female","3":"0.019206179"},{"1":"-0.800595949","2":"Female","3":"0.019835981"},{"1":"-0.790595949","2":"Female","3":"0.020486003"},{"1":"-0.780595949","2":"Female","3":"0.021156867"},{"1":"-0.770595949","2":"Female","3":"0.021849210"},{"1":"-0.760595949","2":"Female","3":"0.022563687"},{"1":"-0.750595949","2":"Female","3":"0.023300971"},{"1":"-0.740595949","2":"Female","3":"0.024061753"},{"1":"-0.730595949","2":"Female","3":"0.024846743"},{"1":"-0.720595949","2":"Female","3":"0.025656669"},{"1":"-0.710595949","2":"Female","3":"0.026492280"},{"1":"-0.700595949","2":"Female","3":"0.027354341"},{"1":"-0.690595949","2":"Female","3":"0.028243639"},{"1":"-0.680595949","2":"Female","3":"0.029160983"},{"1":"-0.670595949","2":"Female","3":"0.030107198"},{"1":"-0.660595949","2":"Female","3":"0.031083133"},{"1":"-0.650595949","2":"Female","3":"0.032089657"},{"1":"-0.640595949","2":"Female","3":"0.033127659"},{"1":"-0.630595949","2":"Female","3":"0.034198051"},{"1":"-0.620595949","2":"Female","3":"0.035301765"},{"1":"-0.610595949","2":"Female","3":"0.036439758"},{"1":"-0.600595949","2":"Female","3":"0.037613004"},{"1":"-0.590595949","2":"Female","3":"0.038822504"},{"1":"-0.580595949","2":"Female","3":"0.040069277"},{"1":"-0.570595949","2":"Female","3":"0.041354367"},{"1":"-0.560595949","2":"Female","3":"0.042678840"},{"1":"-0.550595949","2":"Female","3":"0.044043783"},{"1":"-0.540595949","2":"Female","3":"0.045450308"},{"1":"-0.530595949","2":"Female","3":"0.046899545"},{"1":"-0.520595949","2":"Female","3":"0.048392650"},{"1":"-0.510595949","2":"Female","3":"0.049930800"},{"1":"-0.500595949","2":"Female","3":"0.051515193"},{"1":"-0.490595949","2":"Female","3":"0.053147050"},{"1":"-0.480595949","2":"Female","3":"0.054827611"},{"1":"-0.470595949","2":"Female","3":"0.056558138"},{"1":"-0.460595949","2":"Female","3":"0.058339915"},{"1":"-0.450595949","2":"Female","3":"0.060174244"},{"1":"-0.440595949","2":"Female","3":"0.062062446"},{"1":"-0.430595949","2":"Female","3":"0.064005863"},{"1":"-0.420595949","2":"Female","3":"0.066005854"},{"1":"-0.410595949","2":"Female","3":"0.068063794"},{"1":"-0.400595949","2":"Female","3":"0.070181075"},{"1":"-0.390595949","2":"Female","3":"0.072359106"},{"1":"-0.380595949","2":"Female","3":"0.074599307"},{"1":"-0.370595949","2":"Female","3":"0.076903114"},{"1":"-0.360595949","2":"Female","3":"0.079271974"},{"1":"-0.350595949","2":"Female","3":"0.081707343"},{"1":"-0.340595949","2":"Female","3":"0.084210688"},{"1":"-0.330595949","2":"Female","3":"0.086783482"},{"1":"-0.320595949","2":"Female","3":"0.089427204"},{"1":"-0.310595949","2":"Female","3":"0.092143336"},{"1":"-0.300595949","2":"Female","3":"0.094933364"},{"1":"-0.290595949","2":"Female","3":"0.097798771"},{"1":"-0.280595949","2":"Female","3":"0.100741039"},{"1":"-0.270595949","2":"Female","3":"0.103761644"},{"1":"-0.260595949","2":"Female","3":"0.106862056"},{"1":"-0.250595949","2":"Female","3":"0.110043734"},{"1":"-0.240595949","2":"Female","3":"0.113308125"},{"1":"-0.230595949","2":"Female","3":"0.116656658"},{"1":"-0.220595949","2":"Female","3":"0.120090746"},{"1":"-0.210595949","2":"Female","3":"0.123611780"},{"1":"-0.200595949","2":"Female","3":"0.127221122"},{"1":"-0.190595949","2":"Female","3":"0.130920111"},{"1":"-0.180595949","2":"Female","3":"0.134710048"},{"1":"-0.170595949","2":"Female","3":"0.138592203"},{"1":"-0.160595949","2":"Female","3":"0.142567802"},{"1":"-0.150595949","2":"Female","3":"0.146638031"},{"1":"-0.140595949","2":"Female","3":"0.150804024"},{"1":"-0.130595949","2":"Female","3":"0.155066867"},{"1":"-0.120595949","2":"Female","3":"0.159427586"},{"1":"-0.110595949","2":"Female","3":"0.163887150"},{"1":"-0.100595949","2":"Female","3":"0.168446461"},{"1":"-0.090595949","2":"Female","3":"0.173106350"},{"1":"-0.080595949","2":"Female","3":"0.177867576"},{"1":"-0.070595949","2":"Female","3":"0.182730819"},{"1":"-0.060595949","2":"Female","3":"0.187696674"},{"1":"-0.050595949","2":"Female","3":"0.192765650"},{"1":"-0.040595949","2":"Female","3":"0.197938163"},{"1":"-0.030595949","2":"Female","3":"0.203214529"},{"1":"-0.020595949","2":"Female","3":"0.208594967"},{"1":"-0.010595949","2":"Female","3":"0.214079586"},{"1":"-0.000595949","2":"Female","3":"0.219668385"},{"1":"0.009404051","2":"Female","3":"0.225361249"},{"1":"0.019404051","2":"Female","3":"0.231157943"},{"1":"0.029404051","2":"Female","3":"0.237058110"},{"1":"0.039404051","2":"Female","3":"0.243061266"},{"1":"0.049404051","2":"Female","3":"0.249166794"},{"1":"0.059404051","2":"Female","3":"0.255373947"},{"1":"0.069404051","2":"Female","3":"0.261681838"},{"1":"0.079404051","2":"Female","3":"0.268089441"},{"1":"0.089404051","2":"Female","3":"0.274595589"},{"1":"0.099404051","2":"Female","3":"0.281198969"},{"1":"0.109404051","2":"Female","3":"0.287898122"},{"1":"0.119404051","2":"Female","3":"0.294691441"},{"1":"0.129404051","2":"Female","3":"0.301577171"},{"1":"0.139404051","2":"Female","3":"0.308553407"},{"1":"0.149404051","2":"Female","3":"0.315618093"},{"1":"0.159404051","2":"Female","3":"0.322769027"},{"1":"0.169404051","2":"Female","3":"0.330003855"},{"1":"0.179404051","2":"Female","3":"0.337320076"},{"1":"0.189404051","2":"Female","3":"0.344715047"},{"1":"0.199404051","2":"Female","3":"0.352185976"},{"1":"0.209404051","2":"Female","3":"0.359729934"},{"1":"0.219404051","2":"Female","3":"0.367343855"},{"1":"0.229404051","2":"Female","3":"0.375024537"},{"1":"0.239404051","2":"Female","3":"0.382768650"},{"1":"0.249404051","2":"Female","3":"0.390572740"},{"1":"0.259404051","2":"Female","3":"0.398433233"},{"1":"0.269404051","2":"Female","3":"0.406346443"},{"1":"0.279404051","2":"Female","3":"0.414308575"},{"1":"0.289404051","2":"Female","3":"0.422315735"},{"1":"0.299404051","2":"Female","3":"0.430363935"},{"1":"0.309404051","2":"Female","3":"0.438449103"},{"1":"0.319404051","2":"Female","3":"0.446567087"},{"1":"0.329404051","2":"Female","3":"0.454713667"},{"1":"0.339404051","2":"Female","3":"0.462884563"},{"1":"0.349404051","2":"Female","3":"0.471075441"},{"1":"0.359404051","2":"Female","3":"0.479281926"},{"1":"0.369404051","2":"Female","3":"0.487499607"},{"1":"0.379404051","2":"Female","3":"0.495724051"},{"1":"0.389404051","2":"Female","3":"0.503950810"},{"1":"0.399404051","2":"Female","3":"0.512175431"},{"1":"0.409404051","2":"Female","3":"0.520393463"},{"1":"0.419404051","2":"Female","3":"0.528600474"},{"1":"0.429404051","2":"Female","3":"0.536792053"},{"1":"0.439404051","2":"Female","3":"0.544963821"},{"1":"0.449404051","2":"Female","3":"0.553111444"},{"1":"0.459404051","2":"Female","3":"0.561230639"},{"1":"0.469404051","2":"Female","3":"0.569317183"},{"1":"0.479404051","2":"Female","3":"0.577366922"},{"1":"0.489404051","2":"Female","3":"0.585375780"},{"1":"0.499404051","2":"Female","3":"0.593339767"},{"1":"0.509404051","2":"Female","3":"0.601254982"},{"1":"0.519404051","2":"Female","3":"0.609117630"},{"1":"0.529404051","2":"Female","3":"0.616924018"},{"1":"0.539404051","2":"Female","3":"0.624670568"},{"1":"0.549404051","2":"Female","3":"0.632353821"},{"1":"0.559404051","2":"Female","3":"0.639970442"},{"1":"0.569404051","2":"Female","3":"0.647517225"},{"1":"0.579404051","2":"Female","3":"0.654991097"},{"1":"0.589404051","2":"Female","3":"0.662389123"},{"1":"0.599404051","2":"Female","3":"0.669708508"},{"1":"0.609404051","2":"Female","3":"0.676946601"},{"1":"0.619404051","2":"Female","3":"0.684100896"},{"1":"0.629404051","2":"Female","3":"0.691169035"},{"1":"0.639404051","2":"Female","3":"0.698148806"},{"1":"0.649404051","2":"Female","3":"0.705038150"},{"1":"0.659404051","2":"Female","3":"0.711835156"},{"1":"0.669404051","2":"Female","3":"0.718538062"},{"1":"0.679404051","2":"Female","3":"0.725145256"},{"1":"0.689404051","2":"Female","3":"0.731655273"},{"1":"0.699404051","2":"Female","3":"0.738066795"},{"1":"0.709404051","2":"Female","3":"0.744378647"},{"1":"0.719404051","2":"Female","3":"0.750589799"},{"1":"0.729404051","2":"Female","3":"0.756699359"},{"1":"0.739404051","2":"Female","3":"0.762706573"},{"1":"0.749404051","2":"Female","3":"0.768610821"},{"1":"0.759404051","2":"Female","3":"0.774411613"},{"1":"0.769404051","2":"Female","3":"0.780108586"},{"1":"0.779404051","2":"Female","3":"0.785701501"},{"1":"0.789404051","2":"Female","3":"0.791190238"},{"1":"0.799404051","2":"Female","3":"0.796574792"},{"1":"0.809404051","2":"Female","3":"0.801855268"},{"1":"0.819404051","2":"Female","3":"0.807031880"},{"1":"0.829404051","2":"Female","3":"0.812104941"},{"1":"0.839404051","2":"Female","3":"0.817074863"},{"1":"0.849404051","2":"Female","3":"0.821942151"},{"1":"0.859404051","2":"Female","3":"0.826707396"},{"1":"0.869404051","2":"Female","3":"0.831371277"},{"1":"0.879404051","2":"Female","3":"0.835934547"},{"1":"0.889404051","2":"Female","3":"0.840398037"},{"1":"0.899404051","2":"Female","3":"0.844762645"},{"1":"0.909404051","2":"Female","3":"0.849029337"},{"1":"0.919404051","2":"Female","3":"0.853199139"},{"1":"0.929404051","2":"Female","3":"0.857273131"},{"1":"0.939404051","2":"Female","3":"0.861252448"},{"1":"0.949404051","2":"Female","3":"0.865138273"},{"1":"0.959404051","2":"Female","3":"0.868931831"},{"1":"0.969404051","2":"Female","3":"0.872634390"},{"1":"0.979404051","2":"Female","3":"0.876247251"},{"1":"0.989404051","2":"Female","3":"0.879771748"},{"1":"0.999404051","2":"Female","3":"0.883209247"},{"1":"1.009404051","2":"Female","3":"0.886561135"},{"1":"1.019404051","2":"Female","3":"0.889828824"},{"1":"1.029404051","2":"Female","3":"0.893013744"},{"1":"1.039404051","2":"Female","3":"0.896117340"},{"1":"1.049404051","2":"Female","3":"0.899141072"},{"1":"1.059404051","2":"Female","3":"0.902086408"},{"1":"1.069404051","2":"Female","3":"0.904954825"},{"1":"1.079404051","2":"Female","3":"0.907747803"},{"1":"1.089404051","2":"Female","3":"0.910466829"},{"1":"1.099404051","2":"Female","3":"0.913113384"},{"1":"1.109404051","2":"Female","3":"0.915688953"},{"1":"1.119404051","2":"Female","3":"0.918195015"},{"1":"1.129404051","2":"Female","3":"0.920633043"},{"1":"1.139404051","2":"Female","3":"0.923004504"},{"1":"1.149404051","2":"Female","3":"0.925310855"},{"1":"1.159404051","2":"Female","3":"0.927553543"},{"1":"1.169404051","2":"Female","3":"0.929734003"},{"1":"1.179404051","2":"Female","3":"0.931853659"},{"1":"1.189404051","2":"Female","3":"0.933913917"},{"1":"1.199404051","2":"Female","3":"0.935916172"},{"1":"-1.040595949","2":"Male","3":"0.032284437"},{"1":"-1.030595949","2":"Male","3":"0.033328523"},{"1":"-1.020595949","2":"Male","3":"0.034405174"},{"1":"-1.010595949","2":"Male","3":"0.035515328"},{"1":"-1.000595949","2":"Male","3":"0.036659943"},{"1":"-0.990595949","2":"Male","3":"0.037840000"},{"1":"-0.980595949","2":"Male","3":"0.039056503"},{"1":"-0.970595949","2":"Male","3":"0.040310476"},{"1":"-0.960595949","2":"Male","3":"0.041602966"},{"1":"-0.950595949","2":"Male","3":"0.042935045"},{"1":"-0.940595949","2":"Male","3":"0.044307803"},{"1":"-0.930595949","2":"Male","3":"0.045722355"},{"1":"-0.920595949","2":"Male","3":"0.047179838"},{"1":"-0.910595949","2":"Male","3":"0.048681411"},{"1":"-0.900595949","2":"Male","3":"0.050228255"},{"1":"-0.890595949","2":"Male","3":"0.051821572"},{"1":"-0.880595949","2":"Male","3":"0.053462586"},{"1":"-0.870595949","2":"Male","3":"0.055152544"},{"1":"-0.860595949","2":"Male","3":"0.056892710"},{"1":"-0.850595949","2":"Male","3":"0.058684371"},{"1":"-0.840595949","2":"Male","3":"0.060528834"},{"1":"-0.830595949","2":"Male","3":"0.062427424"},{"1":"-0.820595949","2":"Male","3":"0.064381486"},{"1":"-0.810595949","2":"Male","3":"0.066392381"},{"1":"-0.800595949","2":"Male","3":"0.068461489"},{"1":"-0.790595949","2":"Male","3":"0.070590204"},{"1":"-0.780595949","2":"Male","3":"0.072779938"},{"1":"-0.770595949","2":"Male","3":"0.075032114"},{"1":"-0.760595949","2":"Male","3":"0.077348170"},{"1":"-0.750595949","2":"Male","3":"0.079729555"},{"1":"-0.740595949","2":"Male","3":"0.082177727"},{"1":"-0.730595949","2":"Male","3":"0.084694154"},{"1":"-0.720595949","2":"Male","3":"0.087280311"},{"1":"-0.710595949","2":"Male","3":"0.089937678"},{"1":"-0.700595949","2":"Male","3":"0.092667737"},{"1":"-0.690595949","2":"Male","3":"0.095471973"},{"1":"-0.680595949","2":"Male","3":"0.098351871"},{"1":"-0.670595949","2":"Male","3":"0.101308910"},{"1":"-0.660595949","2":"Male","3":"0.104344567"},{"1":"-0.650595949","2":"Male","3":"0.107460308"},{"1":"-0.640595949","2":"Male","3":"0.110657591"},{"1":"-0.630595949","2":"Male","3":"0.113937860"},{"1":"-0.620595949","2":"Male","3":"0.117302542"},{"1":"-0.610595949","2":"Male","3":"0.120753044"},{"1":"-0.600595949","2":"Male","3":"0.124290753"},{"1":"-0.590595949","2":"Male","3":"0.127917027"},{"1":"-0.580595949","2":"Male","3":"0.131633197"},{"1":"-0.570595949","2":"Male","3":"0.135440561"},{"1":"-0.560595949","2":"Male","3":"0.139340378"},{"1":"-0.550595949","2":"Male","3":"0.143333868"},{"1":"-0.540595949","2":"Male","3":"0.147422206"},{"1":"-0.530595949","2":"Male","3":"0.151606520"},{"1":"-0.520595949","2":"Male","3":"0.155887883"},{"1":"-0.510595949","2":"Male","3":"0.160267312"},{"1":"-0.500595949","2":"Male","3":"0.164745761"},{"1":"-0.490595949","2":"Male","3":"0.169324121"},{"1":"-0.480595949","2":"Male","3":"0.174003209"},{"1":"-0.470595949","2":"Male","3":"0.178783770"},{"1":"-0.460595949","2":"Male","3":"0.183666466"},{"1":"-0.450595949","2":"Male","3":"0.188651879"},{"1":"-0.440595949","2":"Male","3":"0.193740499"},{"1":"-0.430595949","2":"Male","3":"0.198932724"},{"1":"-0.420595949","2":"Male","3":"0.204228851"},{"1":"-0.410595949","2":"Male","3":"0.209629079"},{"1":"-0.400595949","2":"Male","3":"0.215133497"},{"1":"-0.390595949","2":"Male","3":"0.220742081"},{"1":"-0.380595949","2":"Male","3":"0.226454696"},{"1":"-0.370595949","2":"Male","3":"0.232271083"},{"1":"-0.360595949","2":"Male","3":"0.238190860"},{"1":"-0.350595949","2":"Male","3":"0.244213518"},{"1":"-0.340595949","2":"Male","3":"0.250338418"},{"1":"-0.330595949","2":"Male","3":"0.256564785"},{"1":"-0.320595949","2":"Male","3":"0.262891705"},{"1":"-0.310595949","2":"Male","3":"0.269318127"},{"1":"-0.300595949","2":"Male","3":"0.275842856"},{"1":"-0.290595949","2":"Male","3":"0.282464550"},{"1":"-0.280595949","2":"Male","3":"0.289181724"},{"1":"-0.270595949","2":"Male","3":"0.295992742"},{"1":"-0.260595949","2":"Male","3":"0.302895820"},{"1":"-0.250595949","2":"Male","3":"0.309889024"},{"1":"-0.240595949","2":"Male","3":"0.316970273"},{"1":"-0.230595949","2":"Male","3":"0.324137333"},{"1":"-0.220595949","2":"Male","3":"0.331387823"},{"1":"-0.210595949","2":"Male","3":"0.338719216"},{"1":"-0.200595949","2":"Male","3":"0.346128838"},{"1":"-0.190595949","2":"Male","3":"0.353613873"},{"1":"-0.180595949","2":"Male","3":"0.361171365"},{"1":"-0.170595949","2":"Male","3":"0.368798221"},{"1":"-0.160595949","2":"Male","3":"0.376491216"},{"1":"-0.150595949","2":"Male","3":"0.384246995"},{"1":"-0.140595949","2":"Male","3":"0.392062081"},{"1":"-0.130595949","2":"Male","3":"0.399932878"},{"1":"-0.120595949","2":"Male","3":"0.407855678"},{"1":"-0.110595949","2":"Male","3":"0.415826668"},{"1":"-0.100595949","2":"Male","3":"0.423841936"},{"1":"-0.090595949","2":"Male","3":"0.431897476"},{"1":"-0.080595949","2":"Male","3":"0.439989201"},{"1":"-0.070595949","2":"Male","3":"0.448112945"},{"1":"-0.060595949","2":"Male","3":"0.456264477"},{"1":"-0.050595949","2":"Male","3":"0.464439505"},{"1":"-0.040595949","2":"Male","3":"0.472633686"},{"1":"-0.030595949","2":"Male","3":"0.480842638"},{"1":"-0.020595949","2":"Male","3":"0.489061947"},{"1":"-0.010595949","2":"Male","3":"0.497287173"},{"1":"-0.000595949","2":"Male","3":"0.505513868"},{"1":"0.009404051","2":"Male","3":"0.513737579"},{"1":"0.019404051","2":"Male","3":"0.521953858"},{"1":"0.029404051","2":"Male","3":"0.530158275"},{"1":"0.039404051","2":"Male","3":"0.538346425"},{"1":"0.049404051","2":"Male","3":"0.546513938"},{"1":"0.059404051","2":"Male","3":"0.554656487"},{"1":"0.069404051","2":"Male","3":"0.562769801"},{"1":"0.079404051","2":"Male","3":"0.570849669"},{"1":"0.089404051","2":"Male","3":"0.578891952"},{"1":"0.099404051","2":"Male","3":"0.586892588"},{"1":"0.109404051","2":"Male","3":"0.594847605"},{"1":"0.119404051","2":"Male","3":"0.602753121"},{"1":"0.129404051","2":"Male","3":"0.610605359"},{"1":"0.139404051","2":"Male","3":"0.618400649"},{"1":"0.149404051","2":"Male","3":"0.626135435"},{"1":"0.159404051","2":"Male","3":"0.633806280"},{"1":"0.169404051","2":"Male","3":"0.641409874"},{"1":"0.179404051","2":"Male","3":"0.648943035"},{"1":"0.189404051","2":"Male","3":"0.656402717"},{"1":"0.199404051","2":"Male","3":"0.663786012"},{"1":"0.209404051","2":"Male","3":"0.671090150"},{"1":"0.219404051","2":"Male","3":"0.678312509"},{"1":"0.229404051","2":"Male","3":"0.685450611"},{"1":"0.239404051","2":"Male","3":"0.692502124"},{"1":"0.249404051","2":"Male","3":"0.699464867"},{"1":"0.259404051","2":"Male","3":"0.706336809"},{"1":"0.269404051","2":"Male","3":"0.713116066"},{"1":"0.279404051","2":"Male","3":"0.719800905"},{"1":"0.289404051","2":"Male","3":"0.726389743"},{"1":"0.299404051","2":"Male","3":"0.732881142"},{"1":"0.309404051","2":"Male","3":"0.739273811"},{"1":"0.319404051","2":"Male","3":"0.745566604"},{"1":"0.329404051","2":"Male","3":"0.751758517"},{"1":"0.339404051","2":"Male","3":"0.757848685"},{"1":"0.349404051","2":"Male","3":"0.763836378"},{"1":"0.359404051","2":"Male","3":"0.769721002"},{"1":"0.369404051","2":"Male","3":"0.775502091"},{"1":"0.379404051","2":"Male","3":"0.781179307"},{"1":"0.389404051","2":"Male","3":"0.786752432"},{"1":"0.399404051","2":"Male","3":"0.792221371"},{"1":"0.409404051","2":"Male","3":"0.797586137"},{"1":"0.419404051","2":"Male","3":"0.802846859"},{"1":"0.429404051","2":"Male","3":"0.808003768"},{"1":"0.439404051","2":"Male","3":"0.813057197"},{"1":"0.449404051","2":"Male","3":"0.818007576"},{"1":"0.459404051","2":"Male","3":"0.822855426"},{"1":"0.469404051","2":"Male","3":"0.827601357"},{"1":"0.479404051","2":"Male","3":"0.832246060"},{"1":"0.489404051","2":"Male","3":"0.836790305"},{"1":"0.499404051","2":"Male","3":"0.841234935"},{"1":"0.509404051","2":"Male","3":"0.845580863"},{"1":"0.519404051","2":"Male","3":"0.849829064"},{"1":"0.529404051","2":"Male","3":"0.853980575"},{"1":"0.539404051","2":"Male","3":"0.858036490"},{"1":"0.549404051","2":"Male","3":"0.861997950"},{"1":"0.559404051","2":"Male","3":"0.865866148"},{"1":"0.569404051","2":"Male","3":"0.869642317"},{"1":"0.579404051","2":"Male","3":"0.873327731"},{"1":"0.589404051","2":"Male","3":"0.876923698"},{"1":"0.599404051","2":"Male","3":"0.880431559"},{"1":"0.609404051","2":"Male","3":"0.883852683"},{"1":"0.619404051","2":"Male","3":"0.887188463"},{"1":"0.629404051","2":"Male","3":"0.890440315"},{"1":"0.639404051","2":"Male","3":"0.893609671"},{"1":"0.649404051","2":"Male","3":"0.896697979"},{"1":"0.659404051","2":"Male","3":"0.899706702"},{"1":"0.669404051","2":"Male","3":"0.902637309"},{"1":"0.679404051","2":"Male","3":"0.905491278"},{"1":"0.689404051","2":"Male","3":"0.908270090"},{"1":"0.699404051","2":"Male","3":"0.910975231"},{"1":"0.709404051","2":"Male","3":"0.913608185"},{"1":"0.719404051","2":"Male","3":"0.916170433"},{"1":"0.729404051","2":"Male","3":"0.918663455"},{"1":"0.739404051","2":"Male","3":"0.921088722"},{"1":"0.749404051","2":"Male","3":"0.923447699"},{"1":"0.759404051","2":"Male","3":"0.925741842"},{"1":"0.769404051","2":"Male","3":"0.927972596"},{"1":"0.779404051","2":"Male","3":"0.930141394"},{"1":"0.789404051","2":"Male","3":"0.932249656"},{"1":"0.799404051","2":"Male","3":"0.934298787"},{"1":"0.809404051","2":"Male","3":"0.936290176"},{"1":"0.819404051","2":"Male","3":"0.938225198"},{"1":"0.829404051","2":"Male","3":"0.940105208"},{"1":"0.839404051","2":"Male","3":"0.941931544"},{"1":"0.849404051","2":"Male","3":"0.943705526"},{"1":"0.859404051","2":"Male","3":"0.945428453"},{"1":"0.869404051","2":"Male","3":"0.947101604"},{"1":"0.879404051","2":"Male","3":"0.948726239"},{"1":"0.889404051","2":"Male","3":"0.950303596"},{"1":"0.899404051","2":"Male","3":"0.951834891"},{"1":"0.909404051","2":"Male","3":"0.953321320"},{"1":"0.919404051","2":"Male","3":"0.954764057"},{"1":"0.929404051","2":"Male","3":"0.956164252"},{"1":"0.939404051","2":"Male","3":"0.957523034"},{"1":"0.949404051","2":"Male","3":"0.958841512"},{"1":"0.959404051","2":"Male","3":"0.960120768"},{"1":"0.969404051","2":"Male","3":"0.961361866"},{"1":"0.979404051","2":"Male","3":"0.962565845"},{"1":"0.989404051","2":"Male","3":"0.963733723"},{"1":"0.999404051","2":"Male","3":"0.964866495"},{"1":"1.009404051","2":"Male","3":"0.965965135"},{"1":"1.019404051","2":"Male","3":"0.967030594"},{"1":"1.029404051","2":"Male","3":"0.968063801"},{"1":"1.039404051","2":"Male","3":"0.969065665"},{"1":"1.049404051","2":"Male","3":"0.970037073"},{"1":"1.059404051","2":"Male","3":"0.970978889"},{"1":"1.069404051","2":"Male","3":"0.971891960"},{"1":"1.079404051","2":"Male","3":"0.972777109"},{"1":"1.089404051","2":"Male","3":"0.973635140"},{"1":"1.099404051","2":"Male","3":"0.974466836"},{"1":"1.109404051","2":"Male","3":"0.975272963"},{"1":"1.119404051","2":"Male","3":"0.976054264"},{"1":"1.129404051","2":"Male","3":"0.976811465"},{"1":"1.139404051","2":"Male","3":"0.977545273"},{"1":"1.149404051","2":"Male","3":"0.978256377"},{"1":"1.159404051","2":"Male","3":"0.978945446"},{"1":"1.169404051","2":"Male","3":"0.979613133"},{"1":"1.179404051","2":"Male","3":"0.980260073"},{"1":"1.189404051","2":"Male","3":"0.980886885"},{"1":"1.199404051","2":"Male","3":"0.981494168"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> predicted_prob, <span class="fu">aes</span>(<span class="at">x=</span>DilateDiff, <span class="at">y=</span>.fitted, <span class="at">color=</span>Sex)) <span class="sc">+</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="10_multiple_logistic_regression_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We could even add the raw data to this plot, since the raw data were measured on the 0/1 scale</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> predicted_prob, <span class="fu">aes</span>(<span class="at">x=</span>DilateDiff, <span class="at">y=</span>.fitted, <span class="at">color=</span>Sex)) <span class="sc">+</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">data =</span> Eyes,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> Gay),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">height =</span> .<span class="dv">01</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>              )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="10_multiple_logistic_regression_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="example-10.2-medical-school-admissions" class="level3" data-number="10.2.2">
+<h3 data-number="10.2.2" class="anchored" data-anchor-id="example-10.2-medical-school-admissions"><span class="header-section-number">10.2.2</span> Example 10.2: Medical school admissions</h3>
+
+
+</section>
+</section>
+<section class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1" role="doc-endnote"><p>Ironically, the Kinsey scale was originally developed as a way of understanding sexual preferences without explicitly categorizing people as exclusively heterosexual, homosexual or bisexual!<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./09_logistic_regression.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Logistic Regression</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
