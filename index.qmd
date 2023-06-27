@@ -1,3 +1,0 @@
-# Preface {.unnumbered}
-
-This is a guide to conducting the analysis demonstrated in [Stat2: Modeling with Regression and ANOVA](https://www.macmillanlearning.com/college/us/product/STAT2/p/1319054072) [@Cannon2018stat2] using R, with a focus on using tools and techniques from the [Tidyverse](https://www.tidyverse.org/).

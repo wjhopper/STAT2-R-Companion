@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.0.38">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,10 +11,49 @@
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-span.underline{text-decoration: underline;}
-div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -53,10 +92,16 @@ ul.task-list{list-style: none;}
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -64,11 +109,16 @@ ul.task-list{list-style: none;}
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">One-way ANOVA and Randomized Experiments</span></h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05_one-way_ANOVA.html">Unit B: Analysis of Variance</a></li><li class="breadcrumb-item"><a href="./05_one-way_ANOVA.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">One-way ANOVA and Randomized Experiments</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
       </button>
     </div>
   </nav>
@@ -76,125 +126,152 @@ ul.task-list{list-style: none;}
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
-      <a href="./" class="sidebar-logo-link">
+      <a href="./index.html" class="sidebar-logo-link">
       <img src="./STAT2_logo_small.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
       </a>
     <div class="sidebar-title mb-0 py-0">
       <a href="./">The R Companion to STATS2</a> 
     </div>
       </div>
-      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-      </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">Preface</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Unit A: Linear Regression</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Unit A: Linear Regression</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./01_simple_linear_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Simple Linear Regression</span></a>
+  <a href="./01_simple_linear_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Simple Linear Regression</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./02_inference_for_simple_linear_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Inference for Simple Linear Regression</span></a>
+  <a href="./02_inference_for_simple_linear_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Inference for Simple Linear Regression</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./03_multiple_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Multiple Regression</span></a>
+  <a href="./03_multiple_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Multiple Regression</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./04_additional_topics_in_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Additional Topics in Regression</span></a>
+  <a href="./04_additional_topics_in_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Additional Topics in Regression</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Unit B: Analysis of Variance</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Unit B: Analysis of Variance</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./05_one-way_ANOVA.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">One-way ANOVA and Randomized Experiments</span></a>
+  <a href="./05_one-way_ANOVA.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">One-way ANOVA and Randomized Experiments</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./06_two-way_ANOVA.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Blocking and Two-way ANOVA</span></a>
+  <a href="./06_two-way_ANOVA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Blocking and Two-way ANOVA</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./07_ANOVA_with_interaction.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">ANOVA with Interaction and Factorial Designs</span></a>
+  <a href="./07_ANOVA_with_interaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">ANOVA with Interaction and Factorial Designs</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./08_additional_topics_in_ANOVA.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Additional Topics in Analysis of Variance</span></a>
+  <a href="./08_additional_topics_in_ANOVA.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Additional Topics in Analysis of Variance</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">Unit C: Logistic Regression</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Unit C: Logistic Regression</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./09_logistic_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Logistic Regression</span></a>
+  <a href="./09_logistic_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Logistic Regression</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./10_multiple_logistic_regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Multiple Logistic Regression</span></a>
+  <a href="./10_multiple_logistic_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Multiple Logistic Regression</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
   </div>
 </li>
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview-of-anova" id="toc-overview-of-anova" class="nav-link active" data-scroll-target="#overview-of-anova"><span class="header-section-number">5.1</span> Overview of ANOVA</a></li>
+  <li><a href="#the-one-way-randomized-experiment-and-its-observational-sibling" id="toc-the-one-way-randomized-experiment-and-its-observational-sibling" class="nav-link" data-scroll-target="#the-one-way-randomized-experiment-and-its-observational-sibling"><span class="header-section-number">5.2</span> The One-way Randomized Experiment and Its Observational Sibling</a></li>
+  <li><a href="#fitting-the-model" id="toc-fitting-the-model" class="nav-link" data-scroll-target="#fitting-the-model"><span class="header-section-number">5.3</span> Fitting the Model</a></li>
+  <li><a href="#assessing-and-using-the-model" id="toc-assessing-and-using-the-model" class="nav-link" data-scroll-target="#assessing-and-using-the-model"><span class="header-section-number">5.4</span> Assessing and Using the Model</a></li>
+  <li><a href="#using-plots-to-help-choose-a-scale-for-the-response" id="toc-using-plots-to-help-choose-a-scale-for-the-response" class="nav-link" data-scroll-target="#using-plots-to-help-choose-a-scale-for-the-response"><span class="header-section-number">5.5</span> Using Plots to Help Choose a Scale for the Response</a></li>
+  <li><a href="#multiple-comparisons-and-fishers-least-significant-difference" id="toc-multiple-comparisons-and-fishers-least-significant-difference" class="nav-link" data-scroll-target="#multiple-comparisons-and-fishers-least-significant-difference"><span class="header-section-number">5.6</span> Multiple Comparisons and Fisher’s Least Significant Difference</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">One-way ANOVA and Randomized Experiments</span></h1>
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">One-way ANOVA and Randomized Experiments</span></h1>
 </div>
 
 
@@ -202,15 +279,295 @@ ul.task-list{list-style: none;}
 <div class="quarto-title-meta">
 
     
+  
     
   </div>
   
 
 </header>
 
-<p>This section is not yet implemented.</p>
+<section id="overview-of-anova" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="overview-of-anova"><span class="header-section-number">5.1</span> Overview of ANOVA</h2>
+<p>No analyses are carried out in this section, so this section is omitted from the R Companion. However, this stub is included to keep the section numbers in each chapter consistent with the STAT2 text.</p>
+</section>
+<section id="the-one-way-randomized-experiment-and-its-observational-sibling" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="the-one-way-randomized-experiment-and-its-observational-sibling"><span class="header-section-number">5.2</span> The One-way Randomized Experiment and Its Observational Sibling</h2>
+<p>No analyses are carried out in this section, so this section is omitted from the R Companion. However, this stub is included to keep the section numbers in each chapter consistent with the STAT2 text.</p>
+</section>
+<section id="fitting-the-model" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="fitting-the-model"><span class="header-section-number">5.3</span> Fitting the Model</h2>
+<p>There are many different ways to carry out an ANOVA in R, several of which involve R packages outside of the base set of packages installed with R by default. Here, we’ll focus on how to carry out the so-called “one-way” or “one-factor” ANOVA that is the topic of Chapter 5.3 using only the tools included with base R.</p>
+<p>The first analysis we’ll replicate is the ANOVA based on the <code>Undoing</code> data set, which is presented incrementally across Examples 5.6 and 5.9. The <code>Undoing</code> data set holds results from an observational study of one patient’s progress using psychotherapy to treat OCD. Transcript’s from the patient’s psychotherapy sessions were rated by other therapists one a 1 to 4 scale measuring the inverse severity of the patient’s OCD symptoms (a rating of 1 means “severe symptoms”, and a rating of 4 means “no symptoms”). The transcripts were dividing into six chronologically ordered groups, allowing the researchers to measure how the symptom severity ratings given by the therapists changed as they read sessions progressively further along in the patient’s treatment.</p>
+<p>For simplicity, the ANOVA presented in Section 5.3 only uses the rating data from the first, third, and fifth group of session ratings. The data from these three time points is shown below in <a href="#fig-undoing_subset_dotplot">Figure&nbsp;<span>5.1</span></a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"Undoing"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>Undoing_subset <span class="ot">&lt;-</span> Undoing <span class="sc">|&gt;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Group <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"I"</span>, <span class="st">"III"</span>, <span class="st">"IV"</span>))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Undoing_subset,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Group, <span class="at">y =</span> Score)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> .<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-undoing_subset_dotplot" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="05_one-way_ANOVA_files/figure-html/fig-undoing_subset_dotplot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;5.1: A subset of the observations in the <code>Undoing</code> data set reflecting OCD symptom severity ratings from three different time points.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>One such to execute an ANOVA with these data is to</p>
+<ol type="1">
+<li>First use the <code>lm()</code> function to a linear model that regresses your outcome value on your categorical explanatory variable</li>
+<li>Then carry out the ANOVA and F-test for each explanatory variable in your model by calling the <code>anova()</code> function on your linear model object.</li>
+</ol>
+<p>For example, we can replicate the ANOVA table from Example 5.9 by doing:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>undoing_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Score <span class="sc">~</span> Group, <span class="at">data =</span> Undoing_subset)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>anova_table <span class="ot">&lt;-</span> <span class="fu">anova</span>(undoing_model)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>anova_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Df"],"name":[1],"type":["int"],"align":["right"]},{"label":["Sum Sq"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Mean Sq"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["F value"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"2","2":"3.75","3":"1.8750000","4":"3.970588","5":"0.05805575","_rn_":"Group"},{"1":"9","2":"4.25","3":"0.4722222","4":"NA","5":"NA","_rn_":"Residuals"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>One difference between this ANOVA table, and the one presented in Example 5.9, is that this table lacks a “Total” row showing the overall degrees of freedom and sums of squares. This is not a serious loss, and if that information is ever need, you can sum the degrees of freedom and sum of squares columns in the ANOVA table to recover it:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>anova_table <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_df =</span> <span class="fu">sum</span>(Df),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">total_ss =</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Sum Sq</span><span class="st">`</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["total_df"],"name":[1],"type":["int"],"align":["right"]},{"label":["total_ss"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"11","2":"8"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>R also includes an <code>aov()</code> function which combines step 1 (fitting the regression model) and 2 (calculating the sums of squares, mean squares, and F-statistics to construct the ANOVA table) into one step. We’ll demonstrate the <code>aov()</code> function by replicating the ANOVA for the <code>Leafhoppers</code> data set that is presented across Examples 5.5 and 5.5.</p>
+<p>The <code>Leafhoppers</code> data set holds results from an experiment that studied how the lifespan of Potato Leafhopper insects was impacted by earning diets containing solely sugar compounds (Sucrose, Glucose, and Fructose). The data set 8 observations (two observations for each sugar compound, plus a control condition), and are shown below in <a href="#fig-leafhopper">Figure&nbsp;<span>5.2</span></a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"Leafhoppers"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Leafhoppers,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Diet, <span class="at">y =</span> Days)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="st">"Control"</span>, <span class="st">"Sucrose"</span>, <span class="st">"Glucose"</span>, <span class="st">"Fructose"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-leafhopper" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="05_one-way_ANOVA_files/figure-html/fig-leafhopper-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;5.2: Leafhopper survival time (in days) plotted against the leafhopper’s diet</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Finally, we’ll replicate the ANOVA table from Example 5.7 using the <code>aov()</code> function. The <code>aov()</code> function effectively serves as a drop-in replacement for the <code>lm()</code> function: you supply the <code>aov()</code> function with a model formula describing your outcome and explanatory variables (as well as the data set where they cane be located), and it supplies you with an ANOVA table:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>leafhoppers_anova <span class="ot">&lt;-</span> <span class="fu">aov</span>(Days <span class="sc">~</span> Diet, <span class="at">data =</span> Leafhoppers)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(leafhoppers_anova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Df Sum Sq Mean Sq F value  Pr(&gt;F)   
+Diet         3   3.92   1.307   17.42 0.00925 **
+Residuals    4   0.30   0.075                   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="assessing-and-using-the-model" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="assessing-and-using-the-model"><span class="header-section-number">5.4</span> Assessing and Using the Model</h2>
+<p>Section 5.4 explains that the F-statistic created from the <span class="math inline">\(\frac{MS_{Model}}{MS_{Error}}\)</span> ratio can be used to test the null hypothesis that <span class="math inline">\(\mu_1 = \mu_2 = ... \mu_j\)</span> where <span class="math inline">\(j\)</span> indexes the groups of data defined by the categorical explanatory variable in the model.</p>
+<p>The <em>p</em>-values shown in R’s ANOVA tables answer the question “What is the probability of observing an <em>F</em> statistic as extreme or more extreme than the one computed from this sample of data, if <span class="math inline">\(\mu_1 = \mu_2 = ... \mu_j\)</span>?”. These <em>p</em>-values are computed by finding <span class="math inline">\(P(F &gt;= \frac{MS_{Model}}{MS_{Error}})\)</span> using an <em>F</em> distribution with <span class="math inline">\(j-1\)</span> and <span class="math inline">\(n-j\)</span> degrees of freedom. However, for this probability to accurately measure <span class="math inline">\(P(F &gt;= \frac{MS_{Model}}{MS_{Error}})\)</span>, then <span class="math inline">\(\frac{MS_{Model}}{MS_{Error}})\)</span> must <em>actually</em> follow the pattern of an <span class="math inline">\(F_{j-1, n-j}\)</span> distribution. Whether or not this is true boils down to the pattern of residual errors within each group of data, the <span class="math inline">\(y_{ij} - \mu_j\)</span> values. Specifically,</p>
+<ul>
+<li>The residuals (both within and across groups) must reflect a random process</li>
+<li>The residuals (both within and across groups) must be independent</li>
+<li>The residuals have the same degree of variability in each group</li>
+<li>The residuals are normally distributed</li>
+</ul>
+<p>If these conditions look familiar to you, it’s because they are; these are fundamentally the same assumptions (independence, equal variance, normality) that supported the use of <em>t</em>-tests on the <span class="math inline">\(b_k\)</span> coefficients of a linear regression model (which makes sense, given that an ANOVA is just a particular way of analyzing the fit of a linear model). The only difference here is that the equality of variance we’re interested in regards the error variability observed within each group of residuals, rather than assessing the equality of the residual error between each observation and a single, global regression line.</p>
+<p>There isn’t any universal method of assessing the validity of the first two conditions for inference; in other words, there aren’t any “stock” visualizations or hypothesis tests that can be applied to any ANOVA to assess whether randomness and independence are reasonable assumptions to make about your residual errors. Rather, you should ask yourself these questions:</p>
+<ul>
+<li>When observations differ from the group mean, to what do I attribute this difference?
+<ul>
+<li>If you can explain <em>exactly</em> why a particular observation differs from the group mean, then this residual probably isn’t random</li>
+</ul></li>
+<li>Is there anything that directly links two residuals errors together, aside from the fact that they are in the same group?
+<ul>
+<li>For example, ff two residual errors come from the same person, or the same household, then these residual errors will probably be more similar to each other than any other randomly chosen residual errors, and thus, are not independent.</li>
+</ul></li>
+</ul>
+<p>As recommended by the STAT2 text, the Normality and equal variance assumptions can be assessed by plotting distribution of residuals within each group, and well as a Normal-quantile plot for the residuals respectively. The quickest way to create these two plots are with the <code>check_homogeneity()</code> and <code>check_normality()</code> functions from the <code>performance</code> package. To demonstrate, we’ll replicate the ANOVA for the fruit flies data set used in Example 5.11, and reproduce Figure 5.14. First, we’ll need to load the data, and fit the ANOVA model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"FruitFlies"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>fruitfly_anova <span class="ot">&lt;-</span> <span class="fu">aov</span>(Longevity <span class="sc">~</span> Treatment, <span class="at">data =</span> FruitFlies)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fruitfly_anova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+Treatment     4  11939  2984.8   13.61 3.52e-09 ***
+Residuals   120  26314   219.3                     
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Next, we’ll pass our <code>aov</code> model object to the <code>check_homogeneity()</code> and <code>check_normality()</code> functions. These functions themselves do not create the visualizations; rather, the <code>plot()</code> function must be called on the objects returned by <code>check_homogeneity()</code> and <code>check_normality()</code> to see the visualizations. We’ll use the <code>grid.arrange()</code> function (from the <code>gridExtra</code> package) to place them side-by-side in the same figure:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(see)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>variance_check <span class="ot">&lt;-</span> <span class="fu">check_homogeneity</span>(fruitfly_anova)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>normality_check <span class="ot">&lt;-</span> <span class="fu">check_normality</span>(fruitfly_anova)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(<span class="fu">plot</span>(variance_check),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>             <span class="fu">plot</span>(normality_check, <span class="at">type =</span> <span class="st">"qq"</span>),</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="dv">2</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>             )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="05_one-way_ANOVA_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The <code>check_homogeneity()</code> function describes the residuals in each group using violin plots instead of box plots. If you aren’t familiar with reading violin plots, a good introduction is found <a href="https://towardsdatascience.com/violin-plots-explained-fb1d115e023d">here</a> (just ignore the Python code if you don’t speak Python).</p>
+<p>If you’d rather use box plots instead of violin plots, we’ll have to construct them “manually”. We can do this without too much trouble by using the <code>broom::augment()</code> function to obtain a data frame holding residual errors for each observation in the data, and then using <code>ggplot()</code> to plot the distribution of these residuals for each group of fruit flies.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>residuals <span class="ot">&lt;-</span> <span class="fu">augment</span>(fruitfly_anova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `augment()` method for objects of class `aov` is not maintained by the broom team, and is only supported through the `lm` tidier method. Please be cautious in interpreting and reporting broom output.
+
+This warning is displayed once per session.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(residuals, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Longevity"],"name":[1],"type":["int"],"align":["right"]},{"label":["Treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":[".fitted"],"name":[3],"type":["dbl"],"align":["right"]},{"label":[".resid"],"name":[4],"type":["dbl"],"align":["right"]},{"label":[".hat"],"name":[5],"type":["dbl"],"align":["right"]},{"label":[".sigma"],"name":[6],"type":["dbl"],"align":["right"]},{"label":[".cooksd"],"name":[7],"type":["dbl"],"align":["right"]},{"label":[".std.resid"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"35","2":"8 pregnant","3":"63.36","4":"-28.36","5":"0.04","6":"14.63153","7":"3.183921e-02","8":"-1.95466240"},{"1":"37","2":"8 pregnant","3":"63.36","4":"-26.36","5":"0.04","6":"14.66423","7":"2.750684e-02","8":"-1.81681597"},{"1":"49","2":"8 pregnant","3":"63.36","4":"-14.36","5":"0.04","6":"14.80935","7":"8.163167e-03","8":"-0.98973738"},{"1":"46","2":"8 pregnant","3":"63.36","4":"-17.36","5":"0.04","6":"14.78120","7":"1.193024e-02","8":"-1.19650703"},{"1":"63","2":"8 pregnant","3":"63.36","4":"-0.36","5":"0.04","6":"14.87013","7":"5.130442e-06","8":"-0.02481236"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>boxplots <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> residuals,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Treatment, <span class="at">y =</span> .resid)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                   ) <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(boxplots,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>             <span class="fu">plot</span>(normality_check, <span class="at">type =</span> <span class="st">"qq"</span>),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="dv">2</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>             )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>For confidence bands, please install `qqplotr`.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="05_one-way_ANOVA_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Both plotting approaches (the violin plot and box plot methods) encourage use that the conditions for inference (equal variance and normality of the residuals) are quite reasonably met in this case.</p>
+<p>When running the code above, the <code>augment()</code> function may give you warning, cautioning that you that “The <code>augment()</code> method for objects of class <code>aov</code> is not maintained by the broom team…”. In this situation, we can safely ignore this warning. But, that may not be the case for other, more complex ANOVA analyses carried out in <a href="./08_additional_topics_in_ANOVA.html">Chapter 8</a>, specifically those that divide the residual errors into different “strata”.</p>
+</section>
+<section id="using-plots-to-help-choose-a-scale-for-the-response" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="using-plots-to-help-choose-a-scale-for-the-response"><span class="header-section-number">5.5</span> Using Plots to Help Choose a Scale for the Response</h2>
+</section>
+<section id="multiple-comparisons-and-fishers-least-significant-difference" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="multiple-comparisons-and-fishers-least-significant-difference"><span class="header-section-number">5.6</span> Multiple Comparisons and Fisher’s Least Significant Difference</h2>
+<p>A “significant” <em>F</em>-test from an ANOVA variance indicates “At least one group of observations has a mean value that is ‘significantly’ different than the mean value of least one other group of observations”. In other words, a “significant” <em>F</em>-test indicates “a difference exists”, but doesn’t identify the <em>nature</em> of this difference.</p>
+<p>For example, the “significant” <em>F</em>-test Leafhoppers ANOVA in <a href="#fitting-the-model">Section 5.3</a> indicates “There is a difference among the average lifespans of Leafhoppers who consume different sugar compounds”, but we <em>don’t</em> yet know if this difference exists amongst the Glucose and Sucrose groups, the Fructose and Sucrose groups, or both! To address this question, we’ll need to <strong>contrast</strong> the means in each group.</p>
+<p>Section 5.6 focuses on a method of contrasting each pair of group means (called Fisher’s Least Significant Difference) that allows you to hold the false positive rate across the family of contrasts of contrasts a chosen small value (e.g., .05). We’ll execute the Least Significant Difference contrasts “by hand” for the Leafhoppers ANOVA.</p>
+<p>Fisher’s LSD procedure compares each difference in means to a “threshold” value called the Least Significant Difference. This Least Significant Difference (LSD) is defined as <span class="math display">\[
+LSD = min_{j, k} \bigg\{t^* \cdot \sqrt{\frac{MS_{Error}}{n_j} + \frac{MS_{Error}}{n_k}}\bigg\}
+\]</span></p>
+<p>where</p>
+<ul>
+<li><span class="math inline">\(N\)</span> is total number of observations in the data set.</li>
+<li><span class="math inline">\(J\)</span> is the total number of groups (i.e., the number of levels belonging to the explanatory variable).</li>
+<li><span class="math inline">\(t^*\)</span> is the <span class="math inline">\(1-\frac{\alpha}{2}\)</span> quantile of the <em>t</em> distribution with <span class="math inline">\(N-J\)</span> degrees of freedom, and <span class="math inline">\(\alpha\)</span> is the significance level used for the F-test from the ANOVA.</li>
+<li><span class="math inline">\(MS_{Error}\)</span> is the Mean Square Error (computed from the ANOVA model).</li>
+<li><span class="math inline">\(n_j\)</span> and <span class="math inline">\(n_k\)</span> are the number of observations in the <span class="math inline">\(i\)</span>-th and <span class="math inline">\(j\)</span>-th group respectively.</li>
+</ul>
+<p>For an unbalanced design (where each group has a different number of observations), we would have to compute <span class="math inline">\(\frac{j(j-1)}{2}\)</span> different candidate LSD values times (one for each possible pair of groups) and take the minimum of those <span class="math inline">\(\frac{j(j-1)}{2}\)</span> values as our LSD. However, since the Leafhopper data set is balanced (each group has 2 observations), the LSD won’t change, so we can compute it exactly once.</p>
+<p>Thus, for the Leafhoppers ANOVA, we have</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">8</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>J <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>n_j <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>t_star <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (.<span class="dv">05</span><span class="sc">/</span><span class="dv">2</span>), <span class="at">df =</span> N<span class="sc">-</span>J)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>t_star</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.776445</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>MS_error <span class="ot">&lt;-</span> <span class="fu">summary</span>(leafhoppers_anova)[[<span class="dv">1</span>]][<span class="dv">2</span> , <span class="st">"Mean Sq"</span>]</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>MS_error</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.075</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>LSD <span class="ot">&lt;-</span> t_star <span class="sc">*</span> <span class="fu">sqrt</span>(MS_error<span class="sc">/</span><span class="dv">2</span> <span class="sc">+</span> MS_error<span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>LSD</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.7603608</code></pre>
+</div>
+</div>
+<p>Now that we have the LSD threshold, we compare it against each of the 6 differences in means. The quickest way to compute each the pairwise differences in means is with the <code>emmeans()</code> package:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>leafhoppers_means <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(leafhoppers_anova, <span class="at">specs =</span> <span class="sc">~</span> Diet)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>leafhoppers_means</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Diet     emmean    SE df lower.CL upper.CL
+ Control     2.0 0.194  4     1.46     2.54
+ Fructose    2.2 0.194  4     1.66     2.74
+ Glucose     2.8 0.194  4     2.26     3.34
+ Sucrose     3.8 0.194  4     3.26     4.34
+
+Confidence level used: 0.95 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>paiwise_differences <span class="ot">&lt;-</span> <span class="fu">contrast</span>(leafhoppers_means,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">method =</span> <span class="st">"pairwise"</span>,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">infer =</span> <span class="cn">FALSE</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                                )</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>paiwise_differences</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast           estimate    SE df
+ Control - Fructose     -0.2 0.274  4
+ Control - Glucose      -0.8 0.274  4
+ Control - Sucrose      -1.8 0.274  4
+ Fructose - Glucose     -0.6 0.274  4
+ Fructose - Sucrose     -1.6 0.274  4
+ Glucose - Sucrose      -1.0 0.274  4</code></pre>
+</div>
+</div>
+<p>Finally, we can compare each difference in means (which are found in the <code>estimate</code> column) against our LSD threshold:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>paiwise_differences <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">LSD_significant =</span> <span class="fu">abs</span>(estimate) <span class="sc">&gt;</span> LSD)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["contrast"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["LSD_significant"],"name":[5],"type":["lgl"],"align":["right"]}],"data":[{"1":"Control - Fructose","2":"-0.2","3":"0.2738613","4":"4","5":"FALSE","_rn_":"1"},{"1":"Control - Glucose","2":"-0.8","3":"0.2738613","4":"4","5":"TRUE","_rn_":"2"},{"1":"Control - Sucrose","2":"-1.8","3":"0.2738613","4":"4","5":"TRUE","_rn_":"3"},{"1":"Fructose - Glucose","2":"-0.6","3":"0.2738613","4":"4","5":"FALSE","_rn_":"4"},{"1":"Fructose - Sucrose","2":"-1.6","3":"0.2738613","4":"4","5":"TRUE","_rn_":"5"},{"1":"Glucose - Sucrose","2":"-1.0","3":"0.2738613","4":"4","5":"TRUE","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Thus, according to Fisher’s LSD procedure, we can infer than Leafhoppers eating Glucose and Sucrose (but not those eating Fructose) will live longer on average than Leafhoppers eating the control diet, and Leafhoppers eating Glucose and Sucrose will live longer on average than Leafhoppers eating Fructose. In other words, the significant F-test from our ANOVA appears to have been driven by longer lifespans for the insects consuming Glucose and Sucrose compared to the other two groups (control and Fructose).</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -240,9 +597,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -254,7 +625,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
     setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -282,31 +670,136 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   for (var i=0; i<noterefs.length; i++) {
     const ref = noterefs[i];
     tippyHover(ref, function() {
-      let href = ref.getAttribute('href');
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
-    tippyHover(ref, function() {
-      var popup = window.document.createElement('div');
-      cites.forEach(function(cite) {
-        var citeDiv = window.document.createElement('div');
-        citeDiv.classList.add('hanging-indent');
-        citeDiv.classList.add('csl-entry');
-        var biblioDiv = window.document.getElementById('ref-' + cite);
-        if (biblioDiv) {
-          citeDiv.innerHTML = biblioDiv.innerHTML;
-        }
-        popup.appendChild(citeDiv);
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
       });
-      return popup.innerHTML;
-    });
+    }
   }
 });
 </script>
