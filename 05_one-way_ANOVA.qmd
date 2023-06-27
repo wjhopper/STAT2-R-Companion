@@ -216,3 +216,6 @@ paiwise_differences |>
 ```
 
 Thus, according to Fisher's LSD procedure, we can infer than Leafhoppers eating Glucose and Sucrose (but not those eating Fructose) will live longer on average than Leafhoppers eating the control diet, and Leafhoppers eating Glucose and Sucrose will live longer on average than Leafhoppers eating Fructose. In other words, the significant F-test from our ANOVA appears to have been driven by longer lifespans for the insects consuming Glucose and Sucrose compared to the other two groups (control and Fructose).
+
+### Other Methods of Protecting the Family-wise Error Rate
+Fisher's LSD procedure protects your family-wise false positive rate, but only under narrow circumstances: your F-test was significant, and you are contrasting all possible pairs of means. As the STAT2 authors mention in a footnote at the end of section 5.7, there are other methods for protecting the family-wise error rate from becoming inflated by multiple comparison which are more widely applicable. See [Chapter 8.2](08_additional_topics_in_ANOVA.html) for examples of how to perform similar contrast analyses such as the Leafhopper contrasts performed above, but using other more robust methods to deal with the problems created with multiple comparisons.
