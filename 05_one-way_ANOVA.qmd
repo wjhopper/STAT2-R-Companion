@@ -81,3 +81,72 @@ leafhoppers_anova <- aov(Days ~ Diet, data = Leafhoppers)
 summary(leafhoppers_anova)
 ```
 
+## Assessing and Using the Model
+
+Section 5.4 explains that the F-statistic created from the $\frac{MS_{Model}}{MS_{Error}}$ ratio can be used to test the null hypothesis that $\mu_1 = \mu_2 = ... \mu_j$ where $j$ indexes the groups of data defined by the categorical explanatory variable in the model.
+
+The *p*-values shown in R's ANOVA tables answer the question "What is the probability of observing an *F* statistic as extreme or more extreme than the one computed from this sample of data, if $\mu_1 = \mu_2 = ... \mu_j$?". These *p*-values are computed by finding $P(F >= \frac{MS_{Model}}{MS_{Error}})$ using an *F* distribution with $j-1$ and $n-j$ degrees of freedom. However, for this probability to accurately measure $P(F >= \frac{MS_{Model}}{MS_{Error}})$, then $\frac{MS_{Model}}{MS_{Error}})$ must *actually* follow the pattern of an $F_{j-1, n-j}$ distribution. Whether or not this is true boils down to the pattern of residual errors within each group of data, the $y_{ij} - \mu_j$ values. Specifically,
+
+- The residuals (both within and across groups) must reflect a random process
+- The residuals (both within and across groups) must be independent
+- The residuals have the same degree of variability in each group
+- The residuals are normally distributed
+
+If these conditions look familiar to you, it's because they are; these are fundamentally the same assumptions (independence, equal variance, normality) that supported the use of *t*-tests on the $b_k$ coefficients of a linear regression model (which makes sense, given that an ANOVA is just a particular way of analyzing the fit of a linear model). The only difference here is that the equality of variance we're interested in regards the error variability observed within each group of residuals, rather than assessing the equality of the residual error between each observation and a single, global regression line.
+
+There isn't any universal method of assessing the validity of the first two conditions for inference; in other words, there aren't any "stock" visualizations or hypothesis tests that can be applied to any ANOVA to assess whether randomness and independence are reasonable assumptions to make about your residual errors. Rather, you should ask yourself these questions:
+
+- When observations differ from the group mean, to what do I attribute this difference?
+    - If you can explain *exactly* why a particular observation differs from the group mean, then this residual probably isn't random
+- Is there anything that directly links two residuals errors together, aside from the fact that they are in the same group?
+    - For example, ff two residual errors come from the same person, or the same household, then these residual errors will probably be more similar to each other than any other randomly chosen residual errors, and thus, are not independent.
+
+As recommended by the STAT2 text, the Normality and equal variance assumptions can be assessed by plotting distribution of residuals within each group, and well as a Normal-quantile plot for the residuals respectively. The quickest way to create these two plots are with the `check_homogeneity()` and `check_normality()` functions from the `performance` package. To demonstrate, we'll replicate the ANOVA for the fruit flies data set used in Example 5.11, and reproduce Figure 5.14. First, we'll need to load the data, and fit the ANOVA model:
+
+```{r}
+data("FruitFlies")
+fruitfly_anova <- aov(Longevity ~ Treatment, data = FruitFlies)
+summary(fruitfly_anova)
+```
+
+Next, we'll pass our `aov` model object to the `check_homogeneity()` and `check_normality()` functions. These functions themselves do not create the visualizations; rather, the `plot()` function must be called on the objects returned by `check_homogeneity()` and `check_normality()` to see the visualizations. We'll use the `grid.arrange()` function (from the `gridExtra` package) to place them side-by-side in the same figure:
+
+```{r}
+#| message: false
+library(performance)
+library(see)
+library(gridExtra)
+
+variance_check <- check_homogeneity(fruitfly_anova)
+normality_check <- check_normality(fruitfly_anova)
+
+grid.arrange(plot(variance_check),
+             plot(normality_check, type = "qq"),
+             ncol = 2
+             )
+```
+
+The `check_homogeneity()` function describes the residuals in each group using violin plots instead of box plots. If you aren't familiar with reading violin plots, a good introduction is found [here](https://towardsdatascience.com/violin-plots-explained-fb1d115e023d) (just ignore the Python code if you don't speak Python).
+
+If you'd rather use box plots instead of violin plots, we'll have to construct them "manually". We can do this without too much trouble by using the `broom::augment()` function to obtain a data frame holding residual errors for each observation in the data, and then using `ggplot()` to plot the distribution of these residuals for each group of fruit flies.
+
+```{r}
+library(broom)
+
+residuals <- augment(fruitfly_anova)
+head(residuals, 5)
+
+boxplots <- ggplot(data = residuals,
+                   mapping = aes(x = Treatment, y = .resid)
+                   ) +
+  geom_boxplot()
+
+grid.arrange(boxplots,
+             plot(normality_check, type = "qq"),
+             ncol = 2
+             )
+```
+
+Both plotting approaches (the violin plot and box plot methods) encourage use that the conditions for inference (equal variance and normality of the residuals) are quite reasonably met in this case.
+
+When running the code above, the `augment()` function may give you warning, cautioning that you that "The `augment()` method for objects of class `aov` is not maintained by the broom team...". In this situation, we can safely ignore this warning. But, that may not be the case for other, more complex ANOVA analyses carried out in [Chapter 8](08_additional_topics_in_ANOVA.qmd), specifically those that divide the residual errors into different "strata".
