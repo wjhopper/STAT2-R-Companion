@@ -150,3 +150,69 @@ grid.arrange(boxplots,
 Both plotting approaches (the violin plot and box plot methods) encourage use that the conditions for inference (equal variance and normality of the residuals) are quite reasonably met in this case.
 
 When running the code above, the `augment()` function may give you warning, cautioning that you that "The `augment()` method for objects of class `aov` is not maintained by the broom team...". In this situation, we can safely ignore this warning. But, that may not be the case for other, more complex ANOVA analyses carried out in [Chapter 8](08_additional_topics_in_ANOVA.qmd), specifically those that divide the residual errors into different "strata".
+
+## Using Plots to Help Choose a Scale for the Response
+
+## Multiple Comparisons and Fisher's Least Significant Difference
+A "significant" *F*-test from an ANOVA variance indicates "At least one group of observations has a mean value that is 'significantly' different than the mean value of least one other group of observations". In other words, a "significant" *F*-test indicates "a difference exists", but doesn't identify the *nature* of this difference.
+
+For example, the "significant" *F*-test Leafhoppers ANOVA in [Section 5.3](#fitting-the-model) indicates "There is a difference among the average lifespans of Leafhoppers who consume different sugar compounds", but we *don't* yet know if this difference exists amongst the Glucose and Sucrose groups, the Fructose and Sucrose groups, or both! To address this question, we'll need to **contrast** the means in each group.
+
+Section 5.6 focuses on a method of contrasting each pair of group means (called Fisher's Least Significant Difference) that allows you to hold the false positive rate across the family of contrasts of contrasts a chosen small value (e.g., .05). We'll execute the Least Significant Difference contrasts "by hand" for the Leafhoppers ANOVA.
+
+Fisher's LSD procedure compares each difference in means to a "threshold" value called the Least Significant Difference. This Least Significant Difference (LSD) is defined as 
+$$
+LSD = min_{j, k} \bigg\{t^* \cdot \sqrt{\frac{MS_{Error}}{n_j} + \frac{MS_{Error}}{n_k}}\bigg\}
+$$
+
+where 
+
+- $N$ is total number of observations in the data set.
+- $J$ is the total number of groups (i.e., the number of levels belonging to the explanatory variable).
+- $t^*$ is the $1-\frac{\alpha}{2}$ quantile of the *t* distribution with $N-J$ degrees of freedom, and $\alpha$ is the significance level used for the F-test from the ANOVA.
+- $MS_{Error}$ is the Mean Square Error (computed from the ANOVA model).
+- $n_j$ and $n_k$ are the number of observations in the $i$-th and $j$-th group respectively.
+
+For an unbalanced design (where each group has a different number of observations), we would have to compute $\frac{j(j-1)}{2}$ different candidate LSD values times (one for each possible pair of groups) and take the minimum of those $\frac{j(j-1)}{2}$ values as our LSD. However, since the Leafhopper data set is balanced (each group has 2 observations), the LSD won't change, so we can compute it exactly once.
+
+Thus, for the Leafhoppers ANOVA, we have 
+
+```{r}
+N <- 8
+J <- 4
+n_j <- 2
+
+t_star <- qt(1 - (.05/2), df = N-J)
+t_star
+
+MS_error <- summary(leafhoppers_anova)[[1]][2 , "Mean Sq"]
+MS_error
+
+LSD <- t_star * sqrt(MS_error/2 + MS_error/2)
+LSD
+```
+
+Now that we have the LSD threshold, we compare it against each of the 6 differences in means. The quickest way to compute each the pairwise differences in means is with the `emmeans()` package:
+
+```{r}
+library(emmeans)
+
+leafhoppers_means <- emmeans(leafhoppers_anova, specs = ~ Diet)
+leafhoppers_means
+
+paiwise_differences <- contrast(leafhoppers_means,
+                                method = "pairwise",
+                                infer = FALSE
+                                )
+paiwise_differences
+```
+
+Finally, we can compare each difference in means (which are found in the `estimate` column) against our LSD threshold:
+
+```{r}
+paiwise_differences |>
+  as.data.frame() |>
+  mutate(LSD_significant = abs(estimate) > LSD)
+```
+
+Thus, according to Fisher's LSD procedure, we can infer than Leafhoppers eating Glucose and Sucrose (but not those eating Fructose) will live longer on average than Leafhoppers eating the control diet, and Leafhoppers eating Glucose and Sucrose will live longer on average than Leafhoppers eating Fructose. In other words, the significant F-test from our ANOVA appears to have been driven by longer lifespans for the insects consuming Glucose and Sucrose compared to the other two groups (control and Fructose).
