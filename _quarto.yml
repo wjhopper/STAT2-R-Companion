@@ -3,7 +3,8 @@ project:
 
 book:
   title: "The R Companion to STATS2"
-  logo: STAT2_logo_small.png
+  sidebar: 
+    logo: STAT2_logo_small.png
   favicon: favicon.png
   author: "Will Hopper"
   date: "08/18/2020"
