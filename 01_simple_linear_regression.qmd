@@ -249,7 +249,7 @@ extract_eq(centered_mileage_model, use_coefs = TRUE)
 ```
 
 ::: {.callout-warning}
-As the time of writing, there are problems with using the equatiomatic package to display equations when rendering Quarto documents to PDF. Thankfully, there is a workaround that is not too difficult, which involves saving the equation as a variable, and `cat()`-ing the equation yourself:
+As the time of writing, there are problems with using the `equatiomatic` package to display equations when rendering Quarto documents to PDF. Thankfully, there is a workaround that is not too difficult, which involves saving the equation as a variable, and `cat()`-ing the equation yourself:
 
 ```{r}
 #| results: asis
@@ -263,7 +263,7 @@ Just be sure to set the `results: asis` chunk option!
 
 ## Conditions for a Simple Linear Model
 
-Section 1.2 introduces mostly conceptual information about neccesary and sufficient conditions for inference on a linear model, but does introduce the formula for estimating the standard error of the regression (also called the "Residual Standard Error"). You'll rarely need to use this formula "manually", since the value of this statistic is included in the output from the `summary()` function:
+Section 1.2 introduces mostly conceptual information about necessary and sufficient conditions for inference on a linear model, but does introduce the formula for estimating the standard error of the regression (also called the "Residual Standard Error"). You'll rarely need to use this formula "manually", since the value of this statistic is included in the output from the `summary()` function:
 
 ```{r}
 #| eval: false
@@ -295,12 +295,12 @@ Section 1.4 introduces two type of plots that crucial for assessing the validity
 1. The Fitted vs. Residuals Plot
 2. The Normal Quantile plot (which is a specific type of Quantile-Quantile plot)
 
-There are many ways of generating thse plots from a linear model in R, but perhaps the easiest, most full-featured (and prettiest!) method is to use the tools from the [performance](https://easystats.github.io/performance/) package [@performance_package].
+There are many ways of generating these plots from a linear model in R, but perhaps the easiest, most full-featured (and prettiest!) method is to use the tools from the [performance](https://easystats.github.io/performance/) package [@performance_package].
 
 The `check_model()` function from the `performance` package can be used to create both fitted vs. residuals plots, and Normal Quantile plots. What's more, it can create different variations of fitted vs. residuals plots that are customized to help you check either the Linearity or the Homogeneity of Variance assumptions.
 
 ::: {.callout-tip}
-You'll also want to install the `patchwork` and `see` packages at the same time you install the `performance` package, as these supplemental packages are very useful for constructing visualiations with the `performance` package.
+You'll also want to install the `patchwork` and `see` packages at the same time you install the `performance` package, as these supplemental packages are very useful for constructing visualizations with the `performance` package.
 :::
 
 ### Checking Linearity with a Fitted vs. Residuals plot
@@ -318,7 +318,7 @@ linearity_check <- check_model(price_mileage_model, check="linearity",
 plot(linearity_check, data=price_mileage_model)
 ```
 
-One odd thing to note: you need to pass the fitted model object as the data arguemnt to the plot function, *not* the original data set.
+One odd thing to note: you need to pass the fitted model object as the data argument to the plot function, *not* the original data set.
 
 ### Checking Homogeneity of Variance with a Fitted vs. Residuals plot
 
@@ -343,7 +343,7 @@ plot(normality_check, data=price_mileage_model)
 
 ## Transformations/Reexpressions
 
-Section 1.4 introduces a new data set and new model into the mix, to demonstrate how transformations of the outcome and/or explantory variable may be useful when the conditions for a simple linear regression model are not met.
+Section 1.4 introduces a new data set and new model into the mix, to demonstrate how transformations of the outcome and/or explanatory variable may be useful when the conditions for a simple linear regression model are not met.
 
 The `CountyHealth` data set measures the number of doctors and the number of hospitals from 53 Counties in the United States.
 
@@ -373,7 +373,7 @@ check_model(doctor_model, check=c("homogeneity", "qq"))
 The residual errors around this model's predictions grow larger and more variable as the number of hospitals increases, and they don't follow a Normal distribution.
 But, modeling the **square root** of the number of doctor's alleviates these problems.
 
-There are several ways you can adjust to modeling the square root ofa variable. One method is to make a new variable in the data set that holds the transformed values, following the process we did in @sec-centering-the-mileage-variable (where we used the `mutate()` function to help center the Mileage variable).
+There are several ways you can adjust to modeling the square root of a variable. One method is to make a new variable in the data set that holds the transformed values, following the process we did in @sec-centering-the-mileage-variable (where we used the `mutate()` function to help center the Mileage variable).
 
 Another method is to apply the transformation *within the model formula itself*! We can apply the `sqrt()` function to the `MDs` variable at the same time fit the model:
 

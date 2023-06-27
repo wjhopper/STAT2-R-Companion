@@ -218,7 +218,7 @@ ggplot(data = AccordPrice,
   geom_smooth(method = lm, formula = y~x)
 ```
 
-However, `geom_smooth()` doens't have to option to draw prediction intervals instead of confidence; so if you want one, you'll have to plot it "manually": by computing the boundary values yourself using `augment()` and drawing those values on the plot using `geom_line()` or `geom_ribbon()`
+However, `geom_smooth()` doesn't have to option to draw prediction intervals instead of confidence; so if you want one, you'll have to plot it "manually": by computing the boundary values yourself using `augment()` and drawing those values on the plot using `geom_line()` or `geom_ribbon()`
 
 Since we want the boundaries of the prediction interval to appear as a smooth curve across the entire range of the plot, we'll first need to compute the upper and lower boundaries of the interval across a fine grid of x-axis values. So, we'll need to create a series of many closely space mileage values, ranging from the minimum and maximum mileage values in the original data, and supply them to the `augment()` function as the `newdata` argument. 
 
