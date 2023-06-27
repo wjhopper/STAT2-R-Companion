@@ -2,4 +2,82 @@
 title: "One-way ANOVA and Randomized Experiments"
 ---
 
-This section is not yet implemented.
+## Overview of ANOVA
+No analyses are carried out in this section, so this section is omitted from the R Companion. However, this stub is included to keep the section numbers in each chapter consistent with the STAT2 text.
+
+## The One-way Randomized Experiment and Its Observational Sibling 
+No analyses are carried out in this section, so this section is omitted from the R Companion. However, this stub is included to keep the section numbers in each chapter consistent with the STAT2 text.
+
+## Fitting the Model
+
+There are many different ways to carry out an ANOVA in R, several of which involve R packages outside of the base set of packages installed with R by default. Here, we'll focus on how to carry out the so-called "one-way" or "one-factor" ANOVA  that is the topic of Chapter 5.3 using only the tools included with base R. 
+
+The first analysis we'll replicate is the ANOVA based on the `Undoing` data set, which is presented incrementally across Examples 5.6 and 5.9. The `Undoing` data set holds results from an observational study of one patient's progress using psychotherapy to treat OCD. Transcript's from the patient's psychotherapy sessions were rated by other therapists one a 1 to 4 scale measuring the inverse severity of the patient's OCD symptoms (a rating of 1 means "severe symptoms", and a rating of 4 means "no symptoms"). The transcripts were dividing into six chronologically ordered groups, allowing the researchers to measure how the symptom severity ratings given by the therapists changed as they read sessions progressively further along in the patient's treatment.
+
+For simplicity, the ANOVA presented in Section 5.3 only uses the rating data from the first, third, and fifth group of session ratings. The data from these three time points is shown below in @fig-undoing_subset_dotplot.
+
+```{r}
+#| label: fig-undoing_subset_dotplot
+#| fig-cap: A subset of the observations in the `Undoing` data set reflecting OCD symptom severity ratings from three different time points.
+#| message: false
+
+library(Stat2Data)
+library(dplyr)
+library(ggplot2)
+
+data("Undoing")
+Undoing_subset <- Undoing |>
+  filter(Group %in% c("I", "III", "IV"))
+
+ggplot(data = Undoing_subset,
+       mapping = aes(x = Group, y = Score)
+       ) +
+  geom_jitter(width = .1)
+```
+
+One such to execute an ANOVA with these data is to 
+
+1. First use the `lm()` function to a linear model that regresses your outcome value on your categorical explanatory variable
+2. Then carry out the ANOVA and F-test for each explanatory variable in your model by calling the `anova()` function on your linear model object.
+
+For example, we can replicate the ANOVA table from Example 5.9 by doing:
+
+```{r}
+undoing_model <- lm(Score ~ Group, data = Undoing_subset)
+anova_table <- anova(undoing_model)
+anova_table
+```
+
+One difference between this ANOVA table, and the one presented in Example 5.9, is that this table lacks a "Total" row showing the overall degrees of freedom and sums of squares. This is not a serious loss, and if that information is ever need, you can sum the degrees of freedom and sum of squares columns in the ANOVA table to recover it:
+
+```{r}
+anova_table |>
+  summarise(total_df = sum(Df),
+            total_ss = sum(`Sum Sq`)
+            )
+```
+
+R also includes an `aov()` function which combines step 1 (fitting the regression model) and 2 (calculating the sums of squares, mean squares, and F-statistics to construct the ANOVA table) into one step. We'll demonstrate the `aov()` function by replicating the ANOVA for the `Leafhoppers` data set that is presented across Examples 5.5 and 5.5.
+
+The `Leafhoppers` data set holds results from an experiment that studied how the lifespan of Potato Leafhopper insects was impacted by earning diets containing solely sugar compounds (Sucrose, Glucose, and Fructose). The data set 8 observations (two observations for each sugar compound, plus a control condition), and are shown below in @fig-leafhopper.
+
+```{r}
+#| label: fig-leafhopper
+#| fig-cap: Leafhopper survival time (in days) plotted against the leafhopper's diet
+
+data("Leafhoppers")
+
+ggplot(data = Leafhoppers,
+       mapping = aes(x = Diet, y = Days)
+       ) +
+  geom_point() +
+  scale_x_discrete(limits = c("Control", "Sucrose", "Glucose", "Fructose"))
+```
+
+Finally, we'll replicate the ANOVA table from Example 5.7 using the `aov()` function. The `aov()` function effectively serves as a drop-in replacement for the `lm()` function: you supply the `aov()` function with a model formula describing your outcome and explanatory variables (as well as the data set where they cane be located), and it supplies you with an ANOVA table:
+
+```{r}
+leafhoppers_anova <- aov(Days ~ Diet, data = Leafhoppers)
+summary(leafhoppers_anova)
+```
+
