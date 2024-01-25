@@ -2,6 +2,13 @@
 title: "Simple Linear Regression"
 ---
 
+```{r}
+#| echo: false
+# Secret dependencies for performance plots
+library(see)
+library(qqplotr)
+```
+
 ## The Simple Linear Regression Model 
 Linear regression is introduced in Chapter 1 with the motivating question:
 
@@ -300,7 +307,9 @@ There are many ways of generating these plots from a linear model in R, but perh
 The `check_model()` function from the `performance` package can be used to create both fitted vs. residuals plots, and Normal Quantile plots. What's more, it can create different variations of fitted vs. residuals plots that are customized to help you check either the Linearity or the Homogeneity of Variance assumptions.
 
 ::: {.callout-tip}
-You'll also want to install the `patchwork` and `see` packages at the same time you install the `performance` package, as these supplemental packages are very useful for constructing visualizations with the `performance` package.
+When you install the `performance` package, you'll also want to install the `patchwork`, `see` and `qqplotr` packages at the same time. These supplemental packages are technically optional, but they enable the `performance` package to create the visualizations we're interested in.
+
+You can install them all at once by running the command `install.package(c("performance", "see", "patchwork", "qqplotr"))`
 :::
 
 ### Checking Linearity with a Fitted vs. Residuals plot
@@ -312,33 +321,36 @@ library(performance)
 library(see)
 
 <<price_mileage_model>>
-linearity_check <- check_model(price_mileage_model, check="linearity",
-                              panel=FALSE
-                              )
-plot(linearity_check, data=price_mileage_model)
+linearity_check <- check_model(price_mileage_model,
+                               check = "linearity",
+                               panel = FALSE
+                               )
+plot(linearity_check)
 ```
-
-One odd thing to note: you need to pass the fitted model object as the data argument to the plot function, *not* the original data set.
 
 ### Checking Homogeneity of Variance with a Fitted vs. Residuals plot
 
-The only thing that changes for producing a a Fitted vs. Residuals plot designed to check for homoskedasticity (a fancy word for "equal variance") is writing `check="homogeneity"` in the `check_model()` function:
+The only thing that changes for producing a Fitted vs. Residuals plot designed to check for homoskedasticity (a fancy word for "equal variance") is writing `check = "homogeneity"` in the `check_model()` function:
 
 ```{r}
 #| message: false
-variance_check <- check_model(price_mileage_model, check="homogeneity",
-                              panel=FALSE
+variance_check <- check_model(price_mileage_model,
+                              check = "homogeneity",
+                              panel = FALSE
                               )
-plot(variance_check, data=price_mileage_model)
+plot(variance_check)
 ```
 
 ### Checking Normality with a Normal-Quantile plot
 
+Producing a Normal-Quantile plot (better known as a QQ plot) is similarly simple - all we need to do is specify `check = "qq` in the call to `check_model`, and plot the object produced.
+
 ```{r}
-normality_check <- check_model(price_mileage_model, check="qq",
-                              panel=FALSE
-                              )
-plot(normality_check, data=price_mileage_model)
+normality_check <- check_model(price_mileage_model,
+                               check = "qq",
+                               panel = FALSE
+                               )
+plot(normality_check, data = price_mileage_model)
 ```
 
 ## Transformations/Reexpressions
@@ -360,14 +372,14 @@ extract_eq(doctor_model, use_coefs = TRUE)
 ```
 
 ```{r}
-ggplot(CountyHealth, aes(x=Hospitals, y= MDs)) +
+ggplot(CountyHealth, aes(x = Hospitals, y = MDs)) +
   geom_point() +
-  geom_smooth(method=lm, se=FALSE, formula=y~x) +
-  scale_y_continuous(breaks=seq(0,8000,by=2000))
+  geom_smooth(method = lm, se = FALSE, formula = y~x) +
+  scale_y_continuous(breaks=seq(0, 8000, by = 2000))
 ```
 
 ```{r}
-check_model(doctor_model, check=c("homogeneity", "qq"))
+check_model(doctor_model, check = c("homogeneity", "qq"))
 ```
 
 The residual errors around this model's predictions grow larger and more variable as the number of hospitals increases, and they don't follow a Normal distribution.
@@ -392,7 +404,7 @@ The diagnostics plots based on the model using the $\sqrt{MDs}$ variable indicat
 
 ```{r}
 sqrt_doctor_model <- lm(sqrt(MDs) ~ Hospitals, data = CountyHealth)
-check_model(sqrt_doctor_model, check=c("homogeneity", "qq"))
+check_model(sqrt_doctor_model, check = c("homogeneity", "qq"))
 ```
 
 ### Visualizing Transformed Models

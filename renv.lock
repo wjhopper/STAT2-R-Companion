@@ -9,6 +9,16 @@
     ]
   },
   "Packages": {
+    "DEoptimR": {
+      "Package": "DEoptimR",
+      "Version": "1.1-3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "stats"
+      ],
+      "Hash": "72f87e0092e39384aee16df8d67d7410"
+    },
     "GGally": {
       "Package": "GGally",
       "Version": "2.2.0",
@@ -205,6 +215,43 @@
       ],
       "Hash": "61f643ea5ee9fe0e70ab0246340b3c2e"
     },
+    "benchmarkme": {
+      "Package": "benchmarkme",
+      "Version": "1.0.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "benchmarkmeData",
+        "compiler",
+        "doParallel",
+        "dplyr",
+        "foreach",
+        "graphics",
+        "httr",
+        "methods",
+        "parallel",
+        "stringr",
+        "tibble",
+        "utils"
+      ],
+      "Hash": "eaa6ca07e7dfe815da4c1f62a425d9d2"
+    },
+    "benchmarkmeData": {
+      "Package": "benchmarkmeData",
+      "Version": "1.0.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "dplyr",
+        "graphics",
+        "tibble",
+        "utils"
+      ],
+      "Hash": "03127f8e60281ab3c52f96bb98056dcb"
+    },
     "bit": {
       "Package": "bit",
       "Version": "4.0.5",
@@ -228,6 +275,13 @@
         "utils"
       ],
       "Hash": "9fe98599ca456d6552421db0d6772d8f"
+    },
+    "bitops": {
+      "Package": "bitops",
+      "Version": "1.0-7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b7d8d8ee39869c18d8846a184dd8a1af"
     },
     "boot": {
       "Package": "boot",
@@ -333,6 +387,17 @@
         "sass"
       ],
       "Hash": "c0d8599494bc7fb408cd206bbdd9cab0"
+    },
+    "caTools": {
+      "Package": "caTools",
+      "Version": "1.18.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "bitops"
+      ],
+      "Hash": "34d90fa5845004236b9eacafc51d07b2"
     },
     "cachem": {
       "Package": "cachem",
@@ -579,6 +644,20 @@
       ],
       "Hash": "7ede2ee9ea8d3edbf1ca84c1e333ad1a"
     },
+    "doParallel": {
+      "Package": "doParallel",
+      "Version": "1.0.17",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "foreach",
+        "iterators",
+        "parallel",
+        "utils"
+      ],
+      "Hash": "451e5edf411987991ab6a5410c45011f"
+    },
     "dplyr": {
       "Package": "dplyr",
       "Version": "1.1.4",
@@ -737,6 +816,19 @@
         "tibble"
       ],
       "Hash": "1a0a9a3d5083d0d573c4214576f1e690"
+    },
+    "foreach": {
+      "Package": "foreach",
+      "Version": "1.5.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "codetools",
+        "iterators",
+        "utils"
+      ],
+      "Hash": "618609b42c9406731ead03adf5379850"
     },
     "formula.tools": {
       "Package": "formula.tools",
@@ -1059,6 +1151,17 @@
       ],
       "Hash": "0080607b4a1a7b28979aecef976d8bc2"
     },
+    "iterators": {
+      "Package": "iterators",
+      "Version": "1.0.14",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "utils"
+      ],
+      "Hash": "8954069286b4b2b0d023d1b288dce978"
+    },
     "janitor": {
       "Package": "janitor",
       "Version": "2.2.0",
@@ -1264,6 +1367,18 @@
       ],
       "Hash": "e2817ccf4a065c5d9d7f2cfbe7c1d78c"
     },
+    "memuse": {
+      "Package": "memuse",
+      "Version": "4.2-3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "methods",
+        "utils"
+      ],
+      "Hash": "5cfd074e79d5443c523360bbe203d904"
+    },
     "mgcv": {
       "Package": "mgcv",
       "Version": "1.9-1",
@@ -1409,6 +1524,28 @@
         "R"
       ],
       "Hash": "df58958f293b166e4ab885ebcad90e02"
+    },
+    "opdisDownsampling": {
+      "Package": "opdisDownsampling",
+      "Version": "0.8.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "benchmarkme",
+        "caTools",
+        "doParallel",
+        "foreach",
+        "graphics",
+        "memuse",
+        "methods",
+        "parallel",
+        "pracma",
+        "stats",
+        "twosamples",
+        "utils"
+      ],
+      "Hash": "a398ffe269fedaa665508e6d0a5c52e4"
     },
     "openssl": {
       "Package": "openssl",
@@ -1617,6 +1754,20 @@
       ],
       "Hash": "6b8177fd19982f0020743fadbfdbd933"
     },
+    "pracma": {
+      "Package": "pracma",
+      "Version": "2.4.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "grDevices",
+        "graphics",
+        "stats",
+        "utils"
+      ],
+      "Hash": "44bc172d47d1ea0a638d9f299e321203"
+    },
     "praise": {
       "Package": "praise",
       "Version": "1.0.0",
@@ -1702,6 +1853,35 @@
         "vctrs"
       ],
       "Hash": "1cba04a4e9414bdefc9dcaa99649a8dc"
+    },
+    "qqconf": {
+      "Package": "qqconf",
+      "Version": "1.3.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "MASS",
+        "R",
+        "Rcpp",
+        "robustbase"
+      ],
+      "Hash": "0a813d2f61e344db1e587f6195314e1d"
+    },
+    "qqplotr": {
+      "Package": "qqplotr",
+      "Version": "0.0.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "MASS",
+        "R",
+        "dplyr",
+        "ggplot2",
+        "opdisDownsampling",
+        "qqconf",
+        "robustbase"
+      ],
+      "Hash": "a22b3777f51fd005a7cd4c2bccc385ae"
     },
     "quantreg": {
       "Package": "quantreg",
@@ -1826,6 +2006,21 @@
         "yaml"
       ],
       "Hash": "d65e35823c817f09f4de424fcdfa812a"
+    },
+    "robustbase": {
+      "Package": "robustbase",
+      "Version": "0.99-1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "DEoptimR",
+        "R",
+        "graphics",
+        "methods",
+        "stats",
+        "utils"
+      ],
+      "Hash": "3adb5cc6a5cc5650cb4569204a3209c3"
     },
     "rprojroot": {
       "Package": "rprojroot",
@@ -2109,6 +2304,16 @@
         "xfun"
       ],
       "Hash": "5ac22900ae0f386e54f1c307eca7d843"
+    },
+    "twosamples": {
+      "Package": "twosamples",
+      "Version": "2.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "cpp11"
+      ],
+      "Hash": "cc7d944f8cf4a557decafe1dc95531de"
     },
     "tzdb": {
       "Package": "tzdb",
