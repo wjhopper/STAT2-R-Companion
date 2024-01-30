@@ -599,11 +599,31 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="displaying-the-fitted-model-equation" class="level3" data-number="1.1.9">
 <h3 data-number="1.1.9" class="anchored" data-anchor-id="displaying-the-fitted-model-equation"><span class="header-section-number">1.1.9</span> Displaying the fitted model equation</h3>
 <p>If you are using a literate programming environment (like an RMarkdown or Quarto document), you might find yourself wanting to display the fitted model equation in your document, formatted like a “fancy” mathematical equation. You could always write the LaTeX markup you need yourself, but the <a href="https://datalorax.github.io/equatiomatic/">equatiomatic</a> package <span class="citation" data-cites="equatiomatic_package">(<a href="references.html#ref-equatiomatic_package" role="doc-biblioref">Anderson, Heiss, and Sumners 2022</a>)</span> can automatically generate what you need, straight from the model object itself!</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>equatiomatic</code> package isn’t available on CRAN, but you can install it from the package’s GitHub repository using the <code>remotes</code> package</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"datalorax/equatiomatic"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Skipping install of 'equatiomatic' from a github remote, the SHA1 (39e8c3ea) has not changed since last install.
+  Use `force = TRUE` to force installation</code></pre>
+</div>
+</div>
+</div>
+</div>
 <p>To demonstrate, let’s display a formatted equation representing the fitted regression model based on the centered mileage scores by using the <code>extract_eq()</code> function on the model object.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(equatiomatic)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>centered_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage_c50, <span class="at">data =</span> AccordPrice)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(centered_mileage_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(equatiomatic)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>centered_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage_c50, <span class="at">data =</span> AccordPrice)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(centered_mileage_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><span class="math display">\[
 \operatorname{\widehat{Price}} = 14.82 - 0.12(\operatorname{Mileage\_c50})
@@ -621,11 +641,11 @@ Warning
 </div>
 <div class="callout-body-container callout-body">
 <p>As the time of writing, there are problems with using the <code>equatiomatic</code> package to display equations when rendering Quarto documents to PDF. Thankfully, there is a workaround that is not too difficult, which involves saving the equation as a variable, and <code>cat()</code>-ing the equation yourself:</p>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>eq <span class="ot">&lt;-</span> <span class="fu">extract_eq</span>(centered_mileage_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"$$"</span>, eq, <span class="st">"$$"</span>, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>eq <span class="ot">&lt;-</span> <span class="fu">extract_eq</span>(centered_mileage_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"$$"</span>, eq, <span class="st">"$$"</span>, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><span class="math display">\[
 \operatorname{\widehat{Price}} = 14.82 - 0.12(\operatorname{Mileage\_c50})
 \]</span></p>
@@ -638,8 +658,8 @@ Warning
 <h2 data-number="1.2" class="anchored" data-anchor-id="conditions-for-a-simple-linear-model"><span class="header-section-number">1.2</span> Conditions for a Simple Linear Model</h2>
 <p>Section 1.2 introduces mostly conceptual information about necessary and sufficient conditions for inference on a linear model, but does introduce the formula for estimating the standard error of the regression (also called the “Residual Standard Error”). You’ll rarely need to use this formula “manually”, since the value of this statistic is included in the output from the <code>summary()</code> function:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>
 Call:
@@ -665,7 +685,7 @@ F-statistic: 72.25 on 1 and 28 DF,  p-value: 3.055e-09
 </pre>
 <p>If you ever need to obtain this value <em>alone</em> (without the rest of the summary table), you can use the <code>sigma()</code> function on the fitted model object to extract it;</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sigma</span>(price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sigma</span>(price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 3.08504</code></pre>
 </div>
@@ -698,20 +718,20 @@ Tip
 <h3 data-number="1.3.1" class="anchored" data-anchor-id="checking-linearity-with-a-fitted-vs.-residuals-plot"><span class="header-section-number">1.3.1</span> Checking Linearity with a Fitted vs.&nbsp;Residuals plot</h3>
 <p>To generate a variant of the Fitted vs.&nbsp;Residuals plot designed to help you assess the Linearity assumption, you’ll include the <code>check="linearity"</code> argument to the <code>check_model()</code> function. The <code>panel=FALSE</code> argument instructs the <code>check_model()</code> function to devote the entire plot window to this plot (instead of leaving room for other plots checking other model assumptions).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(see)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>linearity_check <span class="ot">&lt;-</span> <span class="fu">check_model</span>(price_mileage_model,</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">check =</span> <span class="st">"linearity"</span>,</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">panel =</span> <span class="cn">FALSE</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>                               )</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(linearity_check)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(see)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>price_mileage_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Mileage, <span class="at">data =</span> AccordPrice)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>linearity_check <span class="ot">&lt;-</span> <span class="fu">check_model</span>(price_mileage_model,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">check =</span> <span class="st">"linearity"</span>,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">panel =</span> <span class="cn">FALSE</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>                               )</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(linearity_check)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$NCV</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -719,16 +739,16 @@ Tip
 <h3 data-number="1.3.2" class="anchored" data-anchor-id="checking-homogeneity-of-variance-with-a-fitted-vs.-residuals-plot"><span class="header-section-number">1.3.2</span> Checking Homogeneity of Variance with a Fitted vs.&nbsp;Residuals plot</h3>
 <p>The only thing that changes for producing a Fitted vs.&nbsp;Residuals plot designed to check for homoskedasticity (a fancy word for “equal variance”) is writing <code>check = "homogeneity"</code> in the <code>check_model()</code> function:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>variance_check <span class="ot">&lt;-</span> <span class="fu">check_model</span>(price_mileage_model,</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">check =</span> <span class="st">"homogeneity"</span>,</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">panel =</span> <span class="cn">FALSE</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                              )</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(variance_check)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>variance_check <span class="ot">&lt;-</span> <span class="fu">check_model</span>(price_mileage_model,</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">check =</span> <span class="st">"homogeneity"</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">panel =</span> <span class="cn">FALSE</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                              )</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(variance_check)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$HOMOGENEITY</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -736,16 +756,16 @@ Tip
 <h3 data-number="1.3.3" class="anchored" data-anchor-id="checking-normality-with-a-normal-quantile-plot"><span class="header-section-number">1.3.3</span> Checking Normality with a Normal-Quantile plot</h3>
 <p>Producing a Normal-Quantile plot (better known as a QQ plot) is similarly simple - all we need to do is specify <code>check = "qq</code> in the call to <code>check_model</code>, and plot the object produced.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>normality_check <span class="ot">&lt;-</span> <span class="fu">check_model</span>(price_mileage_model,</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">check =</span> <span class="st">"qq"</span>,</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">panel =</span> <span class="cn">FALSE</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                               )</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(normality_check, <span class="at">data =</span> price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>normality_check <span class="ot">&lt;-</span> <span class="fu">check_model</span>(price_mileage_model,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">check =</span> <span class="st">"qq"</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">panel =</span> <span class="cn">FALSE</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                               )</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(normality_check, <span class="at">data =</span> price_mileage_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$QQ</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -755,8 +775,8 @@ Tip
 <p>Section 1.4 introduces a new data set and new model into the mix, to demonstrate how transformations of the outcome and/or explanatory variable may be useful when the conditions for a simple linear regression model are not met.</p>
 <p>The <code>CountyHealth</code> data set measures the number of doctors and the number of hospitals from 53 Counties in the United States.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(CountyHealth)</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>CountyHealth</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(CountyHealth)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>CountyHealth</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -768,8 +788,8 @@ Tip
 </div>
 <p>Example 1.7 explores a simple linear model which casts the number doctors in the county as a function of how many hospitals are in the county. However, when we fit this model, we see that not all the conditions for inference seem reasonable</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>doctor_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(MDs <span class="sc">~</span> Hospitals, <span class="at">data =</span> CountyHealth)</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(doctor_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>doctor_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(MDs <span class="sc">~</span> Hospitals, <span class="at">data =</span> CountyHealth)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(doctor_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><span class="math display">\[
 \operatorname{\widehat{MDs}} = -1120.56 + 557.32(\operatorname{Hospitals})
@@ -777,26 +797,26 @@ Tip
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(CountyHealth, <span class="fu">aes</span>(<span class="at">x =</span> Hospitals, <span class="at">y =</span> MDs)) <span class="sc">+</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">formula =</span> y<span class="sc">~</span>x) <span class="sc">+</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">8000</span>, <span class="at">by =</span> <span class="dv">2000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(CountyHealth, <span class="fu">aes</span>(<span class="at">x =</span> Hospitals, <span class="at">y =</span> MDs)) <span class="sc">+</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">formula =</span> y<span class="sc">~</span>x) <span class="sc">+</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">8000</span>, <span class="at">by =</span> <span class="dv">2000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_model</span>(doctor_model, <span class="at">check =</span> <span class="fu">c</span>(<span class="st">"homogeneity"</span>, <span class="st">"qq"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_model</span>(doctor_model, <span class="at">check =</span> <span class="fu">c</span>(<span class="st">"homogeneity"</span>, <span class="st">"qq"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>The residual errors around this model’s predictions grow larger and more variable as the number of hospitals increases, and they don’t follow a Normal distribution. But, modeling the <strong>square root</strong> of the number of doctor’s alleviates these problems.</p>
 <p>There are several ways you can adjust to modeling the square root of a variable. One method is to make a new variable in the data set that holds the transformed values, following the process we did in <a href="#sec-centering-the-mileage-variable"><span>Section&nbsp;1.1.8</span></a> (where we used the <code>mutate()</code> function to help center the Mileage variable).</p>
 <p>Another method is to apply the transformation <em>within the model formula itself</em>! We can apply the <code>sqrt()</code> function to the <code>MDs</code> variable at the same time fit the model:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>sqrt_doctor_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">sqrt</span>(MDs) <span class="sc">~</span> Hospitals, <span class="at">data =</span> CountyHealth)</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(sqrt_doctor_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>sqrt_doctor_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">sqrt</span>(MDs) <span class="sc">~</span> Hospitals, <span class="at">data =</span> CountyHealth)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(sqrt_doctor_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(Intercept)   Hospitals 
   -2.753326    6.876364 </code></pre>
@@ -804,7 +824,7 @@ Tip
 </div>
 <p>One advantage of doing the transformation directly in the model formula is that the <code>extract_eq()</code> function is able to detect the transformation, and include it in the equation!</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(sqrt_doctor_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(sqrt_doctor_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><span class="math display">\[
 \operatorname{\widehat{sqrt(MDs)}} = -2.75 + 6.88(\operatorname{Hospitals})
@@ -813,10 +833,10 @@ Tip
 </div>
 <p>The diagnostics plots based on the model using the <span class="math inline">\(\sqrt{MDs}\)</span> variable indicate that the Normality assumption is met, and the Equal Variance is much more tenable on the transformed scale:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>sqrt_doctor_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">sqrt</span>(MDs) <span class="sc">~</span> Hospitals, <span class="at">data =</span> CountyHealth)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">check_model</span>(sqrt_doctor_model, <span class="at">check =</span> <span class="fu">c</span>(<span class="st">"homogeneity"</span>, <span class="st">"qq"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>sqrt_doctor_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">sqrt</span>(MDs) <span class="sc">~</span> Hospitals, <span class="at">data =</span> CountyHealth)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">check_model</span>(sqrt_doctor_model, <span class="at">check =</span> <span class="fu">c</span>(<span class="st">"homogeneity"</span>, <span class="st">"qq"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <section id="visualizing-transformed-models" class="level3" data-number="1.4.1">
@@ -824,13 +844,13 @@ Tip
 <p>Often times when an assumption is violated, we may decide to <em>fit</em> the model on a transformed scale, but visualize the model’s predictions on the original scale (since the original scale is more interpretable than say, the square-root scale).</p>
 <p>The easiest way to do this when plotting with ggplot and geom_smooth() is to use a square root scale transformation, following by a coordinate transformation that squares the y-axis values (thus reversing the square root operation). What makes this work is that the scale transformation occurs first, so geom_smooth() fits and draws the model on the transformed (and linear!) scale, and coordinate transformation follows, so the model’s predictions are <em>presented</em> on the “raw” scale.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(CountyHealth, <span class="fu">aes</span>(<span class="at">x=</span>Hospitals, <span class="at">y=</span> MDs)) <span class="sc">+</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm, <span class="at">se=</span><span class="cn">FALSE</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_sqrt</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">8000</span>,<span class="at">by=</span><span class="dv">2000</span>), <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>)) <span class="sc">+</span></span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_trans</span>(<span class="at">y =</span> scales<span class="sc">::</span><span class="fu">trans_new</span>(<span class="st">"square"</span>, <span class="cf">function</span>(x) x<span class="sc">^</span><span class="dv">2</span>, <span class="st">"sqrt"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(CountyHealth, <span class="fu">aes</span>(<span class="at">x=</span>Hospitals, <span class="at">y=</span> MDs)) <span class="sc">+</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm, <span class="at">se=</span><span class="cn">FALSE</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_sqrt</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">8000</span>,<span class="at">by=</span><span class="dv">2000</span>), <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_trans</span>(<span class="at">y =</span> scales<span class="sc">::</span><span class="fu">trans_new</span>(<span class="st">"square"</span>, <span class="cf">function</span>(x) x<span class="sc">^</span><span class="dv">2</span>, <span class="st">"sqrt"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
+<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Another approach is to manually compute a grid of predictions for each x-axis position using the fitted model equation, then square and plot each predicted value. Though not demonstrated with transformations specifically, this type of approach is demonstrated in Chapter 2, when <a href="02_inference_for_simple_linear_regression.html#intervals-for-predictions">plotting prediction intervals</a>.</p>
@@ -840,8 +860,8 @@ Tip
 <p>All the previous techniques for modeling and visualizing the square-root of an outcome variable applicable to modeling with variables that have been transformed with the logarithmic function as well: we just use the <code>log()</code> function instead of the <code>sqrt()</code> function!</p>
 <p>As an example, we can reproduce the fitted model, predictions and visualizations from Example 1.8, where the logarithm of the number of mammal species from 13 islands in Southeast Asia is modeled using the logarithm of the Area of the island as an explanatory variable. Since both variables have been transformed, this type of model is know as a “log-log model”.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"SpeciesArea"</span>)</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>SpeciesArea</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"SpeciesArea"</span>)</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>SpeciesArea</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -852,8 +872,8 @@ Tip
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>log_species_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(Species) <span class="sc">~</span> <span class="fu">log</span>(Area), <span class="at">data =</span> SpeciesArea)</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(log_species_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>log_species_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(Species) <span class="sc">~</span> <span class="fu">log</span>(Area), <span class="at">data =</span> SpeciesArea)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(log_species_model, <span class="at">use_coefs =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><span class="math display">\[
 \operatorname{\widehat{log(Species)}} = 1.62 + 0.24(\operatorname{\log(Area)})
@@ -861,15 +881,15 @@ Tip
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(SpeciesArea, <span class="fu">aes</span>(<span class="at">x =</span> Area, <span class="at">y =</span> Species)) <span class="sc">+</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm, <span class="at">se=</span><span class="cn">FALSE</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">trans =</span> <span class="st">"log"</span>) <span class="sc">+</span></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">trans =</span> <span class="st">"log"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(SpeciesArea, <span class="fu">aes</span>(<span class="at">x =</span> Area, <span class="at">y =</span> Species)) <span class="sc">+</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm, <span class="at">se=</span><span class="cn">FALSE</span>, <span class="at">formula=</span>y<span class="sc">~</span>x) <span class="sc">+</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">trans =</span> <span class="st">"log"</span>) <span class="sc">+</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">trans =</span> <span class="st">"log"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="01_simple_linear_regression_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Reproduces Figure 1.19(b), but uses axis labels on the raw instead of logarithmic scale</figcaption>
 </figure>
 </div>
