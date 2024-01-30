@@ -7,6 +7,9 @@ title: "Simple Linear Regression"
 # Secret dependencies for performance plots
 library(see)
 library(qqplotr)
+# Since equatiomatic is not on cran currently, we need to install it from github
+# This is here to signal to renv that yes, we need remotes to re-create the book
+library(remotes)
 ```
 
 ## The Simple Linear Regression Model 
@@ -246,6 +249,15 @@ coef(centered_mileage_model)
 ### Displaying the fitted model equation
 
 If you are using a literate programming environment (like an RMarkdown or Quarto document), you might find yourself wanting to display the fitted model equation in your document, formatted like a "fancy" mathematical equation. You could always write the LaTeX markup you need yourself, but the [equatiomatic](https://datalorax.github.io/equatiomatic/) package [@equatiomatic_package] can automatically generate what you need, straight from the model object itself!
+
+::: {.callout-note}
+The `equatiomatic` package isn't available on CRAN, but you can install it from the package's GitHub repository using the `remotes` package
+
+```{r}
+#| eval: false
+remotes::install_github("datalorax/equatiomatic")
+```
+:::
 
 To demonstrate, let's display a formatted equation representing the fitted regression model based on the centered mileage scores by using the `extract_eq()` function on the model object.
 
