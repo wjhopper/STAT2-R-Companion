@@ -34,3 +34,6 @@ format:
   html:
     theme: cosmo
     df-print: paged
+knitr:
+  opts_chunk: 
+    message: false
