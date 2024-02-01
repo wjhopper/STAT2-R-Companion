@@ -358,7 +358,7 @@ div.csl-indent {
 </div>
 </div>
 <p>Let’s begin with code that executes Steps 1-4 on our hypothesis testing roadmap:</p>
-<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-4_46aba6a28fed55aa304ce99f0ef775ce">
+<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-4_5cf368a71f1646c07a663dc7bab4450b">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(infer)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
@@ -449,7 +449,7 @@ div.csl-indent {
 <section id="a-randomization-test-for-the-correlation" class="level3" data-number="4.6.2">
 <h3 data-number="4.6.2" class="anchored" data-anchor-id="a-randomization-test-for-the-correlation"><span class="header-section-number">4.6.2</span> A randomization test for the correlation</h3>
 <p>Example 4.11 actually demonstrates a randomization test for the Verbal SAT vs.&nbsp;GPA <em>correlation</em>, the <code>GPA ~ VerbalSAT</code> <em>slope</em>. But, it is easy to execute such a test simply by changing the <code>stat</code> argument of the calculate function from <code>"slope"</code> to <code>"correlation"</code>!</p>
-<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-14_d7db574ae01e88b3b44892640adf6b66">
+<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-14_ec78cd8207e0a7967242686d5a548156">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>null_correlation_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
@@ -486,7 +486,7 @@ div.csl-indent {
 <li>Complete your pipeline with the <code>fit()</code> function, instead of the <code>calcuate()</code> function (which makes sense, since there isn’t one single summary statistic for all the relationships encoded by a multiple regression model)</li>
 </ol>
 <p>For example, we could perform a permutation test on all four of the coefficients in the <code>GPA ~ VerbalSAT * MathSAT</code> model:</p>
-<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-15_00618965949140738f53646aee066e22">
+<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-15_f09cc616cfada83acdb62e93e581ec9e">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>null_models <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT <span class="sc">*</span> MathSAT) <span class="sc">|&gt;</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
@@ -504,7 +504,7 @@ div.csl-indent {
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["p_value"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"intercept","2":"0.692"},{"1":"MathSAT","2":"0.504"},{"1":"VerbalSAT","2":"0.736"},{"1":"VerbalSAT:MathSAT","2":"0.550"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["p_value"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"MathSAT","2":"0.504"},{"1":"VerbalSAT","2":"0.736"},{"1":"VerbalSAT:MathSAT","2":"0.550"},{"1":"intercept","2":"0.692"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
