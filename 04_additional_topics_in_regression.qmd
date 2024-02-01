@@ -131,7 +131,7 @@ Finally, we compute the p-value of our slope by using the `get_p_value()` functi
 get_p_value(x = null_dist, obs_stat = observed_slope, direction = "both")
 ```
 
-This p-values corresponds to the area in the histogram of permuted slopes that is more extreme than `r round(observed_slope$stat, 4)`.
+This p-values corresponds to the area in the histogram of permuted slopes that is more extreme than `r sprintf("%0.4f", observed_slope$stat)`.
 
 ```{r}
 visualise(null_dist) +
