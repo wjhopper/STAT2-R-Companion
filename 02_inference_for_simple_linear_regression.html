@@ -645,7 +645,6 @@ sample estimates:
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">interval =</span> <span class="st">"prediction"</span>, </span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                               )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Since we need to eventually supply these values to <code>ggplot</code>, and <code>ggplot</code> only deals with data frames, we’ll need to coerce these values from a matrix into a data frame:</p>
 <p>Now, we’re ready to plot! Here, we demonstrate two ways of adding this interval to the plot. First, we’ll draw the boundaries of this interval as two separate dashed lines:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> AccordPrice,</span>
