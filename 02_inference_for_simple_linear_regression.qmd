@@ -244,8 +244,6 @@ prediction_interval <- augment(price_mileage_model,
                                )
 ```
 
-Since we need to eventually supply these values to `ggplot`, and `ggplot` only deals with data frames, we'll need to coerce these values from a matrix into a data frame:
-
 Now, we're ready to plot! Here, we demonstrate two ways of adding this interval to the plot. First, we'll draw the boundaries of this interval as two separate dashed lines:
 
 ```{r}
