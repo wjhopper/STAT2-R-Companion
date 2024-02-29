@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Will Hopper">
-<meta name="dcterms.date" content="2020-08-18">
 
-<title>The R Companion to STATS2</title>
+<title>The R Companion to STATS2 - Corrections</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,26 +20,7 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -51,7 +30,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./01_simple_linear_regression.html" rel="next">
+<link href="./references.html" rel="prev">
 <link href="./favicon.png" rel="icon" type="image/png">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -95,7 +74,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Preface</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./errata.html">Corrections</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -125,7 +104,7 @@ div.csl-indent {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preface</span></a>
   </div>
 </li>
@@ -230,7 +209,7 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./errata.html" class="sidebar-item-text sidebar-link">
+  <a href="./errata.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Corrections</span></a>
   </div>
 </li>
@@ -240,39 +219,21 @@ div.csl-indent {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#preface" id="toc-preface" class="nav-link active" data-scroll-target="#preface">Preface</a></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">The R Companion to STATS2</h1>
+<h1 class="title">Corrections</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Will Hopper </p>
-          </div>
-  </div>
     
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">August 18, 2020</p>
-    </div>
-  </div>
   
     
   </div>
@@ -280,24 +241,12 @@ div.csl-indent {
 
 </header>
 
-<section id="preface" class="level1 unnumbered">
-<h1 class="unnumbered">Preface</h1>
-<p>This is a guide to conducting the analysis demonstrated in <a href="https://www.macmillanlearning.com/college/us/product/STAT2/p/1319054072">Stat2: Modeling with Regression and ANOVA</a> <span class="citation" data-cites="Cannon2018stat2">(<a href="references.html#ref-Cannon2018stat2" role="doc-biblioref">Cannon et al. 2018</a>)</span> using R, with a focus on using tools and techniques from the <a href="https://www.tidyverse.org/">Tidyverse</a>.</p>
-<p>This guide assumes some prior familiarity with R programming, so that it may focus on demonstrating the content from STAT2, rather than teaching R wholesale. Thankfully, there are many free resources introducing R programming and <code>tidyverse</code> packages the reader may take advantage of to gain this familiarity. Below are a few books which provide a mostly comprehensive introduction:</p>
+<p>Thanks to readers who have pointed out errors!</p>
 <ul>
-<li><a href="https://moderndive.com/">Statistical Inference via Data Science: A ModernDive into R and the Tidyverse</a></li>
-<li><a href="https://datasciencebook.ca/">Data Science: A First Introduction</a></li>
-<li><a href="https://bookdown.org/ndphillips/YaRrr/test-your-r-might-1.html">YaRrr! The Pirate’s Guide to R</a> (focused more on ‘base’ R than the tidyverse, but still good.)</li>
-<li><a href="https://jjallaire.github.io/hopr/">Hands-On Programming with R</a></li>
+<li>An earlier version of the book claimed that the <code>anova()</code> function would not compute <em>F</em>-statistics and <em>p</em>-values when given non-nested models to compare. <a href="https://www.smith.edu/people/kaitlyn-cook">Kaitlyn Cook</a> pointed out that this is incorrect; <code>anova()</code> is happy to produce <em>F</em>-statistics and <em>p</em>-values from a non-nested model comparison, so long as the smaller model is a worse fit to the data than the larger model! Thank you Kaitlyn, and shame on you <code>anova()</code>.</li>
 </ul>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
-<div id="ref-Cannon2018stat2" class="csl-entry" role="listitem">
-Cannon, A. R., G. W. Cobb, B. A. Hartlaub, J. M. Legler, R. H. Lock, T. L. Moore, A. J. Rossman, and J. A. Witmer. 2018. <em>STAT2: Modeling with Regression and ANOVA</em>. Macmillan Learning. <a href="https://www.macmillanlearning.com/college/us/product/STAT2/p/1319054072">https://www.macmillanlearning.com/college/us/product/STAT2/p/1319054072</a>.
-</div>
-</div>
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -535,11 +484,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="./references.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">References</span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./01_simple_linear_regression.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Simple Linear Regression</span></span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->
