@@ -293,7 +293,7 @@ returns the conditional mean win percentage, upper confidence interval bound on 
 
 And we can still generate the confidence interval boundaries on the mean win percentage for arbitrary values of our explanatory variables by supplying a new data frame of "observed" values to the `precict()` function. But, constructing this new data frame of values can be a bit more involved when dealing with a multiple regression model: now, we need to create a data frame with multiple columns in it, because our model uses **combination** of explanatory variables to generate it's predictions.
 
-One function that is quite useful in this context is the `expand.grid()` function^[Tidyverse aficionados will prefer the `expand_grid()` function from the `tidyr` package, which performs the same task, but never converts strings to factors, does not add any additional attributes, can expand any generalized vector, including data frames and lists.]. You supply the `expand.grid()` function one or more vector of values, and it constructs a data frame whose rows hold all possible combinations of the values from that variable. This is quite useful for generating a grid of values at which to evaluate the predictions of your multiple regression model!
+One function that is quite useful in this context is the `expand.grid()` function^[Tidyverse aficionados will prefer the `expand_grid()` function from the `tidyr` package, which performs the same task, but never converts strings to factors, does not add any additional attributes, and can expand any generalized vector, including data frames and lists.]. You supply the `expand.grid()` function one or more vector of values, and it constructs a data frame whose rows hold all possible combinations of the values from that variable. This is quite useful for generating a grid of values at which to evaluate the predictions of your multiple regression model!
 
 For example, consider the example below, which constructs a data frame whose 9 rows hold all 9 possible combinations of 200, 300, and 400 points allowed, and 200, 300, and 400 points scored:
 
@@ -625,7 +625,7 @@ co2_poly_model <- lm(CO2 ~ Day + Day^2, data = CO2Germany)
 coef(co2_poly_model)
 ```
 
-Our model has two coefficients, not three? That's not right - it seems that the whole term involving `^` is completely ignored! Well, as it turns out, the `^` isn't *ignored*: it just has a different meaning than "square this number" inside a model formula^[The quote the help page for [?formula](): "The ^ operator indicates crossing to the specified degree. For example (a+b+c)^2 is identical to (a+b+c)*(a+b+c) which in turn expands to a formula containing the main effects for a, b and c together with their second-order interactions."]. If we want `^` to mean "square this number", we can wrap the operation inside the `I()` function (short for "inhibit"):
+Our model has two coefficients, not three? That's not right - it seems that the whole term involving `^` is completely ignored! Well, as it turns out, the `^` isn't *ignored*: it just has a different meaning than "square this number" inside a model formula^[To quote the help page for [?formula](): "The ^ operator indicates crossing to the specified degree. For example (a+b+c)^2 is identical to (a+b+c)*(a+b+c) which in turn expands to a formula containing the main effects for a, b and c together with their second-order interactions."]. If we want `^` to mean "square this number", we can wrap the operation inside the `I()` function (short for "inhibit"):
 
 ```{r}
 co2_poly_model <- lm(CO2 ~ Day + I(Day^2), data= CO2Germany)
@@ -817,7 +817,8 @@ anova(price_size, price_size_beds_lot, price_all_variables)
 
 So the F-test in row 2 of the table compares model 2 (`Price ~ Size + Beds + Lot`) to model 1 (`Price ~ Size`), while the F-test in row 3 of the table compares model 3 (`Price ~ Beds + Baths + Size + Lot`) model 2 (`Price ~ Size + Beds + Lot`).
 
-If you ever attempt to supply *non*-nested model to the `anova()` function, you won't get an error, but you also won't get any F-statistics - R does its best to protect you from yourself!
+::: {.callout-warning}
+In some cases, supplying non-nested models to the `anova()` function will lead to a missing F statistic and *p*-value:
 
 ```{r}
 price_size <- lm(Price ~ Size, data = HousesNY)
@@ -825,3 +826,14 @@ price_beds_lot <- lm(Price ~ Beds + Lot, data = HousesNY)
 
 anova(price_size, price_beds_lot)
 ```
+
+This is a good thing - constructing an F-statistic and *p*-value from the sums of squares given by these two models makes no sense, because the smaller model's explanatory variables are not a subset of the larger model's explanatory variables. However, R will not **always** protect you from computing and F-statistic and *p*-value that make no sense:
+
+```{r}
+price_beds <- lm(Price ~ Beds, data = HousesNY)
+price_size_lot <- lm(Price ~ Size + Lot, data = HousesNY)
+anova(price_beds, price_size_lot)
+```
+
+So exercise caution - don't just throw models into `anova()` and look for *p* < .05! You must make sure that you're comparing **nested** models, and R won't check this for you!  
+:::

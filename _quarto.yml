@@ -27,6 +27,7 @@ book:
         - "09_logistic_regression.qmd"
         - "10_multiple_logistic_regression.qmd"
     - references.qmd
+    - errata.qmd
 
 bibliography: references.bib
 

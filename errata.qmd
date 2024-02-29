@@ -1,0 +1,5 @@
+# Corrections {.unnumbered}
+
+Thanks to readers who have pointed out errors!
+
+- An earlier version of the book claimed that the `anova()` function would not compute *F*-statistics and *p*-values when given non-nested models to compare. [Kaitlyn Cook](https://www.smith.edu/people/kaitlyn-cook) pointed out that this is incorrect; `anova()` is happy to produce *F*-statistics and *p*-values from a non-nested model comparison, so long as the smaller model is a worse fit to the data than the larger model! Thank you Kaitlyn, and shame on you `anova()`.
