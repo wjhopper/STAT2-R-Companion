@@ -329,6 +329,109 @@ div.csl-indent {
 </section>
 <section id="identifying-unusual-points-in-regression" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="identifying-unusual-points-in-regression"><span class="header-section-number">4.4</span> Identifying Unusual Points in Regression</h2>
+<p>Section 4.4 introduces four new metrics intended to describe the “unusualness” of individual observations:</p>
+<ul>
+<li>The <strong>leverage</strong> <span class="math inline">\(h_i\)</span>, which measures how “unusual” an observation is in terms of it’s values across all explanatory variables</li>
+<li>The <strong>standardized residual</strong>, which measures how “unusual” an observation’s deviation from the regression model’s predictions is</li>
+<li>The <strong>studentized residual</strong>, which also measures how “unusual” an observation’s deviation from the regression model’s predictions is.
+<ul>
+<li>The only difference between the “standardized” and “studentized” residual statistics for an observation <span class="math inline">\(y_i\)</span> is whether the standard error of the regression is computed <em>including</em> <span class="math inline">\(y_i\)</span> (standardized), or <em>excluding</em> <span class="math inline">\(y_i\)</span> (studentized).</li>
+</ul></li>
+<li>The <strong>Cook’s Distance</strong> <span class="math inline">\(D_i\)</span>, which measures how “influential” an observation is over the values of the model’s fitted coefficients</li>
+</ul>
+<p>Section 4.4 applies these metrics to the observations in the <code>PalmBeach</code> data set, after fitting a “simple” linear regression that estimates the number of votes received for Pat Buchanan based on the number of votes received for George W. Bush in the same Florida county. This model (shown as Figure 4.7 in the textbook) is visualized below in <a href="#fig-palm-beach-model">Figure&nbsp;<span>4.1</span></a></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"PalmBeach"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> PalmBeach,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Bush, <span class="at">y =</span> Buchanan)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">formula =</span> y <span class="sc">~</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-palm-beach-model" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="04_additional_topics_in_regression_files/figure-html/fig-palm-beach-model-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;4.1: Votes cast for Pat Buchanan in Florida’s 67 counties in the 2000 U.S. Presdential election, modeled as a linear function of the votes for George W. Bush.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The most convenient way to compute the leverage, Cook’s distance, and standardized residuals for each observation is to apply the <code>augment()</code> function (from the <code>broom</code> package) to a fitted model object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>palm_beach_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Buchanan <span class="sc">~</span> Bush, <span class="at">data =</span> PalmBeach)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>influece_metrics <span class="ot">&lt;-</span> broom<span class="sc">::</span><span class="fu">augment</span>(palm_beach_model)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>influece_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Buchanan"],"name":[1],"type":["int"],"align":["right"]},{"label":["Bush"],"name":[2],"type":["int"],"align":["right"]},{"label":[".fitted"],"name":[3],"type":["dbl"],"align":["right"]},{"label":[".resid"],"name":[4],"type":["dbl"],"align":["right"]},{"label":[".hat"],"name":[5],"type":["dbl"],"align":["right"]},{"label":[".sigma"],"name":[6],"type":["dbl"],"align":["right"]},{"label":[".cooksd"],"name":[7],"type":["dbl"],"align":["right"]},{"label":[".std.resid"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"262","2":"34062","3":"212.76686","4":"49.233140","5":"0.01532832","6":"356.6226","7":"1.529612e-04","8":"0.1401857886"},{"1":"73","2":"5610","3":"72.87327","4":"0.126733","5":"0.02157204","6":"356.6765","7":"1.444667e-09","8":"0.0003620075"},{"1":"248","2":"38637","3":"235.26135","4":"12.738651","5":"0.01502925","6":"356.6729","7":"1.003441e-05","8":"0.0362663590"},{"1":"65","2":"5413","3":"71.90465","4":"-6.904652","5":"0.02164160","6":"356.6754","7":"4.302604e-06","8":"-0.0197235450"},{"1":"570","2":"115185","3":"611.63471","4":"-41.634707","5":"0.03899504","6":"356.6370","7":"2.921619e-04","8":"-0.1200010035"},{"1":"789","2":"177279","3":"916.94023","4":"-127.940231","5":"0.09859725","6":"356.2785","7":"7.928585e-03","8":"-0.3807499647"},{"1":"90","2":"2873","3":"59.41591","4":"30.584092","5":"0.02257091","6":"356.6556","7":"8.821126e-05","8":"0.0874067826"},{"1":"182","2":"35419","3":"219.43900","4":"-37.438996","5":"0.01521924","6":"356.6453","7":"8.780448e-05","8":"-0.1065973963"},{"1":"270","2":"29744","3":"191.53600","4":"78.464003","5":"0.01578974","6":"356.5395","7":"4.005847e-04","8":"0.2234697268"},{"1":"186","2":"41745","3":"250.54285","4":"-64.542851","5":"0.01493748","6":"356.5839","7":"2.559766e-04","8":"-0.1837419936"},{"1":"122","2":"60426","3":"342.39412","4":"-220.394117","5":"0.01628477","6":"355.5933","7":"3.262851e-03","8":"-0.6278522849"},{"1":"89","2":"10964","3":"99.19796","4":"-10.197965","5":"0.01982019","6":"356.6742","7":"8.564022e-06","8":"-0.0291040083"},{"1":"561","2":"289456","3":"1468.49526","4":"-907.495258","5":"0.29747301","6":"330.0023","7":"1.981366e+00","8":"-3.0591800436"},{"1":"36","2":"4256","3":"66.21588","4":"-30.215882","5":"0.02205745","6":"356.6561","7":"8.405305e-05","8":"-0.0863317966"},{"1":"29","2":"2698","3":"58.55546","4":"-29.555464","5":"0.02263715","6":"356.6569","7":"8.263043e-05","8":"-0.0844699118"},{"1":"650","2":"152082","3":"793.05091","4":"-143.050914","5":"0.07007421","6":"356.1942","7":"6.619074e-03","8":"-0.4191395751"},{"1":"504","2":"73029","3":"404.36090","4":"99.639099","5":"0.01903306","6":"356.4548","7":"7.838155e-04","8":"0.2842462770"},{"1":"83","2":"12608","3":"107.28123","4":"-24.281230","5":"0.01933594","6":"356.6633","7":"4.731736e-05","8":"-0.0692791793"},{"1":"33","2":"2448","3":"57.32626","4":"-24.326256","5":"0.02273228","6":"356.6632","7":"5.622388e-05","8":"-0.0695281516"},{"1":"39","2":"4750","3":"68.64479","4":"-29.644795","5":"0.02187837","6":"356.6568","7":"8.021959e-05","8":"-0.0846923524"},{"1":"29","2":"3300","3":"61.51539","4":"-32.515394","5":"0.02241047","6":"356.6528","7":"9.896243e-05","8":"-0.0929186584"},{"1":"9","2":"1840","3":"54.33682","4":"-45.336825","5":"0.02296607","6":"356.6304","7":"1.973894e-04","8":"-0.1295950635"},{"1":"71","2":"3546","3":"62.72493","4":"8.275066","5":"0.02231882","6":"356.6750","7":"6.382252e-06","8":"0.0236464000"},{"1":"24","2":"2153","3":"55.87579","4":"-31.875792","5":"0.02284528","6":"356.6537","7":"9.703898e-05","8":"-0.0911111441"},{"1":"30","2":"3764","3":"63.79680","4":"-33.796802","5":"0.02223806","6":"356.6509","7":"1.060563e-04","8":"-0.0965720004"},{"1":"22","2":"4743","3":"68.61038","4":"-46.610377","5":"0.02188089","6":"356.6279","7":"1.983358e-04","8":"-0.1331615749"},{"1":"242","2":"30646","3":"195.97098","4":"46.029025","5":"0.01567898","6":"356.6294","7":"1.368554e-04","8":"0.1310857762"},{"1":"99","2":"20196","3":"144.59012","4":"-45.590122","5":"0.01742765","6":"356.6302","7":"1.497634e-04","8":"-0.1299513102"},{"1":"836","2":"176967","3":"915.40618","4":"-79.406181","5":"0.09820784","6":"356.5233","7":"3.039459e-03","8":"-0.2362616662"},{"1":"76","2":"4985","3":"69.80025","4":"6.199751","5":"0.02179398","6":"356.6757","7":"3.494448e-06","8":"0.0177113324"},{"1":"105","2":"28627","3":"186.04390","4":"-81.043900","5":"0.01593742","6":"356.5303","7":"4.314869e-04","8":"-0.2308347296"},{"1":"102","2":"9138","3":"90.21984","4":"11.780163","5":"0.02038761","6":"356.6734","7":"1.176833e-05","8":"0.0336291866"},{"1":"29","2":"2481","3":"57.48851","4":"-28.488512","5":"0.02271969","6":"356.6583","7":"7.706514e-05","8":"-0.0814239877"},{"1":"10","2":"1669","3":"53.49605","4":"-43.496047","5":"0.02303244","6":"356.6341","7":"1.822358e-04","8":"-0.1243374344"},{"1":"289","2":"49963","3":"290.94934","4":"-1.949344","5":"0.01512903","6":"356.6764","7":"2.365832e-07","8":"-0.0055499748"},{"1":"305","2":"106141","3":"567.16691","4":"-262.166914","5":"0.03331541","6":"355.1157","7":"9.781056e-03","8":"-0.7534035530"},{"1":"282","2":"39053","3":"237.30675","4":"44.693251","5":"0.01501174","6":"356.6321","7":"1.233693e-04","8":"0.1272385162"},{"1":"67","2":"6860","3":"79.01930","4":"-12.019302","5":"0.02113910","6":"356.6733","7":"1.272206e-05","8":"-0.0343250312"},{"1":"39","2":"1316","3":"51.76041","4":"-12.760407","5":"0.02317032","6":"356.6729","7":"1.578257e-05","8":"-0.0364793663"},{"1":"29","2":"3038","3":"60.22719","4":"-31.227185","5":"0.02250871","6":"356.6547","7":"9.169484e-05","8":"-0.0892418508"},{"1":"272","2":"57948","3":"330.21022","4":"-58.210216","5":"0.01591874","6":"356.6011","7":"2.223308e-04","8":"-0.1657967122"},{"1":"563","2":"55135","3":"316.37918","4":"246.620821","5":"0.01557267","6":"355.3206","7":"3.901302e-03","8":"0.7023119969"},{"1":"108","2":"33864","3":"211.79333","4":"-103.793328","5":"0.01534567","6":"356.4368","7":"6.806309e-04","8":"-0.2955423496"},{"1":"47","2":"16059","3":"124.24920","4":"-77.249204","5":"0.01840145","6":"356.5433","7":"4.549113e-04","8":"-0.2203024051"},{"1":"90","2":"16404","3":"125.94551","4":"-35.945510","5":"0.01831414","6":"356.6477","7":"9.801333e-05","8":"-0.1025062997"},{"1":"267","2":"52043","3":"301.17635","4":"-34.176347","5":"0.01527744","6":"356.6505","7":"7.345622e-05","8":"-0.0973107615"},{"1":"43","2":"5058","3":"70.15918","4":"-27.159178","5":"0.02176787","6":"356.6600","7":"6.697606e-05","8":"-0.0775867993"},{"1":"446","2":"134476","3":"706.48524","4":"-260.485238","5":"0.05365982","6":"355.1026","7":"1.622838e-02","8":"-0.7565744223"},{"1":"145","2":"26216","3":"174.18943","4":"-29.189427","5":"0.01629587","6":"356.6575","7":"5.727353e-05","8":"-0.0831544510"},{"1":"3407","2":"152846","3":"796.80737","4":"2610.192630","5":"0.07085197","6":"112.4530","7":"2.231935e+00","8":"7.6510719151"},{"1":"570","2":"68581","3":"382.49085","4":"187.509150","5":"0.01789388","6":"355.8915","7":"2.603676e-03","8":"0.5346079795"},{"1":"1010","2":"184312","3":"951.52028","4":"58.479716","5":"0.10761608","6":"356.5926","7":"1.844755e-03","8":"0.1749127914"},{"1":"538","2":"90101","3":"488.30099","4":"49.699009","5":"0.02511932","6":"356.6210","7":"2.605882e-04","8":"0.1422211479"},{"1":"147","2":"13439","3":"111.36711","4":"35.632886","5":"0.01910076","6":"356.6482","7":"1.006140e-04","8":"0.1016555224"},{"1":"229","2":"39497","3":"239.48982","4":"-10.489821","5":"0.01499484","6":"356.6741","7":"6.788210e-06","8":"-0.0298635207"},{"1":"124","2":"34705","3":"215.92838","4":"-91.928381","5":"0.01527449","6":"356.4885","7":"5.313615e-04","8":"-0.2617484970"},{"1":"311","2":"36248","3":"223.51505","4":"87.484953","5":"0.01516106","6":"356.5062","7":"4.775515e-04","8":"0.2490823408"},{"1":"305","2":"83100","3":"453.87828","4":"-148.878277","5":"0.02229450","6":"356.1796","7":"2.063472e-03","8":"-0.4254215488"},{"1":"194","2":"75293","3":"415.49260","4":"-221.492600","5":"0.01968379","6":"355.5787","7":"4.010967e-03","8":"-0.6320745562"},{"1":"114","2":"12126","3":"104.91132","4":"9.088681","5":"0.01947531","6":"356.6747","7":"6.679182e-06","8":"0.0259336578"},{"1":"108","2":"8014","3":"84.69332","4":"23.306678","5":"0.02075236","6":"356.6644","7":"4.692427e-05","8":"0.0665466647"},{"1":"27","2":"4051","3":"65.20793","4":"-38.207932","5":"0.02213243","6":"356.6438","7":"1.348747e-04","8":"-0.1091705980"},{"1":"26","2":"2326","3":"56.72640","4":"-30.726403","5":"0.02277892","6":"356.6554","7":"8.989286e-05","8":"-0.0878228434"},{"1":"396","2":"82214","3":"449.52197","4":"-53.521967","5":"0.02196961","6":"356.6124","7":"2.626250e-04","8":"-0.1529142902"},{"1":"46","2":"4511","3":"67.46967","4":"-21.469673","5":"0.02196472","6":"356.6662","7":"4.224953e-05","8":"-0.0613395163"},{"1":"120","2":"12176","3":"105.15716","4":"14.842840","5":"0.01946075","6":"356.6716","7":"1.779991e-05","8":"0.0423522692"},{"1":"88","2":"4983","3":"69.79042","4":"18.209584","5":"0.02179469","6":"356.6691","7":"3.014707e-05","8":"0.0520208211"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>The leverage measurement for each observation is found in the <code>.hat</code> column, the Cook’s Distance metric is found in the <code>.cooksd</code> column, and the standardized residual for each observation is found in the final column, labeled <code>.std.resid</code>.</p>
+<p>The only metric <em>not</em> reported here is the studentized residual. We can compute this metric for ourselves calling the <code>rstudent</code> function on our fitted model object, and add it to the data set using <code>dplyr::mutate()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>influece_metrics <span class="ot">&lt;-</span> influece_metrics <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">.studentized =</span> <span class="fu">rstudent</span>(palm_beach_model))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>influece_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Buchanan"],"name":[1],"type":["int"],"align":["right"]},{"label":["Bush"],"name":[2],"type":["int"],"align":["right"]},{"label":[".fitted"],"name":[3],"type":["dbl"],"align":["right"]},{"label":[".resid"],"name":[4],"type":["dbl"],"align":["right"]},{"label":[".hat"],"name":[5],"type":["dbl"],"align":["right"]},{"label":[".sigma"],"name":[6],"type":["dbl"],"align":["right"]},{"label":[".cooksd"],"name":[7],"type":["dbl"],"align":["right"]},{"label":[".std.resid"],"name":[8],"type":["dbl"],"align":["right"]},{"label":[".studentized"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"262","2":"34062","3":"212.76686","4":"49.233140","5":"0.01532832","6":"356.6226","7":"1.529612e-04","8":"0.1401857886","9":"0.1391242896"},{"1":"73","2":"5610","3":"72.87327","4":"0.126733","5":"0.02157204","6":"356.6765","7":"1.444667e-09","8":"0.0003620075","9":"0.0003592121"},{"1":"248","2":"38637","3":"235.26135","4":"12.738651","5":"0.01502925","6":"356.6729","7":"1.003441e-05","8":"0.0362663590","9":"0.0359866698"},{"1":"65","2":"5413","3":"71.90465","4":"-6.904652","5":"0.02164160","6":"356.6754","7":"4.302604e-06","8":"-0.0197235450","9":"-0.0195712959"},{"1":"570","2":"115185","3":"611.63471","4":"-41.634707","5":"0.03899504","6":"356.6370","7":"2.921619e-04","8":"-0.1200010035","9":"-0.1190875331"},{"1":"789","2":"177279","3":"916.94023","4":"-127.940231","5":"0.09859725","6":"356.2785","7":"7.928585e-03","8":"-0.3807499647","9":"-0.3782317902"},{"1":"90","2":"2873","3":"59.41591","4":"30.584092","5":"0.02257091","6":"356.6556","7":"8.821126e-05","8":"0.0874067826","9":"0.0867369142"},{"1":"182","2":"35419","3":"219.43900","4":"-37.438996","5":"0.01521924","6":"356.6453","7":"8.780448e-05","8":"-0.1065973963","9":"-0.1057834847"},{"1":"270","2":"29744","3":"191.53600","4":"78.464003","5":"0.01578974","6":"356.5395","7":"4.005847e-04","8":"0.2234697268","9":"0.2218292968"},{"1":"186","2":"41745","3":"250.54285","4":"-64.542851","5":"0.01493748","6":"356.5839","7":"2.559766e-04","8":"-0.1837419936","9":"-0.1823704832"},{"1":"122","2":"60426","3":"342.39412","4":"-220.394117","5":"0.01628477","6":"355.5933","7":"3.262851e-03","8":"-0.6278522849","9":"-0.6249017008"},{"1":"89","2":"10964","3":"99.19796","4":"-10.197965","5":"0.01982019","6":"356.6742","7":"8.564022e-06","8":"-0.0291040083","9":"-0.0288794518"},{"1":"561","2":"289456","3":"1468.49526","4":"-907.495258","5":"0.29747301","6":"330.0023","7":"1.981366e+00","8":"-3.0591800436","9":"-3.2809221986"},{"1":"36","2":"4256","3":"66.21588","4":"-30.215882","5":"0.02205745","6":"356.6561","7":"8.405305e-05","8":"-0.0863317966","9":"-0.0856700436"},{"1":"29","2":"2698","3":"58.55546","4":"-29.555464","5":"0.02263715","6":"356.6569","7":"8.263043e-05","8":"-0.0844699118","9":"-0.0838222255"},{"1":"650","2":"152082","3":"793.05091","4":"-143.050914","5":"0.07007421","6":"356.1942","7":"6.619074e-03","8":"-0.4191395751","9":"-0.4164661078"},{"1":"504","2":"73029","3":"404.36090","4":"99.639099","5":"0.01903306","6":"356.4548","7":"7.838155e-04","8":"0.2842462770","9":"0.2822267528"},{"1":"83","2":"12608","3":"107.28123","4":"-24.281230","5":"0.01933594","6":"356.6633","7":"4.731736e-05","8":"-0.0692791793","9":"-0.0687467351"},{"1":"33","2":"2448","3":"57.32626","4":"-24.326256","5":"0.02273228","6":"356.6632","7":"5.622388e-05","8":"-0.0695281516","9":"-0.0689938123"},{"1":"39","2":"4750","3":"68.64479","4":"-29.644795","5":"0.02187837","6":"356.6568","7":"8.021959e-05","8":"-0.0846923524","9":"-0.0840429848"},{"1":"29","2":"3300","3":"61.51539","4":"-32.515394","5":"0.02241047","6":"356.6528","7":"9.896243e-05","8":"-0.0929186584","9":"-0.0922072532"},{"1":"9","2":"1840","3":"54.33682","4":"-45.336825","5":"0.02296607","6":"356.6304","7":"1.973894e-04","8":"-0.1295950635","9":"-0.1286109309"},{"1":"71","2":"3546","3":"62.72493","4":"8.275066","5":"0.02231882","6":"356.6750","7":"6.382252e-06","8":"0.0236464000","9":"0.0234639005"},{"1":"24","2":"2153","3":"55.87579","4":"-31.875792","5":"0.02284528","6":"356.6537","7":"9.703898e-05","8":"-0.0911111441","9":"-0.0904133462"},{"1":"30","2":"3764","3":"63.79680","4":"-33.796802","5":"0.02223806","6":"356.6509","7":"1.060563e-04","8":"-0.0965720004","9":"-0.0958331348"},{"1":"22","2":"4743","3":"68.61038","4":"-46.610377","5":"0.02188089","6":"356.6279","7":"1.983358e-04","8":"-0.1331615749","9":"-0.1321513114"},{"1":"242","2":"30646","3":"195.97098","4":"46.029025","5":"0.01567898","6":"356.6294","7":"1.368554e-04","8":"0.1310857762","9":"0.1300907123"},{"1":"99","2":"20196","3":"144.59012","4":"-45.590122","5":"0.01742765","6":"356.6302","7":"1.497634e-04","8":"-0.1299513102","9":"-0.1289645641"},{"1":"836","2":"176967","3":"915.40618","4":"-79.406181","5":"0.09820784","6":"356.5233","7":"3.039459e-03","8":"-0.2362616662","9":"-0.2345379523"},{"1":"76","2":"4985","3":"69.80025","4":"6.199751","5":"0.02179398","6":"356.6757","7":"3.494448e-06","8":"0.0177113324","9":"0.0175746057"},{"1":"105","2":"28627","3":"186.04390","4":"-81.043900","5":"0.01593742","6":"356.5303","7":"4.314869e-04","8":"-0.2308347296","9":"-0.2291461375"},{"1":"102","2":"9138","3":"90.21984","4":"11.780163","5":"0.02038761","6":"356.6734","7":"1.176833e-05","8":"0.0336291866","9":"0.0333697882"},{"1":"29","2":"2481","3":"57.48851","4":"-28.488512","5":"0.02271969","6":"356.6583","7":"7.706514e-05","8":"-0.0814239877","9":"-0.0807993425"},{"1":"10","2":"1669","3":"53.49605","4":"-43.496047","5":"0.02303244","6":"356.6341","7":"1.822358e-04","8":"-0.1243374344","9":"-0.1233919602"},{"1":"289","2":"49963","3":"290.94934","4":"-1.949344","5":"0.01512903","6":"356.6764","7":"2.365832e-07","8":"-0.0055499748","9":"-0.0055071185"},{"1":"305","2":"106141","3":"567.16691","4":"-262.166914","5":"0.03331541","6":"355.1157","7":"9.781056e-03","8":"-0.7534035530","9":"-0.7508713845"},{"1":"282","2":"39053","3":"237.30675","4":"44.693251","5":"0.01501174","6":"356.6321","7":"1.233693e-04","8":"0.1272385162","9":"0.1262716910"},{"1":"67","2":"6860","3":"79.01930","4":"-12.019302","5":"0.02113910","6":"356.6733","7":"1.272206e-05","8":"-0.0343250312","9":"-0.0340602778"},{"1":"39","2":"1316","3":"51.76041","4":"-12.760407","5":"0.02317032","6":"356.6729","7":"1.578257e-05","8":"-0.0364793663","9":"-0.0361980387"},{"1":"29","2":"3038","3":"60.22719","4":"-31.227185","5":"0.02250871","6":"356.6547","7":"9.169484e-05","8":"-0.0892418508","9":"-0.0885581397"},{"1":"272","2":"57948","3":"330.21022","4":"-58.210216","5":"0.01591874","6":"356.6011","7":"2.223308e-04","8":"-0.1657967122","9":"-0.1645512077"},{"1":"563","2":"55135","3":"316.37918","4":"246.620821","5":"0.01557267","6":"355.3206","7":"3.901302e-03","8":"0.7023119969","9":"0.6995479154"},{"1":"108","2":"33864","3":"211.79333","4":"-103.793328","5":"0.01534567","6":"356.4368","7":"6.806309e-04","8":"-0.2955423496","9":"-0.2934573716"},{"1":"47","2":"16059","3":"124.24920","4":"-77.249204","5":"0.01840145","6":"356.5433","7":"4.549113e-04","8":"-0.2203024051","9":"-0.2186828593"},{"1":"90","2":"16404","3":"125.94551","4":"-35.945510","5":"0.01831414","6":"356.6477","7":"9.801333e-05","8":"-0.1025062997","9":"-0.1017229558"},{"1":"267","2":"52043","3":"301.17635","4":"-34.176347","5":"0.01527744","6":"356.6505","7":"7.345622e-05","8":"-0.0973107615","9":"-0.0965663501"},{"1":"43","2":"5058","3":"70.15918","4":"-27.159178","5":"0.02176787","6":"356.6600","7":"6.697606e-05","8":"-0.0775867993","9":"-0.0769912297"},{"1":"446","2":"134476","3":"706.48524","4":"-260.485238","5":"0.05365982","6":"355.1026","7":"1.622838e-02","8":"-0.7565744223","9":"-0.7540596140"},{"1":"145","2":"26216","3":"174.18943","4":"-29.189427","5":"0.01629587","6":"356.6575","7":"5.727353e-05","8":"-0.0831544510","9":"-0.0825167112"},{"1":"3407","2":"152846","3":"796.80737","4":"2610.192630","5":"0.07085197","6":"112.4530","7":"2.231935e+00","8":"7.6510719151","9":"24.0801444830"},{"1":"570","2":"68581","3":"382.49085","4":"187.509150","5":"0.01789388","6":"355.8915","7":"2.603676e-03","8":"0.5346079795","9":"0.5316497933"},{"1":"1010","2":"184312","3":"951.52028","4":"58.479716","5":"0.10761608","6":"356.5926","7":"1.844755e-03","8":"0.1749127914","9":"0.1736029542"},{"1":"538","2":"90101","3":"488.30099","4":"49.699009","5":"0.02511932","6":"356.6210","7":"2.605882e-04","8":"0.1422211479","9":"0.1411448613"},{"1":"147","2":"13439","3":"111.36711","4":"35.632886","5":"0.01910076","6":"356.6482","7":"1.006140e-04","8":"0.1016555224","9":"0.1008785452"},{"1":"229","2":"39497","3":"239.48982","4":"-10.489821","5":"0.01499484","6":"356.6741","7":"6.788210e-06","8":"-0.0298635207","9":"-0.0296331142"},{"1":"124","2":"34705","3":"215.92838","4":"-91.928381","5":"0.01527449","6":"356.4885","7":"5.313615e-04","8":"-0.2617484970","9":"-0.2598642320"},{"1":"311","2":"36248","3":"223.51505","4":"87.484953","5":"0.01516106","6":"356.5062","7":"4.775515e-04","8":"0.2490823408","9":"0.2472769364"},{"1":"305","2":"83100","3":"453.87828","4":"-148.878277","5":"0.02229450","6":"356.1796","7":"2.063472e-03","8":"-0.4254215488","9":"-0.4227253114"},{"1":"194","2":"75293","3":"415.49260","4":"-221.492600","5":"0.01968379","6":"355.5787","7":"4.010967e-03","8":"-0.6320745562","9":"-0.6291300320"},{"1":"114","2":"12126","3":"104.91132","4":"9.088681","5":"0.01947531","6":"356.6747","7":"6.679182e-06","8":"0.0259336578","9":"0.0257335281"},{"1":"108","2":"8014","3":"84.69332","4":"23.306678","5":"0.02075236","6":"356.6644","7":"4.692427e-05","8":"0.0665466647","9":"0.0660350327"},{"1":"27","2":"4051","3":"65.20793","4":"-38.207932","5":"0.02213243","6":"356.6438","7":"1.348747e-04","8":"-0.1091705980","9":"-0.1083375019"},{"1":"26","2":"2326","3":"56.72640","4":"-30.726403","5":"0.02277892","6":"356.6554","7":"8.989286e-05","8":"-0.0878228434","9":"-0.0871498353"},{"1":"396","2":"82214","3":"449.52197","4":"-53.521967","5":"0.02196961","6":"356.6124","7":"2.626250e-04","8":"-0.1529142902","9":"-0.1517607665"},{"1":"46","2":"4511","3":"67.46967","4":"-21.469673","5":"0.02196472","6":"356.6662","7":"4.224953e-05","8":"-0.0613395163","9":"-0.0608676066"},{"1":"120","2":"12176","3":"105.15716","4":"14.842840","5":"0.01946075","6":"356.6716","7":"1.779991e-05","8":"0.0423522692","9":"0.0420257996"},{"1":"88","2":"4983","3":"69.79042","4":"18.209584","5":"0.02179469","6":"356.6691","7":"3.014707e-05","8":"0.0520208211","9":"0.0516201845"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>We can use this data set to reproduce Table 4.1, which described the 5 “most unusual” observations in the dataset. These were defined as: observations with a leverage values greater than <span class="math inline">\(\frac{6}{n}\)</span>, <em>or</em> with a absolute standardized residual value greater than 3.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>influece_metrics <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.hat <span class="sc">&gt;=</span> <span class="dv">6</span><span class="sc">/</span><span class="fu">n</span>() <span class="sc">|</span> <span class="fu">abs</span>(.std.resid) <span class="sc">&gt;</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Buchanan, Bush, .std.resid, .hat, .cooksd)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Buchanan"],"name":[1],"type":["int"],"align":["right"]},{"label":["Bush"],"name":[2],"type":["int"],"align":["right"]},{"label":[".std.resid"],"name":[3],"type":["dbl"],"align":["right"]},{"label":[".hat"],"name":[4],"type":["dbl"],"align":["right"]},{"label":[".cooksd"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"789","2":"177279","3":"-0.3807500","4":"0.09859725","5":"0.007928585"},{"1":"561","2":"289456","3":"-3.0591800","4":"0.29747301","5":"1.981365681"},{"1":"836","2":"176967","3":"-0.2362617","4":"0.09820784","5":"0.003039459"},{"1":"3407","2":"152846","3":"7.6510719","4":"0.07085197","5":"2.231935359"},{"1":"1010","2":"184312","3":"0.1749128","4":"0.10761608","5":"0.001844755"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>If you don’t have a specific criteria in mind for identifying “unusual” observations, the simplest way to identify influential observations is to take a graphical approach, and plot each observation’s standardized residual as a function of it’s leverage.</p>
+<p>The <code>check_outliers()</code> function from the <code>performance</code> package returns an object that, when plotted, produces a scatter plot showing the relationship between the leverage and the standardized residuals of each observation:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>unusual <span class="ot">&lt;-</span> <span class="fu">check_outliers</span>(palm_beach_model)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(unusual)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The contour line in this plot traces out a Cook’s Distance value that can be used to identify observations that have noticeably strong influence over the values of the fitted coefficients. This visualization identifies two observations (observation 50 and observation 13) as influential. We can use the object returned from <code>check_outliers()</code> to subset the <code>PalmBeach()</code> data, and identify which counties they are:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>PalmBeach[unusual, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["County"],"name":[1],"type":["fct"],"align":["left"]},{"label":["Buchanan"],"name":[2],"type":["int"],"align":["right"]},{"label":["Bush"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"DADE","2":"561","3":"289456","_rn_":"13"},{"1":"PALM BEACH","2":"3407","3":"152846","_rn_":"50"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Not surprisingly, observation 50 (the one with the <em>very</em> high standardized residual) is Palm Beach County!</p>
 </section>
 <section id="coding-categorical-predictors" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="coding-categorical-predictors"><span class="header-section-number">4.5</span> Coding Categorical Predictors</h2>
@@ -350,8 +453,8 @@ div.csl-indent {
 <h3 data-number="4.6.1" class="anchored" data-anchor-id="a-randomization-test-for-the-slope"><span class="header-section-number">4.6.1</span> A randomization test for the slope</h3>
 <p>Let’s base our example on the SAT and GPA data used in Example 4.11</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"SATGPA"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"SATGPA"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="cell-output-display">
@@ -364,28 +467,28 @@ div.csl-indent {
 </div>
 </div>
 <p>Let’s begin with code that executes Steps 1-4 on our hypothesis testing roadmap:</p>
-<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-4_5cf368a71f1646c07a663dc7bab4450b">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(infer)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-10_09d95c53a1f3710eee803ee02d35bdcd">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(infer)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>and break this code down, one line at a time.</p>
 <section id="step-1-specify-the-relationship-of-interest" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="step-1-specify-the-relationship-of-interest">Step 1: Specify the relationship of interest</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA  <span class="sc">|&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA  <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>specify()</code> function is where you set up the structure of the model using a the familiar formula notation. We’re specifying that we’re interested in the <code>GPA</code> and <code>VerbalSAT</code> relationship, and that we think the <code>VerbalSAT</code> score explains the <code>GPA</code> outcome.</p>
 </section>
 <section id="step-2-state-your-null-hypothesis" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="step-2-state-your-null-hypothesis">Step 2: State your null hypothesis</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Every null hypothesis test begins with an assumption that the null hypothesis is true. Most of the time, this assumption is implicit, but randomization tests with <code>infer</code> require you to make this assumption explicit.</p>
 <p>Writing <code>null = "independene"</code> in this context means you are saying “knowing a persons Verbal SAT score tells me nothing about what their GPA is likely to be”. In other words, you’re saying the the slope of the regression line relating Verbal SAT to GPA is 0 in the entire population of SAT test takers.</p>
@@ -393,7 +496,7 @@ div.csl-indent {
 <section id="step-3-generate-new-samples-of-data-by-permuting-our-data" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="step-3-generate-new-samples-of-data-by-permuting-our-data">Step 3: Generate new samples of data by permuting our data</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This is the most import step in our hypothesis testing “pipeline”: This is where we take each Verbal SAT score from our data, and pair it with a random GPA score that is sampled (without replacement) from our original data as well. We repeated this process 1,000 times, which generates 1,000 new samples of data that are permutations of our original data.</p>
 <p>This permutation process is helpful, because it generates 1,000 new data sets <em>where each Verbal SAT score is completely unrelated to it’s paired GPA value</em>. This how the Null Hypothesis says data is generated in the “real world”, and it’s exactly how we’ve generated our permutations. So, these 1,000 new data sets will show us exactly what kinds of GPA and Verbal SAT pairs we’d expect, if the null hypothesis is true!</p>
@@ -401,13 +504,13 @@ div.csl-indent {
 <section id="step-4-calculate-the-gpa-verbalsat-slope-from-each-permutation" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="step-4-calculate-the-gpa-verbalsat-slope-from-each-permutation">Step 4: Calculate the <code>GPA ~ VerbalSAT</code> slope from each permutation</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Since our hypothesis test is about the <em>relationship</em> between GPA and Verbal SAT score, the slope is the statistic that best represents that idea. So, we summarize all of our 1,000 permuted data sets by fitting the <code>GPA ~ VerbalSAT</code> regression model to each one, and extracting the slope coefficient from each. So, the final result from our “pipeline” is 1,000 slopes observed from a world where the null hypothesis of “no relationship” is true!</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualize</span>(null_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualize</span>(null_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -415,11 +518,11 @@ div.csl-indent {
 <h4 class="unnumbered anchored" data-anchor-id="step-5-computing-the-p-value">Step 5: Computing the p-value</h4>
 <p>Computing the p-value for our hypothesis test means we need to compare the observed slope from our <em>real</em>, unpermuted data to the distribution of slopes we obtained by summarizing our permuted data. Thus, we need the value of the observed slope! You could always do this the “traditional” way, using the <code>lm()</code> function, but since we only need the slope (and not the standard error, or <span class="math inline">\(R^2\)</span>, etc.), let’s demonstrate how you would do this using just <code>specify()</code> and <code>calculate()</code> from the <code>infer</code> package:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>observed_slope <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>observed_slope</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>observed_slope <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>observed_slope</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -431,7 +534,7 @@ div.csl-indent {
 </div>
 <p>Finally, we compute the p-value of our slope by using the <code>get_p_value()</code> function. This function counts number of times our a slope more extreme than the “real” slope resulted from the random permutation process, and dividing that by the total number of permutations performed. Since our question was a generic “is there a relationship?” question (not “is there a positive/negative” relationship), we want to count values in both tails of the null hypothesis distribution as “extreme”.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(<span class="at">x =</span> null_dist, <span class="at">obs_stat =</span> observed_slope, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(<span class="at">x =</span> null_dist, <span class="at">obs_stat =</span> observed_slope, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -443,10 +546,10 @@ div.csl-indent {
 </div>
 <p>This p-values corresponds to the area in the histogram of permuted slopes that is more extreme than 0.0009.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_dist) <span class="sc">+</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_slope, <span class="at">direction =</span> <span class="st">'both'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_dist) <span class="sc">+</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_slope, <span class="at">direction =</span> <span class="st">'both'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>With such a large p-value, we fail to reject the null hypothesis, and conclude there is no evidence the two quantities are related in the population of SAT test takers.</p>
@@ -455,20 +558,20 @@ div.csl-indent {
 <section id="a-randomization-test-for-the-correlation" class="level3" data-number="4.6.2">
 <h3 data-number="4.6.2" class="anchored" data-anchor-id="a-randomization-test-for-the-correlation"><span class="header-section-number">4.6.2</span> A randomization test for the correlation</h3>
 <p>Example 4.11 actually demonstrates a randomization test for the Verbal SAT vs.&nbsp;GPA <em>correlation</em>, the <code>GPA ~ VerbalSAT</code> <em>slope</em>. But, it is easy to execute such a test simply by changing the <code>stat</code> argument of the calculate function from <code>"slope"</code> to <code>"correlation"</code>!</p>
-<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-14_ec78cd8207e0a7967242686d5a548156">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>null_correlation_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>observed_correlation <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(null_correlation_dist, <span class="at">obs_stat =</span> observed_correlation,</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">direction =</span> <span class="st">"both"</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-20_a7d8113fdbc1a03d0b5cad506cc3665c">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>null_correlation_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>observed_correlation <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(null_correlation_dist, <span class="at">obs_stat =</span> observed_correlation,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">direction =</span> <span class="st">"both"</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -477,10 +580,10 @@ div.csl-indent {
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_correlation_dist) <span class="sc">+</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_correlation, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_correlation_dist) <span class="sc">+</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_correlation, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -492,20 +595,20 @@ div.csl-indent {
 <li>Complete your pipeline with the <code>fit()</code> function, instead of the <code>calcuate()</code> function (which makes sense, since there isn’t one single summary statistic for all the relationships encoded by a multiple regression model)</li>
 </ol>
 <p>For example, we could perform a permutation test on all four of the coefficients in the <code>GPA ~ VerbalSAT * MathSAT</code> model:</p>
-<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-15_f09cc616cfada83acdb62e93e581ec9e">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>null_models <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT <span class="sc">*</span> MathSAT) <span class="sc">|&gt;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>()</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>observed_model <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT <span class="sc">*</span> MathSAT) <span class="sc">|&gt;</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>()</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(null_models, <span class="at">obs_stat =</span> observed_model,</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">direction =</span> <span class="st">"both"</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-21_f552991dda7f0ef027613e0140a45988">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>null_models <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT <span class="sc">*</span> MathSAT) <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>()</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>observed_model <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT <span class="sc">*</span> MathSAT) <span class="sc">|&gt;</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>()</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(null_models, <span class="at">obs_stat =</span> observed_model,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">direction =</span> <span class="st">"both"</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -514,10 +617,10 @@ div.csl-indent {
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_models) <span class="sc">+</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_model, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_models) <span class="sc">+</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_model, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -525,9 +628,9 @@ div.csl-indent {
 <h3 data-number="4.6.4" class="anchored" data-anchor-id="a-note-about-controlling-randomness"><span class="header-section-number">4.6.4</span> A note about controlling randomness</h3>
 <p>We’re used to our R code producing identical results every time we run it. For example, we don’t expect the correlation to change the first and second times we calculate it:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -538,9 +641,9 @@ div.csl-indent {
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -552,11 +655,11 @@ div.csl-indent {
 </div>
 <p>But, things get a bit trickier when we’re constructing the null hypothesis distribution. Consider the example below, where we construct 3 permutations and summarize each one with the correlation coefficient, and then run the exact same code again:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -567,11 +670,11 @@ div.csl-indent {
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -586,12 +689,12 @@ div.csl-indent {
 <p>Having no idea what result you’ll get each time you run your code makes it difficult to write about your results, or re-produce them for people who are interested in the “proof” of your work. Luckily, we can take some control over R’s random number generator using the <code>set.seed()</code> function.</p>
 <p>The <code>set.seed()</code> function “seeds” R’s random number generator with a fixed value, making the sequence of numbers it generates reproducible between different runs of the same code. Watch what happens when we “seed” the generate with an 11:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -600,12 +703,12 @@ div.csl-indent {
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
