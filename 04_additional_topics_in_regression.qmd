@@ -15,6 +15,81 @@ library(infer)
 
 ## Identifying Unusual Points in Regression
 
+Section 4.4 introduces four new metrics intended to describe the "unusualness" of individual observations:
+
+- The **leverage** $h_i$, which measures how "unusual" an observation is in terms of it's values across all explanatory variables
+- The **standardized residual**, which measures how "unusual" an observation's deviation from the regression model's predictions is
+- The **studentized residual**, which also measures how "unusual" an observation's deviation from the regression model's predictions is.
+    - The only difference between the "standardized" and "studentized" residual statistics for an observation $y_i$ is whether the standard error of the regression is computed *including* $y_i$ (standardized), or *excluding* $y_i$ (studentized).
+- The **Cook's Distance** $D_i$, which measures how "influential" an observation is over the values of the model's fitted coefficients
+
+Section 4.4 applies these metrics to the observations in the `PalmBeach` data set, after fitting a "simple" linear regression that estimates the number of votes received for Pat Buchanan based on the number of votes received for George W. Bush in the same Florida county. This model (shown as Figure 4.7 in the textbook) is visualized below in @fig-palm-beach-model
+
+```{r}
+#| label: fig-palm-beach-model
+#| fig-cap: "Votes cast for Pat Buchanan in Florida's 67 counties in the 2000 U.S. Presdential election, modeled as a linear function of the votes for George W. Bush."
+library(Stat2Data)
+library(ggplot2)
+data("PalmBeach")
+
+ggplot(
+  data = PalmBeach,
+  mapping = aes(x = Bush, y = Buchanan)
+) +
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE, formula = y ~ x)
+```
+
+The most convenient way to compute the leverage, Cook's distance, and standardized residuals for each observation is to apply the `augment()` function (from the `broom` package) to a fitted model object:
+
+```{r}
+library(broom)
+
+palm_beach_model <- lm(Buchanan ~ Bush, data = PalmBeach)
+
+influece_metrics <- broom::augment(palm_beach_model)
+influece_metrics
+```
+
+The leverage measurement for each observation is found in the `.hat` column, the Cook's Distance metric is found in the `.cooksd` column, and the standardized residual for each observation is found in the final column, labeled `.std.resid`.
+
+The only metric *not* reported here is the studentized residual. We can compute this metric for ourselves calling the `rstudent` function on our fitted model object, and add it to the data set using `dplyr::mutate()`:
+
+```{r}
+library(dplyr)
+
+influece_metrics <- influece_metrics |>
+  dplyr::mutate(.studentized = rstudent(palm_beach_model))
+
+influece_metrics
+```
+
+We can use this data set to reproduce Table 4.1, which described the 5 "most unusual" observations in the dataset. These were defined as: observations with a leverage values greater than $\frac{6}{n}$, *or* with a absolute standardized residual value greater than 3.
+
+```{r}
+influece_metrics |>
+  filter(.hat >= 6/n() | abs(.std.resid) > 3) |>
+  select(Buchanan, Bush, .std.resid, .hat, .cooksd)
+```
+
+If you don't have a specific criteria in mind for identifying "unusual" observations, the simplest way to identify influential observations is to take a graphical approach, and plot each observation's standardized residual as a function of it's leverage.
+
+The `check_outliers()` function from the `performance` package returns an object that, when plotted, produces a scatter plot showing the relationship between the leverage and the standardized residuals of each observation:
+
+```{r}
+library(performance)
+unusual <- check_outliers(palm_beach_model)
+plot(unusual)
+```
+
+The contour line in this plot traces out a Cook's Distance value that can be used to identify observations that have noticeably strong influence over the values of the fitted coefficients. This visualization identifies two observations (observation 50 and observation 13) as influential. We can use the object returned from `check_outliers()` to subset the `PalmBeach()` data, and identify which counties they are:
+
+```{r}
+PalmBeach[unusual, ]
+```
+
+Not surprisingly, observation 50 (the one with the *very* high standardized residual) is Palm Beach County!
+
 ## Coding Categorical Predictors
 
 ## Randomization Test for Predictors
