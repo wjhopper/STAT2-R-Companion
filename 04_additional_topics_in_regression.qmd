@@ -13,6 +13,111 @@ library(infer)
 
 ## Cross-validation
 
+Section 4.3 demonstrates cross-validation by dividing the `HousesNY` data set into two distinct subsets:
+
+- Two-thirds of the data (35 out of 56 observations) are allocated to a "training" data set, used to fit a regression model
+- One-third of the data (the remaining 18 observations) are reserved as a "testing" data set, used to measure the fitted regression model's predictive performance
+
+To replicate this test/training split, we first load the data, and generate a vector of row numbers based on the size of the data set
+```{r}
+library(Stat2Data)
+data("HousesNY")
+
+HousesNY
+
+rows <- 1:nrow(HousesNY)
+rows
+```
+
+Then, we sample two-third of these rows numbers; these sampled row numbers represent the rows that will become part of our "training" data set
+
+```{r}
+set.seed(32419)
+training_rows <- sample(rows, size = (2/3) * nrow(HousesNY))
+training_rows
+```
+
+The row numbers that were **not** sampled represent the rows that will make up the "testing" data set. We can figure out which rows were **not** sampled by finding the difference between the set of all rows, and the set of sampled rows
+
+```{r}
+test_rows <- setdiff(rows, training_rows)
+test_rows
+```
+
+Finally, we can create the test/training split by subsetting the `NYHouses` data set using these row numbers to indicate which rows should be kept in each subset
+
+```{r}
+training <- HousesNY[training_rows, ]
+testing <- HousesNY[test_rows, ]
+```
+
+Now we can fit the `Price ~ Size` regression model to the "training" data set, using `lm` as usual:
+
+```{r}
+training_model <- lm(Price ~ Size, data = training)
+summary(training_model)
+anova(training_model)
+```
+
+```{r}
+#| echo: false
+training_summary <- summary(training_model)
+r2 <- training_summary$r.squared
+
+anova_table <- anova(training_model)
+mse <- anova_table[2, "Mean Sq"]
+```
+
+The model achieves an $R^2$ of `r round(r2, 4)`, and a Mean Square Error of `r `round(mse, 4)` when fit to the training data set. But how well do these fitted coefficients generalize to the testing data set?
+
+We can compute the predicted price for each home in the "testing" data set by using the `augment` function from the `broom` package
+
+```{r}
+library(broom)
+test_predictions <- broom::augment(training_model, newdata = testing)
+test_predictions
+```
+
+We can compute the $R^2$ statistic for our test data by squaring the correlation between the observed and predicted prices:
+
+```{r}
+library(dplyr)
+
+test_predictions |>
+  summarize(R2 = cor(Price, .fitted)^2)
+```
+
+```{r}
+test_r2 <- test_predictions |>
+  summarize(R2 = cor(Price, .fitted)^2) |>
+  dplyr::pull(R2)
+```
+
+And we can compute the $MS_{Error}$ using the usual formula $\frac{\sum{(y_i - \hat{y}_i)^2}}{n-k-1}$
+
+```{r}
+test_predictions |>
+  mutate(error = Price - .fitted,
+         sq_error = error^2
+         ) |>
+  summarize(MSE = sum(sq_error)/(n() - 2))
+```
+
+```{r}
+test_mse <- test_predictions |>
+  mutate(error = Price - .fitted,
+         sq_error = error^2
+         ) |>
+  summarize(MSE = sum(sq_error)/(n() - 2)) |>
+  dplyr::pull(MSE)
+```
+
+Our model performs *much* worse on the held out "testing" data set! $R^2$ drops from `r round(r2, 4)` to `r round(test_r2, 4)` (a shrinkage of almost 30 percentage points!), and $MS_{error}$ increases to `r round(test_mse, 4)`. So it seems that the coefficients estimated based on the sample of 35 houses does not generalize particularly well to new houses.
+
+Note that our results in the replication do not perfectly match the results in Section 4.3, because out training data differs; we have no way of knowing which 35 observations constituted the author's training data, so we have no way of perfectly replicating their results. This highlights the importance of using `set.seed()` whenever utilize randomization in your R code; without setting (and sharing!) your RNG seed, your results won't be replicable!
+
+
+
 ## Identifying Unusual Points in Regression
 
 Section 4.4 introduces four new metrics intended to describe the "unusualness" of individual observations:
