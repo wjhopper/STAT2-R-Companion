@@ -284,7 +284,10 @@ div.csl-indent {
   <ul>
   <li><a href="#added-variable-plots" id="toc-added-variable-plots" class="nav-link active" data-scroll-target="#added-variable-plots"><span class="header-section-number">4.1</span> Added Variable Plots</a></li>
   <li><a href="#techniques-for-choosing-predictors" id="toc-techniques-for-choosing-predictors" class="nav-link" data-scroll-target="#techniques-for-choosing-predictors"><span class="header-section-number">4.2</span> Techniques for Choosing Predictors</a></li>
-  <li><a href="#cross-validation" id="toc-cross-validation" class="nav-link" data-scroll-target="#cross-validation"><span class="header-section-number">4.3</span> Cross-validation</a></li>
+  <li><a href="#cross-validation" id="toc-cross-validation" class="nav-link" data-scroll-target="#cross-validation"><span class="header-section-number">4.3</span> Cross-validation</a>
+  <ul class="collapse">
+  <li><a href="#v-fold-cross-validation" id="toc-v-fold-cross-validation" class="nav-link" data-scroll-target="#v-fold-cross-validation"><span class="header-section-number">4.3.1</span> V-fold Cross Validation</a></li>
+  </ul></li>
   <li><a href="#identifying-unusual-points-in-regression" id="toc-identifying-unusual-points-in-regression" class="nav-link" data-scroll-target="#identifying-unusual-points-in-regression"><span class="header-section-number">4.4</span> Identifying Unusual Points in Regression</a></li>
   <li><a href="#coding-categorical-predictors" id="toc-coding-categorical-predictors" class="nav-link" data-scroll-target="#coding-categorical-predictors"><span class="header-section-number">4.5</span> Coding Categorical Predictors</a></li>
   <li><a href="#randomization-test-for-predictors" id="toc-randomization-test-for-predictors" class="nav-link" data-scroll-target="#randomization-test-for-predictors"><span class="header-section-number">4.6</span> Randomization Test for Predictors</a>
@@ -328,7 +331,7 @@ div.csl-indent {
 <h2 data-number="4.3" class="anchored" data-anchor-id="cross-validation"><span class="header-section-number">4.3</span> Cross-validation</h2>
 <p>Section 4.3 demonstrates cross-validation by dividing the <code>HousesNY</code> data set into two distinct subsets:</p>
 <ul>
-<li>Two-thirds of the data (35 out of 56 observations) are allocated to a “training” data set, used to fit a regression model</li>
+<li>Two-thirds of the data (35 out of 56 observations) are allocated to a “training” data set, used to fit the <code>Price ~ Size</code> regression model</li>
 <li>One-third of the data (the remaining 18 observations) are reserved as a “testing” data set, used to measure the fitted regression model’s predictive performance</li>
 </ul>
 <p>To replicate this test/training split, we first load the data, and generate a vector of row numbers based on the size of the data set</p>
@@ -410,7 +413,7 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </div>
 </div>
 </div>
-<p>The model achieves an <span class="math inline">\(R^2\)</span> of 0.3468, and a Mean Square Error of <code>r</code>round(mse, 4)` when fit to the training data set. But how well do these fitted coefficients generalize to the testing data set?</p>
+<p>The model achieves an <span class="math inline">\(R^2\)</span> of 0.3468, and a Mean Square Error of 1286.0237 when fit to the training data set. But how well do these fitted coefficients generalize to the testing data set?</p>
 <p>We can compute the predicted price for each home in the “testing” data set by using the <code>augment</code> function from the <code>broom</code> package</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
@@ -470,7 +473,194 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">pull</span>(MSE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Our model performs <em>much</em> worse on the held out “testing” data set! <span class="math inline">\(R^2\)</span> drops from 0.3468 to 0.0576 (a shrinkage of almost 30 percentage points!), and <span class="math inline">\(MS_{error}\)</span> increases to 1479.6001. So it seems that the coefficients estimated based on the sample of 35 houses does not generalize particularly well to new houses.</p>
-<p>Note that our results in the replication do not perfectly match the results in Section 4.3, because out training data differs; we have no way of knowing which 35 observations constituted the author’s training data, so we have no way of perfectly replicating their results. This highlights the importance of using <code>set.seed()</code> whenever utilize randomization in your R code; without setting (and sharing!) your RNG seed, your results won’t be replicable!</p>
+<p>Note that our results in this replication do not perfectly match the results in Section 4.3, because out training data differs; we have no way of knowing which 35 observations constituted the author’s training data, so we have no way of perfectly replicating their results. This highlights the importance of using <code>set.seed()</code> whenever utilize randomization in your R code; without setting (and sharing!) your RNG seed, your results won’t be replicable!</p>
+<section id="v-fold-cross-validation" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="v-fold-cross-validation"><span class="header-section-number">4.3.1</span> V-fold Cross Validation</h3>
+<p>When using Cross-Validation as a model selection strategy, it’s uncommon to use a single test/train split. Rather, the “training” data set from the initial split is typically split again into <span class="math inline">\(v\)</span> equally sized smaller subsets. One by one, each of these subsets plays the role of a held-out validation set (on which the model’s predictive accuracy is measured), while the model is fit to the data from all the remaining subsets. The processes of repeatedly fitting the model and assessing it on different, mutually exclusive subsets of the training data is known as <span class="math inline">\(v\)</span>-fold cross validation<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/k-fold.gif" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">An animation of how data is divided iteratively across five folds of cross validation</figcaption>
+</figure>
+</div>
+<p>In <span class="math inline">\(v\)</span>-fold cross validation, each candidate model is fit and “validated” (using a metric such as <span class="math inline">\(R^2\)</span> or <span class="math inline">\(MS_{Error}\)</span>) <span class="math inline">\(v\)</span> different times. The model with the best performance on average across the <span class="math inline">\(v\)</span> held-out validation sets is taken to be the preferred model. Finally, that preferred model is fit to the full training data set, and assessed against the “testing” data set that had been held out all along.</p>
+<p>Let’s demonstrate this process by using <span class="math inline">\(v\)</span>-fold cross validation to compare two models:</p>
+<ul>
+<li><code>Price ~ Baths</code></li>
+<li><code>Price ~ Baths + Lot + Beds + Size</code></li>
+</ul>
+<p>None of the individual <code>Lot</code>, <code>Beds</code>, or <code>Size</code> coefficients are “significant” when added to the model already containing <code>Bath</code>, but these are likely to be important confounders to adjust for when estimating the true effect of the number of bathrooms on price. So, we would like to use the larger model <em>if</em> we aren’t over-fitting the sample and reducing our ability to generalize the model to new homes.</p>
+<p>To carry out the cross validation procedure, we’ll use the <code>tidymodels</code> package <span class="citation" data-cites="tidymodels">(<a href="references.html#ref-tidymodels" role="doc-biblioref">Kuhn and Wickham 2020</a>)</span>, which is an “umbrella” package for many different R packages all designed to enable a wide variety of modeling and machine-learning tasks in a systematic ‘pipeline’ by providing a common interface to all these disparate tasks.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Whenever one of the functions under the <code>tidymodels</code> umbrella is used, I will prefix that function using the name of the package it comes from, in order to emphasize that the <code>tidymodels</code> package is a collection, not a monolith.</p>
+<p>To get started, we’ll creating a new test/train split for our <code>HousesNY</code> data set. This time, we’ll use an 80/20 train/test split (since we need to further subdivide the training data set, it helps to have a larger training set to start with).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">40</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>HousesNY_split <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">initial_split</span>(</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  HousesNY,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prop =</span> <span class="fl">0.80</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>HousesNY_train <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">training</span>(HousesNY_split)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>HousesNY_test  <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">testing</span>(HousesNY_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, we’ll divide the <code>HousesNY_train</code> data into the separate training/validation splits using the <code>vfold_cv</code> function. In the parlance of machine learning, we’re using 3-fold cross validation:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>HousesNY_3splits <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">vfold_cv</span>(HousesNY_train, <span class="at">v =</span> <span class="dv">3</span>, <span class="at">repeats =</span> <span class="dv">100</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>HousesNY_3splits</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["splits"],"name":[1],"type":["list"],"align":["right"]},{"label":["id"],"name":[2],"type":["chr"],"align":["left"]},{"label":["id2"],"name":[3],"type":["chr"],"align":["left"]}],"data":[{"1":"<S3: vfold_split>","2":"Repeat001","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat001","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat001","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat002","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat002","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat002","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat003","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat003","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat003","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat004","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat004","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat004","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat005","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat005","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat005","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat006","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat006","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat006","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat007","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat007","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat007","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat008","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat008","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat008","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat009","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat009","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat009","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat010","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat010","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat010","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat011","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat011","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat011","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat012","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat012","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat012","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat013","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat013","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat013","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat014","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat014","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat014","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat015","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat015","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat015","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat016","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat016","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat016","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat017","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat017","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat017","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat018","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat018","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat018","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat019","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat019","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat019","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat020","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat020","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat020","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat021","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat021","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat021","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat022","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat022","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat022","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat023","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat023","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat023","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat024","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat024","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat024","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat025","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat025","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat025","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat026","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat026","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat026","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat027","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat027","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat027","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat028","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat028","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat028","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat029","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat029","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat029","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat030","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat030","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat030","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat031","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat031","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat031","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat032","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat032","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat032","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat033","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat033","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat033","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat034","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat034","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat034","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat035","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat035","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat035","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat036","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat036","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat036","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat037","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat037","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat037","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat038","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat038","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat038","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat039","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat039","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat039","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat040","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat040","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat040","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat041","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat041","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat041","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat042","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat042","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat042","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat043","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat043","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat043","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat044","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat044","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat044","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat045","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat045","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat045","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat046","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat046","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat046","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat047","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat047","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat047","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat048","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat048","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat048","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat049","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat049","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat049","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat050","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat050","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat050","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat051","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat051","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat051","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat052","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat052","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat052","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat053","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat053","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat053","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat054","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat054","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat054","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat055","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat055","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat055","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat056","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat056","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat056","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat057","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat057","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat057","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat058","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat058","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat058","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat059","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat059","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat059","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat060","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat060","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat060","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat061","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat061","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat061","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat062","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat062","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat062","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat063","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat063","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat063","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat064","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat064","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat064","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat065","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat065","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat065","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat066","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat066","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat066","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat067","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat067","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat067","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat068","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat068","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat068","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat069","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat069","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat069","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat070","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat070","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat070","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat071","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat071","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat071","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat072","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat072","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat072","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat073","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat073","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat073","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat074","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat074","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat074","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat075","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat075","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat075","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat076","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat076","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat076","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat077","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat077","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat077","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat078","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat078","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat078","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat079","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat079","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat079","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat080","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat080","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat080","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat081","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat081","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat081","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat082","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat082","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat082","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat083","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat083","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat083","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat084","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat084","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat084","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat085","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat085","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat085","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat086","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat086","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat086","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat087","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat087","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat087","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat088","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat088","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat088","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat089","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat089","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat089","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat090","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat090","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat090","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat091","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat091","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat091","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat092","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat092","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat092","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat093","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat093","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat093","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat094","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat094","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat094","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat095","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat095","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat095","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat096","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat096","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat096","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat097","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat097","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat097","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat098","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat098","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat098","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat099","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat099","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat099","3":"Fold3"},{"1":"<S3: vfold_split>","2":"Repeat100","3":"Fold1"},{"1":"<S3: vfold_split>","2":"Repeat100","3":"Fold2"},{"1":"<S3: vfold_split>","2":"Repeat100","3":"Fold3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Cross-validation is usually done with more “folds” (5-fold and 10-fold are common choices). But since our sample size is quite small (there are only 42 observations training data), we’ll keep the number of folds small so that we have a decent number of observations in each held-out validation set.</p>
+<p>Since we have such a small sample, there is likely to be considerable variance in the fitted coefficients and accuracy on the held-out validation set across these three splits. To reduce the impact of this variability, we’ll repeat generate 100 different 3-way folds of the training data, and average accuracy across all 300 of the held-out validation sets.</p>
+</div>
+</div>
+<p>Fitting a regression model within the <code>tidymodels</code> framework will feel quite different from how you’re used to fitting a regression model. At first, this will feel overly complicated for no reason. To some degree, it is! The tools of the <code>tidymodels</code> framework are designed to be highly modular and used with nearly <em>any</em> type of model. Since our use case is relatively simple in the grand scheme of things, it does seem to be a bit more trouble than it is worth. However, I feel it is worthwhile to introduce you to this framework (rather than “roll our own” <span class="math inline">\(v\)</span>-fold cross validation) since it represents how cross validation is carried out “in the real world”, and because it’s easier to learn a new framework when the task at hand is relatively simple.</p>
+<p>To fit a regression model via the <code>tidymodels</code> framework, we will need to build up three components:</p>
+<ul>
+<li>A <strong>recipe</strong> that describes the data and variables involved in fitting the model</li>
+<li>A <strong>model specification</strong> that describes the type of model, and the “engine” that should be use to fit it</li>
+<li>A <strong>workflow</strong>, which is a combination of a recipe and a model specification</li>
+</ul>
+<p>Let’s start by building the first component we need, a recipe object. Our recipe is quite simple; it specifies our outcome and explanatory variables, and what data set they can be found in.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>price_baths_recipe <span class="ot">&lt;-</span> recipes<span class="sc">::</span><span class="fu">recipe</span>(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  Price <span class="sc">~</span> Baths,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> HousesNY_train</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>price_baths_recipe</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, let’s create our model specification. We need to communicate that we want to fit a linear regression model, and we want that model be fit using the <code>lm</code> function. Believe or not, this is a two-step process, because there are actually <em>many</em> different ways to fit a linear model. See the help page at <code>?parsnip::linear_reg()</code> to learn about the 14 different “engines” that can fit a linear regression model!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>linear_model <span class="ot">&lt;-</span> parsnip<span class="sc">::</span><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  parsnip<span class="sc">::</span><span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>linear_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear Regression Model Specification (regression)
+
+Computational engine: lm </code></pre>
+</div>
+</div>
+<p>Last but not least, we create “workflow” for our modeling process, and add our recipe and our model to that workflow:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>price_baths_workflow  <span class="ot">&lt;-</span> workflows<span class="sc">::</span><span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  workflows<span class="sc">::</span><span class="fu">add_recipe</span>(price_baths_recipe) <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  workflows<span class="sc">::</span><span class="fu">add_model</span>(linear_model)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>price_baths_workflow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
+Preprocessor: Recipe
+Model: linear_reg()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+0 Recipe Steps
+
+── Model ───────────────────────────────────────────────────────────────────────
+Linear Regression Model Specification (regression)
+
+Computational engine: lm </code></pre>
+</div>
+</div>
+<p>With all that tedium out of the way, we’re ready to fit out <code>Price ~ Size</code> model to each “fold”, and measure its performance on each held-out validation set. This iterative process is facilitated by the <code>fit_resamples</code> function. The <code>metrics</code> argument indicates that we will evaluate each model’s goodness of fit to the held-out validation set by measuring its <span class="math inline">\(R^2\)</span> (<code>rsq</code>) and its <strong>r</strong>oot <strong>m</strong>ean <strong>s</strong>quared <strong>e</strong>rror (<code>rmse</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>price_baths_fitted <span class="ot">&lt;-</span> tune<span class="sc">::</span><span class="fu">fit_resamples</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  price_baths_workflow,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> HousesNY_3splits,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> yardstick<span class="sc">::</span><span class="fu">metric_set</span>(yardstick<span class="sc">::</span>rmse, yardstick<span class="sc">::</span>rsq)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>tune<span class="sc">::</span><span class="fu">collect_metrics</span>(price_baths_fitted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":["mean"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["n"],"name":[4],"type":["int"],"align":["right"]},{"label":["std_err"],"name":[5],"type":["dbl"],"align":["right"]},{"label":[".config"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"rmse","2":"standard","3":"36.0565102","4":"300","5":"0.29569730","6":"Preprocessor1_Model1"},{"1":"rsq","2":"standard","3":"0.3243746","4":"300","5":"0.01041565","6":"Preprocessor1_Model1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>This output tells us that on average, across the 100 replications of the three-way training/validation splits, the <code>Price ~ Size</code> model achieved an average <span class="math inline">\(R^2\)</span> of .324, and an average root mean squared error of 36.1 on the held-out validation set. Now, let’s do the same thing for the larger <code>Price ~ Size + Lots + Beds + Baths</code> model.</p>
+<p>Here, we’ll see the modularity of the <code>tidymodels</code> framework pay off a little bit! Since the only thing changing are the explanatory variables, we can create the new workflow we need by updating the previous workflow object for the <code>Price ~ Size</code> model to use a different collection of variables!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>all_vars_workflow <span class="ot">&lt;-</span> price_baths_workflow <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  workflows<span class="sc">::</span><span class="fu">remove_recipe</span>() <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  workflows<span class="sc">::</span><span class="fu">add_variables</span>(</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcomes =</span> Price,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">predictors =</span> <span class="fu">c</span>(Baths, Size, Lot, Beds)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can carryout the 3-fold cross validation using this updated workflow object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>all_vars_fitted <span class="ot">&lt;-</span> tune<span class="sc">::</span><span class="fu">fit_resamples</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  all_vars_workflow,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> HousesNY_3splits,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> yardstick<span class="sc">::</span><span class="fu">metric_set</span>(yardstick<span class="sc">::</span>rmse, yardstick<span class="sc">::</span>rsq)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>tune<span class="sc">::</span><span class="fu">collect_metrics</span>(all_vars_fitted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":["mean"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["n"],"name":[4],"type":["int"],"align":["right"]},{"label":["std_err"],"name":[5],"type":["dbl"],"align":["right"]},{"label":[".config"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"rmse","2":"standard","3":"37.0744608","4":"300","5":"0.341899970","6":"Preprocessor1_Model1"},{"1":"rsq","2":"standard","3":"0.3214674","4":"300","5":"0.009375355","6":"Preprocessor1_Model1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>The average cross-validated <span class="math inline">\(R^2\)</span> and root mean squared error (RMSE) for the larger model are not much different (.321 and 37.1 vs.&nbsp;.324 and 36.1 for the <code>Price ~ Baths</code> model). But given that it has four times as many explanatory variables, and is actually doing slightly <em>worse</em>, suggests that the <code>Price ~ Baths + Lot + Size + Beds</code> model is over-fitting our observed data and will generalize poorly to new data.</p>
+<p>Given that our cross validation procedure favors the reduced <code>Price ~ Size</code> model, let’s put it to the test by re-fitting it to the “full” data set, and evaluating its performance on the <code>HousesNY_test</code> data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>baths_fit <span class="ot">&lt;-</span> price_baths_workflow <span class="sc">|&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  parsnip<span class="sc">::</span><span class="fu">fit</span>(<span class="at">data =</span> HousesNY_train)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>baths_preds <span class="ot">&lt;-</span> broom<span class="sc">::</span><span class="fu">augment</span>(baths_fit, <span class="at">new_data =</span> HousesNY_test)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">metric_set</span>(yardstick<span class="sc">::</span>rmse, rsq)(baths_preds, <span class="at">truth =</span> Price, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"rmse","2":"standard","3":"34.4003780"},{"1":"rsq","2":"standard","3":"0.3199481"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>And just for fun, let’s see how the model we <em>didn’t</em> prefer after cross-validation would fare on the test data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>all_vars_fit <span class="ot">&lt;-</span> all_vars_workflow <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  parsnip<span class="sc">::</span><span class="fu">fit</span>(<span class="at">data =</span> HousesNY_train)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>all_vars_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(all_vars_fit, <span class="at">new_data =</span> HousesNY_test)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">metric_set</span>(yardstick<span class="sc">::</span>rmse, rsq)(all_vars_preds, <span class="at">truth =</span> Price, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"rmse","2":"standard","3":"34.9749533"},{"1":"rsq","2":"standard","3":"0.2451313"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Just as we suspected: The <code>Price ~ Baths</code> model has higher <span class="math inline">\(R^2\)</span> and lower RMSE on the test data set!</p>
+</section>
 </section>
 <section id="identifying-unusual-points-in-regression" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="identifying-unusual-points-in-regression"><span class="header-section-number">4.4</span> Identifying Unusual Points in Regression</h2>
@@ -486,16 +676,16 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </ul>
 <p>Section 4.4 applies these metrics to the observations in the <code>PalmBeach</code> data set, after fitting a “simple” linear regression that estimates the number of votes received for Pat Buchanan based on the number of votes received for George W. Bush in the same Florida county. This model (shown as Figure 4.7 in the textbook) is visualized below in <a href="#fig-palm-beach-model">Figure&nbsp;<span>4.1</span></a></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"PalmBeach"</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> PalmBeach,</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Bush, <span class="at">y =</span> Buchanan)</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">formula =</span> y <span class="sc">~</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"PalmBeach"</span>)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> PalmBeach,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Bush, <span class="at">y =</span> Buchanan)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">formula =</span> y <span class="sc">~</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-palm-beach-model" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -507,12 +697,12 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </div>
 <p>The most convenient way to compute the leverage, Cook’s distance, and standardized residuals for each observation is to apply the <code>augment()</code> function (from the <code>broom</code> package) to a fitted model object:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>palm_beach_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Buchanan <span class="sc">~</span> Bush, <span class="at">data =</span> PalmBeach)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>influece_metrics <span class="ot">&lt;-</span> broom<span class="sc">::</span><span class="fu">augment</span>(palm_beach_model)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>influece_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>palm_beach_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Buchanan <span class="sc">~</span> Bush, <span class="at">data =</span> PalmBeach)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>influece_metrics <span class="ot">&lt;-</span> broom<span class="sc">::</span><span class="fu">augment</span>(palm_beach_model)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>influece_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -525,12 +715,12 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <p>The leverage measurement for each observation is found in the <code>.hat</code> column, the Cook’s Distance metric is found in the <code>.cooksd</code> column, and the standardized residual for each observation is found in the final column, labeled <code>.std.resid</code>.</p>
 <p>The only metric <em>not</em> reported here is the studentized residual. We can compute this metric for ourselves calling the <code>rstudent</code> function on our fitted model object, and add it to the data set using <code>dplyr::mutate()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>influece_metrics <span class="ot">&lt;-</span> influece_metrics <span class="sc">|&gt;</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">.studentized =</span> <span class="fu">rstudent</span>(palm_beach_model))</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>influece_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>influece_metrics <span class="ot">&lt;-</span> influece_metrics <span class="sc">|&gt;</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">.studentized =</span> <span class="fu">rstudent</span>(palm_beach_model))</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>influece_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -542,9 +732,9 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </div>
 <p>We can use this data set to reproduce Table 4.1, which described the 5 “most unusual” observations in the dataset. These were defined as: observations with a leverage values greater than <span class="math inline">\(\frac{6}{n}\)</span>, <em>or</em> with a absolute standardized residual value greater than 3.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>influece_metrics <span class="sc">|&gt;</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.hat <span class="sc">&gt;=</span> <span class="dv">6</span><span class="sc">/</span><span class="fu">n</span>() <span class="sc">|</span> <span class="fu">abs</span>(.std.resid) <span class="sc">&gt;</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Buchanan, Bush, .std.resid, .hat, .cooksd)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>influece_metrics <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.hat <span class="sc">&gt;=</span> <span class="dv">6</span><span class="sc">/</span><span class="fu">n</span>() <span class="sc">|</span> <span class="fu">abs</span>(.std.resid) <span class="sc">&gt;</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Buchanan, Bush, .std.resid, .hat, .cooksd)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -557,16 +747,16 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <p>If you don’t have a specific criteria in mind for identifying “unusual” observations, the simplest way to identify influential observations is to take a graphical approach, and plot each observation’s standardized residual as a function of it’s leverage.</p>
 <p>The <code>check_outliers()</code> function from the <code>performance</code> package returns an object that, when plotted, produces a scatter plot showing the relationship between the leverage and the standardized residuals of each observation:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>unusual <span class="ot">&lt;-</span> <span class="fu">check_outliers</span>(palm_beach_model)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(unusual)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>unusual <span class="ot">&lt;-</span> <span class="fu">check_outliers</span>(palm_beach_model)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(unusual)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>The contour line in this plot traces out a Cook’s Distance value that can be used to identify observations that have noticeably strong influence over the values of the fitted coefficients. This visualization identifies two observations (observation 50 and observation 13) as influential. We can use the object returned from <code>check_outliers()</code> to subset the <code>PalmBeach()</code> data, and identify which counties they are:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>PalmBeach[unusual, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>PalmBeach[unusual, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -590,7 +780,7 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <li>Hypothesizing about their relationship</li>
 <li>Generating samples of data from this hypothesized state of the world</li>
 <li>Calculating a summary of each sample that measures their relationship in that sample</li>
-<li>Calculating the probability of observing your <strong>original</strong> data<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, given the data you’ve observed from your hypothesized state of the world via your simulations in step 3.</li>
+<li>Calculating the probability of observing your <strong>original</strong> data<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, given the data you’ve observed from your hypothesized state of the world via your simulations in step 3.</li>
 </ol>
 <p>Steps 1 through 4 describe the process behind creating the null-hypothesis distribution (i.e., the distribution of statistics you would expect to observe <strong>if the null hypothesis were true</strong>), while step 5 describes computing the p-value, so that you can reach a “reject” or “fail to reject” decision for your test. Each of these steps along the way has their own function in the <code>infer</code> package; to perform a hypothesis test, you simply chain these steps together!</p>
 <p>Sometimes to understand how something, it’s best to see the whole, big picture, and slowly break it down piece by piece from there. I think this “forest, then tree” approach is useful for understanding the <code>infer</code> package, so to see how the <code>infer</code> package executes a randomization test, we’ll jump ahead to a completed example, and break down each part afterwards.</p>
@@ -598,8 +788,8 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <h3 data-number="4.6.1" class="anchored" data-anchor-id="a-randomization-test-for-the-slope"><span class="header-section-number">4.6.1</span> A randomization test for the slope</h3>
 <p>Let’s base our example on the SAT and GPA data used in Example 4.11</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"SATGPA"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Stat2Data)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"SATGPA"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="cell-output-display">
@@ -612,28 +802,28 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </div>
 </div>
 <p>Let’s begin with code that executes Steps 1-4 on our hypothesis testing roadmap:</p>
-<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-21_b239c26fa5be0418186dfb4dc1a2b024">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(infer)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-33_1f5910185e0909ea2466ce00efec134f">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(infer)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>and break this code down, one line at a time.</p>
 <section id="step-1-specify-the-relationship-of-interest" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="step-1-specify-the-relationship-of-interest">Step 1: Specify the relationship of interest</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA  <span class="sc">|&gt;</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>null_dist <span class="ot">&lt;-</span> SATGPA  <span class="sc">|&gt;</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>specify()</code> function is where you set up the structure of the model using a the familiar formula notation. We’re specifying that we’re interested in the <code>GPA</code> and <code>VerbalSAT</code> relationship, and that we think the <code>VerbalSAT</code> score explains the <code>GPA</code> outcome.</p>
 </section>
 <section id="step-2-state-your-null-hypothesis" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="step-2-state-your-null-hypothesis">Step 2: State your null hypothesis</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Every null hypothesis test begins with an assumption that the null hypothesis is true. Most of the time, this assumption is implicit, but randomization tests with <code>infer</code> require you to make this assumption explicit.</p>
 <p>Writing <code>null = "independene"</code> in this context means you are saying “knowing a persons Verbal SAT score tells me nothing about what their GPA is likely to be”. In other words, you’re saying the the slope of the regression line relating Verbal SAT to GPA is 0 in the entire population of SAT test takers.</p>
@@ -641,7 +831,7 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <section id="step-3-generate-new-samples-of-data-by-permuting-our-data" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="step-3-generate-new-samples-of-data-by-permuting-our-data">Step 3: Generate new samples of data by permuting our data</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This is the most import step in our hypothesis testing “pipeline”: This is where we take each Verbal SAT score from our data, and pair it with a random GPA score that is sampled (without replacement) from our original data as well. We repeated this process 1,000 times, which generates 1,000 new samples of data that are permutations of our original data.</p>
 <p>This permutation process is helpful, because it generates 1,000 new data sets <em>where each Verbal SAT score is completely unrelated to it’s paired GPA value</em>. This how the Null Hypothesis says data is generated in the “real world”, and it’s exactly how we’ve generated our permutations. So, these 1,000 new data sets will show us exactly what kinds of GPA and Verbal SAT pairs we’d expect, if the null hypothesis is true!</p>
@@ -649,13 +839,13 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <section id="step-4-calculate-the-gpa-verbalsat-slope-from-each-permutation" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="step-4-calculate-the-gpa-verbalsat-slope-from-each-permutation">Step 4: Calculate the <code>GPA ~ VerbalSAT</code> slope from each permutation</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Since our hypothesis test is about the <em>relationship</em> between GPA and Verbal SAT score, the slope is the statistic that best represents that idea. So, we summarize all of our 1,000 permuted data sets by fitting the <code>GPA ~ VerbalSAT</code> regression model to each one, and extracting the slope coefficient from each. So, the final result from our “pipeline” is 1,000 slopes observed from a world where the null hypothesis of “no relationship” is true!</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualize</span>(null_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualize</span>(null_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -663,11 +853,11 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <h4 class="unnumbered anchored" data-anchor-id="step-5-computing-the-p-value">Step 5: Computing the p-value</h4>
 <p>Computing the p-value for our hypothesis test means we need to compare the observed slope from our <em>real</em>, unpermuted data to the distribution of slopes we obtained by summarizing our permuted data. Thus, we need the value of the observed slope! You could always do this the “traditional” way, using the <code>lm()</code> function, but since we only need the slope (and not the standard error, or <span class="math inline">\(R^2\)</span>, etc.), let’s demonstrate how you would do this using just <code>specify()</code> and <code>calculate()</code> from the <code>infer</code> package:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>observed_slope <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>observed_slope</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>observed_slope <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"slope"</span>)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>observed_slope</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -679,7 +869,7 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </div>
 <p>Finally, we compute the p-value of our slope by using the <code>get_p_value()</code> function. This function counts number of times our a slope more extreme than the “real” slope resulted from the random permutation process, and dividing that by the total number of permutations performed. Since our question was a generic “is there a relationship?” question (not “is there a positive/negative” relationship), we want to count values in both tails of the null hypothesis distribution as “extreme”.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(<span class="at">x =</span> null_dist, <span class="at">obs_stat =</span> observed_slope, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(<span class="at">x =</span> null_dist, <span class="at">obs_stat =</span> observed_slope, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -691,10 +881,10 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </div>
 <p>This p-values corresponds to the area in the histogram of permuted slopes that is more extreme than 0.0009.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_dist) <span class="sc">+</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_slope, <span class="at">direction =</span> <span class="st">'both'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_dist) <span class="sc">+</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_slope, <span class="at">direction =</span> <span class="st">'both'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>With such a large p-value, we fail to reject the null hypothesis, and conclude there is no evidence the two quantities are related in the population of SAT test takers.</p>
@@ -703,20 +893,20 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <section id="a-randomization-test-for-the-correlation" class="level3" data-number="4.6.2">
 <h3 data-number="4.6.2" class="anchored" data-anchor-id="a-randomization-test-for-the-correlation"><span class="header-section-number">4.6.2</span> A randomization test for the correlation</h3>
 <p>Example 4.11 actually demonstrates a randomization test for the Verbal SAT vs.&nbsp;GPA <em>correlation</em>, the <code>GPA ~ VerbalSAT</code> <em>slope</em>. But, it is easy to execute such a test simply by changing the <code>stat</code> argument of the calculate function from <code>"slope"</code> to <code>"correlation"</code>!</p>
-<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-31_c78eaa732f4935fa562874da7b499e9c">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>null_correlation_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>observed_correlation <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(null_correlation_dist, <span class="at">obs_stat =</span> observed_correlation,</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">direction =</span> <span class="st">"both"</span></span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-43_76d7d22776f77ac61379f0c4145254db">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>null_correlation_dist <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>observed_correlation <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(null_correlation_dist, <span class="at">obs_stat =</span> observed_correlation,</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">direction =</span> <span class="st">"both"</span></span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -725,10 +915,10 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_correlation_dist) <span class="sc">+</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_correlation, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_correlation_dist) <span class="sc">+</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_correlation, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -740,20 +930,20 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <li>Complete your pipeline with the <code>fit()</code> function, instead of the <code>calcuate()</code> function (which makes sense, since there isn’t one single summary statistic for all the relationships encoded by a multiple regression model)</li>
 </ol>
 <p>For example, we could perform a permutation test on all four of the coefficients in the <code>GPA ~ VerbalSAT * MathSAT</code> model:</p>
-<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-32_a350eb5a0fc92f82007d588692960860">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>null_models <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT <span class="sc">*</span> MathSAT) <span class="sc">|&gt;</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>()</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>observed_model <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT <span class="sc">*</span> MathSAT) <span class="sc">|&gt;</span></span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>()</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(null_models, <span class="at">obs_stat =</span> observed_model,</span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">direction =</span> <span class="st">"both"</span></span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="04_additional_topics_in_regression_cache/html/unnamed-chunk-44_fbfb4d4f74232866b0060faa4de01044">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>null_models <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT <span class="sc">*</span> MathSAT) <span class="sc">|&gt;</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>()</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>observed_model <span class="ot">&lt;-</span> SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT <span class="sc">*</span> MathSAT) <span class="sc">|&gt;</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>()</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_value</span>(null_models, <span class="at">obs_stat =</span> observed_model,</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">direction =</span> <span class="st">"both"</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>            )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -762,10 +952,10 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_models) <span class="sc">+</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_model, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(null_models) <span class="sc">+</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(<span class="at">obs_stat =</span> observed_model, <span class="at">direction =</span> <span class="st">"both"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
+<p><img src="04_additional_topics_in_regression_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -773,9 +963,9 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <h3 data-number="4.6.4" class="anchored" data-anchor-id="a-note-about-controlling-randomness"><span class="header-section-number">4.6.4</span> A note about controlling randomness</h3>
 <p>We’re used to our R code producing identical results every time we run it. For example, we don’t expect the correlation to change the first and second times we calculate it:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -786,9 +976,9 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -800,11 +990,11 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </div>
 <p>But, things get a bit trickier when we’re constructing the null hypothesis distribution. Consider the example below, where we construct 3 permutations and summarize each one with the correlation coefficient, and then run the exact same code again:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -815,11 +1005,11 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -834,12 +1024,12 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <p>Having no idea what result you’ll get each time you run your code makes it difficult to write about your results, or re-produce them for people who are interested in the “proof” of your work. Luckily, we can take some control over R’s random number generator using the <code>set.seed()</code> function.</p>
 <p>The <code>set.seed()</code> function “seeds” R’s random number generator with a fixed value, making the sequence of numbers it generates reproducible between different runs of the same code. Watch what happens when we “seed” the generate with an 11:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -848,12 +1038,12 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>SATGPA <span class="sc">|&gt;</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(GPA <span class="sc">~</span> VerbalSAT) <span class="sc">|&gt;</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">3</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"correlation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -875,12 +1065,16 @@ F-statistic: 17.52 on 1 and 33 DF,  p-value: 0.0001981</code></pre>
 <div id="ref-infer_package" class="csl-entry" role="listitem">
 Couch, Simon P., Andrew P. Bray, Chester Ismay, Evgeni Chasnovski, Benjamin S. Baumer, and Mine Çetinkaya-Rundel. 2021. <span>“<span class="nocase">infer</span>: An <span>R</span> Package for Tidyverse-Friendly Statistical Inference.”</span> <em>Journal of Open Source Software</em> 6 (65): 3661. <a href="https://doi.org/10.21105/joss.03661">https://doi.org/10.21105/joss.03661</a>.
 </div>
+<div id="ref-tidymodels" class="csl-entry" role="listitem">
+Kuhn, Max, and Hadley Wickham. 2020. <em>Tidymodels: A Collection of Packages for Modeling and Machine Learning Using Tidyverse Principles.</em> <a href="https://www.tidymodels.org">https://www.tidymodels.org</a>.
+</div>
 </div>
 </section>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn1"><p>Not your original data <em>exactly</em>; rather, a statistic based on your original data<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>It is also commonly referred to as <span class="math inline">\(k\)</span>-fold validation.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Not your original data <em>exactly</em>; rather, a statistic based on your original data<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
