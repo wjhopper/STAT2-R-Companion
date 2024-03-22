@@ -530,7 +530,7 @@ Tip
 </div>
 <div class="callout-body-container callout-body">
 <p>Cross-validation is usually done with more “folds” (5-fold and 10-fold are common choices). But since our sample size is quite small (there are only 42 observations training data), we’ll keep the number of folds small so that we have a decent number of observations in each held-out validation set.</p>
-<p>Since we have such a small sample, there is likely to be considerable variance in the fitted coefficients and accuracy on the held-out validation set across these three splits. To reduce the impact of this variability, we’ll repeat generate 100 different 3-way folds of the training data, and average accuracy across all 300 of the held-out validation sets.</p>
+<p>Since we have such a small sample, there is likely to be considerable variance in the fitted coefficients and accuracy on the held-out validation set across these three splits. To reduce the impact of this variability, we’ll generate 100 different 3-way folds of the training data, and average accuracy across all 300 of the held-out validation sets.</p>
 </div>
 </div>
 <p>Fitting a regression model within the <code>tidymodels</code> framework will feel quite different from how you’re used to fitting a regression model. At first, this will feel overly complicated for no reason. To some degree, it is! The tools of the <code>tidymodels</code> framework are designed to be highly modular and used with nearly <em>any</em> type of model. Since our use case is relatively simple in the grand scheme of things, it does seem to be a bit more trouble than it is worth. However, I feel it is worthwhile to introduce you to this framework (rather than “roll our own” <span class="math inline">\(v\)</span>-fold cross validation) since it represents how cross validation is carried out “in the real world”, and because it’s easier to learn a new framework when the task at hand is relatively simple.</p>
@@ -548,7 +548,7 @@ Tip
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>price_baths_recipe</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Next, let’s create our model specification. We need to communicate that we want to fit a linear regression model, and we want that model be fit using the <code>lm</code> function. Believe or not, this is a two-step process, because there are actually <em>many</em> different ways to fit a linear model. See the help page at <code>?parsnip::linear_reg()</code> to learn about the 14 different “engines” that can fit a linear regression model!</p>
+<p>Next, let’s create our model specification. We need to communicate that we want to fit a linear regression model, and we want that model be fit using the <code>lm</code> function. Believe it or not, this is a two-step process, because there are actually <em>many</em> different ways to fit a linear model. See the help page at <code>?parsnip::linear_reg()</code> to learn about the 14 different “engines” that can fit a linear regression model!</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>linear_model <span class="ot">&lt;-</span> parsnip<span class="sc">::</span><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  parsnip<span class="sc">::</span><span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
@@ -560,7 +560,7 @@ Tip
 Computational engine: lm </code></pre>
 </div>
 </div>
-<p>Last but not least, we create “workflow” for our modeling process, and add our recipe and our model to that workflow:</p>
+<p>Last but not least, we’ll create a “workflow” for our modeling process, and add our recipe and our model to that workflow:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>price_baths_workflow  <span class="ot">&lt;-</span> workflows<span class="sc">::</span><span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  workflows<span class="sc">::</span><span class="fu">add_recipe</span>(price_baths_recipe) <span class="sc">|&gt;</span></span>
@@ -599,14 +599,14 @@ Computational engine: lm </code></pre>
 </div>
 </div>
 </div>
-<p>This output tells us that on average, across the 100 replications of the three-way training/validation splits, the <code>Price ~ Size</code> model achieved an average <span class="math inline">\(R^2\)</span> of .324, and an average root mean squared error of 36.1 on the held-out validation set. Now, let’s do the same thing for the larger <code>Price ~ Size + Lots + Beds + Baths</code> model.</p>
+<p>This output tells us that on average, across the 100 replications of the 3-way training/validation splits, the <code>Price ~ Size</code> model achieved an average <span class="math inline">\(R^2\)</span> of .324, and an average root mean squared error of 36.1 on the held-out validation set. Now, let’s do the same thing for the larger <code>Price ~ Size + Lots + Beds + Baths</code> model.</p>
 <p>Here, we’ll see the modularity of the <code>tidymodels</code> framework pay off a little bit! Since the only thing changing are the explanatory variables, we can create the new workflow we need by updating the previous workflow object for the <code>Price ~ Size</code> model to use a different collection of variables!</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>all_vars_workflow <span class="ot">&lt;-</span> price_baths_workflow <span class="sc">|&gt;</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  workflows<span class="sc">::</span><span class="fu">remove_recipe</span>() <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  workflows<span class="sc">::</span><span class="fu">remove_recipe</span>() <span class="sc">|&gt;</span> <span class="co"># out with the old..</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  workflows<span class="sc">::</span><span class="fu">add_variables</span>(</span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcomes =</span> Price,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">predictors =</span> <span class="fu">c</span>(Baths, Size, Lot, Beds)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">predictors =</span> <span class="fu">c</span>(Baths, Size, Lot, Beds) <span class="co"># in with the new!</span></span>
 <span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we can carryout the 3-fold cross validation using this updated workflow object:</p>
@@ -626,7 +626,7 @@ Computational engine: lm </code></pre>
 </div>
 </div>
 </div>
-<p>The average cross-validated <span class="math inline">\(R^2\)</span> and root mean squared error (RMSE) for the larger model are not much different (.321 and 37.1 vs.&nbsp;.324 and 36.1 for the <code>Price ~ Baths</code> model). But given that it has four times as many explanatory variables, and is actually doing slightly <em>worse</em>, suggests that the <code>Price ~ Baths + Lot + Size + Beds</code> model is over-fitting our observed data and will generalize poorly to new data.</p>
+<p>The average cross-validated <span class="math inline">\(R^2\)</span> and root mean squared error (RMSE) for the larger model are not much different (.321 and 37.1 versus .324 and 36.1 for the <code>Price ~ Baths</code> model). But given that it uses four times as many explanatory variables and actually performs slightly <em>worse</em>, this is a pretty disappointing result <code>Price ~ Baths + Lot + Size + Beds</code> model. It seems the complexity of this model leads to over-fitting on the training data, and poor generalization to new data.</p>
 <p>Given that our cross validation procedure favors the reduced <code>Price ~ Size</code> model, let’s put it to the test by re-fitting it to the “full” data set, and evaluating its performance on the <code>HousesNY_test</code> data:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>baths_fit <span class="ot">&lt;-</span> price_baths_workflow <span class="sc">|&gt;</span></span>
