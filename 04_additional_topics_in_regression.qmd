@@ -15,7 +15,7 @@ library(infer)
 
 Section 4.3 demonstrates cross-validation by dividing the `HousesNY` data set into two distinct subsets:
 
-- Two-thirds of the data (35 out of 56 observations) are allocated to a "training" data set, used to fit a regression model
+- Two-thirds of the data (35 out of 56 observations) are allocated to a "training" data set, used to fit the `Price ~ Size` regression model
 - One-third of the data (the remaining 18 observations) are reserved as a "testing" data set, used to measure the fitted regression model's predictive performance
 
 To replicate this test/training split, we first load the data, and generate a vector of row numbers based on the size of the data set
@@ -68,7 +68,7 @@ anova_table <- anova(training_model)
 mse <- anova_table[2, "Mean Sq"]
 ```
 
-The model achieves an $R^2$ of `r round(r2, 4)`, and a Mean Square Error of `r `round(mse, 4)` when fit to the training data set. But how well do these fitted coefficients generalize to the testing data set?
+The model achieves an $R^2$ of `r round(r2, 4)`, and a Mean Square Error of `r round(mse, 4)` when fit to the training data set. But how well do these fitted coefficients generalize to the testing data set?
 
 We can compute the predicted price for each home in the "testing" data set by using the `augment` function from the `broom` package
 
@@ -114,9 +114,160 @@ test_mse <- test_predictions |>
 
 Our model performs *much* worse on the held out "testing" data set! $R^2$ drops from `r round(r2, 4)` to `r round(test_r2, 4)` (a shrinkage of almost 30 percentage points!), and $MS_{error}$ increases to `r round(test_mse, 4)`. So it seems that the coefficients estimated based on the sample of 35 houses does not generalize particularly well to new houses.
 
-Note that our results in the replication do not perfectly match the results in Section 4.3, because out training data differs; we have no way of knowing which 35 observations constituted the author's training data, so we have no way of perfectly replicating their results. This highlights the importance of using `set.seed()` whenever utilize randomization in your R code; without setting (and sharing!) your RNG seed, your results won't be replicable!
+Note that our results in this replication do not perfectly match the results in Section 4.3, because out training data differs; we have no way of knowing which 35 observations constituted the author's training data, so we have no way of perfectly replicating their results. This highlights the importance of using `set.seed()` whenever utilize randomization in your R code; without setting (and sharing!) your RNG seed, your results won't be replicable!
 
+### V-fold Cross Validation
+When using Cross-Validation as a model selection strategy, it's uncommon to use a single test/train split. Rather, the "training" data set from the initial split is typically split again into $v$ equally sized smaller subsets. One by one, each of these subsets plays the role of a held-out validation set (on which the model's predictive accuracy is measured), while the model is fit to the data from all the remaining subsets. The processes of repeatedly fitting the model and assessing it on different, mutually exclusive subsets of the training data is known as $v$-fold cross validation^[It is also commonly referred to as $k$-fold validation.].
 
+![An animation of how data is divided iteratively across five folds of cross validation](img/k-fold.gif){fig-align="center"}
+
+In $v$-fold cross validation, each candidate model is fit and "validated" (using a metric such as $R^2$ or $MS_{Error}$) $v$ different times. The model with the best performance on average across the $v$ held-out validation sets is taken to be the preferred model. Finally, that preferred model is fit to the full training data set, and assessed against the "testing" data set that had been held out all along.
+
+Let's demonstrate this process by using $v$-fold cross validation to compare two models:
+
+- `Price ~ Baths`
+- `Price ~ Baths + Lot + Beds + Size`
+
+```{r}
+#| eval: false
+#| echo: false
+reduced <- lm(Price ~ Baths, data = HousesNY)
+full <-  lm(Price ~ Baths + Lot + Beds + Size, data = HousesNY)
+anova(reduced, full)
+```
+
+None of the individual `Lot`, `Beds`, or `Size` coefficients are "significant" when added to the model already containing `Bath`, but these are likely to be important confounders to adjust for when estimating the true effect of the number of bathrooms on price. So, we would like to use the larger model *if* we aren't over-fitting the sample and reducing our ability to generalize the model to new homes.
+
+To carry out the cross validation procedure, we'll use the `tidymodels` package [@tidymodels], which is an "umbrella" package for many different R packages all designed to enable a wide variety of modeling and machine-learning tasks in a systematic 'pipeline' by providing a common interface to all these disparate tasks.
+
+```{r}
+library(tidymodels)
+```
+
+Whenever one of the functions under the `tidymodels` umbrella is used, I will prefix that function using the name of the package it comes from, in order to emphasize that the `tidymodels` package is a collection, not a monolith.
+
+To get started, we'll creating a new test/train split for our `HousesNY` data set. This time, we'll use an 80/20 train/test split (since we need to further subdivide the training data set, it helps to have a larger training set to start with).
+
+```{r}
+set.seed(40)
+
+HousesNY_split <- rsample::initial_split(
+  HousesNY,
+  prop = 0.80
+)
+HousesNY_train <- rsample::training(HousesNY_split)
+HousesNY_test  <- rsample::testing(HousesNY_split)
+```
+
+Then, we'll divide the `HousesNY_train` data into the separate training/validation splits using the `vfold_cv` function. In the parlance of machine learning, we're using 3-fold cross validation:
+
+```{r}
+HousesNY_3splits <- rsample::vfold_cv(HousesNY_train, v = 3, repeats = 100)
+HousesNY_3splits
+```
+
+::: {.callout-tip}
+Cross-validation is usually done with more "folds" (5-fold and 10-fold are common choices). But since our sample size is quite small (there are only 42 observations training data), we'll keep the number of folds small so that we have a decent number of observations in each held-out validation set.
+
+Since we have such a small sample, there is likely to be considerable variance in the fitted coefficients and accuracy on the held-out validation set across these three splits. To reduce the impact of this variability, we'll generate 100 different 3-way folds of the training data, and average accuracy across all 300 of the held-out validation sets.
+:::
+
+Fitting a regression model within the `tidymodels` framework will feel quite different from how you're used to fitting a regression model. At first, this will feel overly complicated for no reason. To some degree, it is! The tools of the `tidymodels` framework are designed to be highly modular and used with nearly *any* type of model. Since our use case is relatively simple in the grand scheme of things, it does seem to be a bit more trouble than it is worth. However, I feel it is worthwhile to introduce you to this framework (rather than "roll our own" $v$-fold cross validation) since it represents how cross validation is carried out "in the real world", and because it's easier to learn a new framework when the task at hand is relatively simple.
+
+To fit a regression model via the `tidymodels` framework, we will need to build up three components:
+
+- A **recipe** that describes the data and variables involved in fitting the model
+- A **model specification** that describes the type of model, and the "engine" that should be use to fit it
+- A **workflow**, which is a combination of a recipe and a model specification
+
+Let's start by building the first component we need, a recipe object. Our recipe is quite simple; it specifies our outcome and explanatory variables, and what data set they can be found in.
+
+```{r}
+price_baths_recipe <- recipes::recipe(
+  Price ~ Baths,
+  data = HousesNY_train
+)
+price_baths_recipe
+```
+
+Next, let's create our model specification. We need to communicate that we want to fit a linear regression model, and we want that model be fit using the `lm` function. Believe it or not, this is a two-step process, because there are actually *many* different ways to fit a linear model. See the help page at `?parsnip::linear_reg()` to learn about the 14 different "engines" that can fit a linear regression model!
+
+```{r}
+linear_model <- parsnip::linear_reg() |>
+  parsnip::set_engine("lm")
+
+linear_model
+```
+
+Last but not least, we'll create a "workflow" for our modeling process, and add our recipe and our model to that workflow:
+
+```{r}
+price_baths_workflow  <- workflows::workflow() |>
+  workflows::add_recipe(price_baths_recipe) |>
+  workflows::add_model(linear_model)
+
+price_baths_workflow
+```
+
+With all that tedium out of the way, we're ready to fit out `Price ~ Size` model to each "fold", and measure its performance on each held-out validation set. This iterative process is facilitated by the `fit_resamples` function. The `metrics` argument indicates that we will evaluate each model's goodness of fit to the held-out validation set by measuring its $R^2$ (`rsq`) and its **r**oot **m**ean **s**quared **e**rror (`rmse`).
+
+```{r}
+price_baths_fitted <- tune::fit_resamples(
+  price_baths_workflow,
+  resamples = HousesNY_3splits,
+  metrics = yardstick::metric_set(yardstick::rmse, yardstick::rsq)
+  )
+
+tune::collect_metrics(price_baths_fitted)
+```
+
+This output tells us that on average, across the 100 replications of the 3-way training/validation splits, the `Price ~ Size` model achieved an average $R^2$ of .324, and an average root mean squared error of 36.1 on the held-out validation set. Now, let's do the same thing for the larger `Price ~ Size + Lots + Beds + Baths` model.
+
+Here, we'll see the modularity of the `tidymodels` framework pay off a little bit! Since the only thing changing are the explanatory variables, we can create the new workflow we need by updating the previous workflow object for the `Price ~ Size` model to use a different collection of variables!
+
+```{r}
+all_vars_workflow <- price_baths_workflow |>
+  workflows::remove_recipe() |> # out with the old..
+  workflows::add_variables(
+    outcomes = Price,
+    predictors = c(Baths, Size, Lot, Beds) # in with the new!
+  )
+```
+
+Now we can carryout the 3-fold cross validation using this updated workflow object:
+
+```{r}
+all_vars_fitted <- tune::fit_resamples(
+  all_vars_workflow,
+  resamples = HousesNY_3splits,
+  metrics = yardstick::metric_set(yardstick::rmse, yardstick::rsq)
+  )
+tune::collect_metrics(all_vars_fitted)
+```
+
+The average cross-validated $R^2$ and root mean squared error (RMSE) for the larger model are not much different (.321 and 37.1 versus .324 and 36.1 for the `Price ~ Baths` model). But given that it uses four times as many explanatory variables and actually performs slightly *worse*, this is a pretty disappointing result `Price ~ Baths + Lot + Size + Beds` model. It seems the complexity of this model leads to over-fitting on the training data, and poor generalization to new data.
+
+Given that our cross validation procedure favors the reduced `Price ~ Size` model, let's put it to the test by re-fitting it to the "full" data set, and evaluating its performance on the `HousesNY_test` data:
+
+```{r}
+baths_fit <- price_baths_workflow |>
+  parsnip::fit(data = HousesNY_train)
+
+baths_preds <- broom::augment(baths_fit, new_data = HousesNY_test)
+metric_set(yardstick::rmse, rsq)(baths_preds, truth = Price, estimate = .pred)
+```
+
+And just for fun, let's see how the model we *didn't* prefer after cross-validation would fare on the test data:
+
+```{r}
+all_vars_fit <- all_vars_workflow |>
+  parsnip::fit(data = HousesNY_train)
+
+all_vars_preds <- augment(all_vars_fit, new_data = HousesNY_test)
+metric_set(yardstick::rmse, rsq)(all_vars_preds, truth = Price, estimate = .pred)
+```
+
+Just as we suspected: The `Price ~ Baths` model has higher $R^2$ and lower RMSE on the test data set!
 
 ## Identifying Unusual Points in Regression
 
